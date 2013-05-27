@@ -10,8 +10,7 @@ echo "Cloning vim-awesome"
 git clone git@github.com:divad12/vim-awesome.git $NEW_CLONE > /dev/null
 
 echo "Linking new vim-awesome into place"
-rm vim-awesome
-ln -s $NEW_CLONE vim-awesome
+ln -snf $NEW_CLONE vim-awesome
 
 # Kill the old gunicorn server, if it exists
 if [ -e .gunicorn.pid ]
