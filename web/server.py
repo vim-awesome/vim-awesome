@@ -17,9 +17,10 @@ def index():
 
 @app.route('/crash')
 def crash():
+    """Throw an exception to test error logging."""
     class WhatIsTorontoError(Exception):
         pass
-    """For testing error logging"""
+
     logging.warn("Crashing because you want me to (hit /crash)")
     raise WhatIsTorontoError("OH NOES we've crashed!!!!!!!!!! /crash was hit")
 
