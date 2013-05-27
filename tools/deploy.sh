@@ -22,9 +22,6 @@ fi
 echo "Restarting gunicorn"
 gunicorn --config vim-awesome/conf/gunicorn.py server:app
 
-echo "Restarting nginx"
-sudo service nginx restart > /dev/null
-
 echo "Removing old vim-awesome clones"
 for old in $(ls repos/ | head -n -2)
 do
