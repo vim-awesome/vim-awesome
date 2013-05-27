@@ -1,12 +1,9 @@
 SHELL=/bin/bash
 
-.PHONY: local setup deploy clean
+.PHONY: local deploy clean
 
 local:
 	tools/local_server.sh
-
-setup:
-	tools/setup.sh
 
 deploy:
 	@if [ `whoami` = 'vim' ]; then \
