@@ -9,7 +9,11 @@ setup:
 	tools/setup.sh
 
 deploy:
-	# TODO
+	@if [ `whoami` = 'vim' ]; then \
+		tools/deploy.sh; \
+	else \
+		cat tools/deploy.sh | ssh vim@vim.benalpert.com sh; \
+	fi
 
 clean:
 	find . -name '*.pyc' -delete
