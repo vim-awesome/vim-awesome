@@ -1,10 +1,12 @@
+(function() {
 'use strict';
+/*global window: false */
 
-/* Filters */
-
-angular.module('myApp.filters', []).
+window.angular.module('myApp.filters', []).
   filter('interpolate', ['version', function(version) {
     return function(text) {
       return String(text).replace(/\%VERSION\%/mg, version);
-    }
+    };
   }]);
+
+})();

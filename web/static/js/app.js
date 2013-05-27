@@ -1,10 +1,16 @@
+(function() {
 'use strict';
+/*global window: false */
 
+var TEMPLATE_URL = 'static/partials';
 
 // Declare app level module which depends on filters, and services
-angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 'myApp.controllers']).
+window.angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 'myApp.controllers']).
   config(['$routeProvider', function($routeProvider) {
-    $routeProvider.when('/view1', {templateUrl: 'static/partials/partial1.html', controller: 'MyCtrl1'});
-    $routeProvider.when('/view2', {templateUrl: 'static/partials/partial2.html', controller: 'MyCtrl2'});
-    $routeProvider.otherwise({redirectTo: '/view1'});
+    $routeProvider
+      .when('/view1', {templateUrl: TEMPLATE_URL + '/partial1.html', controller: 'MyCtrl1'})
+      .when('/view2', {templateUrl: TEMPLATE_URL + '/partial2.html', controller: 'MyCtrl2'})
+      .otherwise({redirectTo: '/view1'});
   }]);
+
+})();

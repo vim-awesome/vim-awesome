@@ -1,11 +1,19 @@
+(function() {
 'use strict';
+/*global window: false */
 
-/* Controllers */
-
-angular.module('myApp.controllers', []).
+window.angular.module('myApp.controllers', []).
   controller('MyCtrl1', [function() {
 
   }])
   .controller('MyCtrl2', [function() {
 
-  }]);
+  }])
+
+  // Main single-page app controller
+  .controller('AppController', [function() {
+
+  }])
+;
+
+})();
