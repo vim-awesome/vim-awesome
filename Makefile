@@ -13,4 +13,4 @@ deploy:
 
 clean:
 	find . -name '*.pyc' -delete
-	rm -rf server/static/css
+	rm -rf web/static/css
