@@ -13,4 +13,4 @@ deploy:
 
 clean:
 	find . -name '*.pyc' -delete
-	rm -rf web/static/css
+	compass clean --config conf/compass.rb
