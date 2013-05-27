@@ -14,9 +14,8 @@ trap clean_up SIGTERM SIGINT ERR
 
 # TODO(david): Start rethinkdb, redis, etc.
 
-# TODO(david): uncomment
-#echo "Starting compass watch"
-#compass watch server &
+echo "Starting compass watch"
+compass watch --config conf/compass.rb &
 
 echo "Starting flask server"
 #FLASK_CONFIG=../config/flask_dev.py \

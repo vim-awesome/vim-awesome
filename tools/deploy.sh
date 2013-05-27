@@ -9,6 +9,10 @@ NEW_CLONE=repos/vim-awesome-`date +%s`
 echo "Cloning vim-awesome"
 git clone git@github.com:divad12/vim-awesome.git $NEW_CLONE > /dev/null
 
+echo "Compass compile sass files"
+( cd $NEW_CLONE && \
+  compass compile --config conf/compass.rb --output-style compressed )
+
 echo "Linking new vim-awesome into place"
 ln -snf $NEW_CLONE vim-awesome
 
