@@ -6,8 +6,8 @@ TODO(david): description of what this repo does
 1. Install Sass and Compass
 
         $ gem update --system
-        $ gem install sass compass
-        $ compass init --config conf/compass.rb && rm config.rb
+        $ gem install bundler
+        $ bundle install
 
 1. Start a local server serving port 5001 by invoking, in the project root
    directory,
