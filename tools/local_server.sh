@@ -12,7 +12,9 @@ function clean_up() {
 # Kill all child processes on script abort
 trap clean_up SIGTERM SIGINT ERR
 
-# TODO(david): Start rethinkdb, redis, etc.
+echo "Starting rethinkdb"
+[ -d db/rethinkdb_data ] || rethinkdb create -d db/rethinkdb_data
+rethinkdb serve -d db/rethinkdb_data &
 
 echo "Starting compass watch"
 compass watch --config conf/compass.rb &

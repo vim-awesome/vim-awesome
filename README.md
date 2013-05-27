@@ -2,7 +2,8 @@ TODO(david): description of what this repo does
 
 # Setup
 
-1. Install RethinkDB. TODO(david): Instructions
+1. Install RethinkDB from http://rethinkdb.com/docs/install/.
+
 1. Install Sass and Compass
 
         $ gem update --system
@@ -13,3 +14,7 @@ TODO(david): description of what this repo does
    directory,
 
         $ make
+
+1. Seed the database with some test data:
+
+        $ python db/seed.py

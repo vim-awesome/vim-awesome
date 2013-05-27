@@ -1,3 +1,4 @@
 *.py[co]
 .sass-cache/
+db/rethinkdb_data/
 web/static/css/
