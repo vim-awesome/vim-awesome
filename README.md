@@ -10,6 +10,10 @@ TODO(david): description of what this repo does
         $ gem install bundler
         $ bundle install
 
+1. Install Python dependencies.
+
+        $ pip install -r requirements.txt
+
 1. Start a local server serving port 5001 by invoking, in the project root
    directory,
 
