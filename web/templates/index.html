@@ -7,6 +7,17 @@
   <link rel="stylesheet" href="static/css/screen.css"/>
 </head>
 <body ng-controller="AppController">
+  <div class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" href="/">VimAwesome</a>
+      <ul class="nav">
+        <li class="active"><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+      </ul>
+    </div>
+  </div>
+
   <ul class="menu">
     <li><a href="#/view1">view1</a></li>
     <li><a href="#/view2">view2</a></li>
@@ -14,12 +25,11 @@
 
   <div ng-view></div>
 
-  <div>Angular seed app: v<span app-version></span></div>
-
   <!-- TODO(david): In production use:
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
   -->
   <script src="static/lib/angular/angular.js"></script>
+  <script src="static/lib/angular/angular-resource.js"></script>
   <script src="static/js/app.js"></script>
   <script src="static/js/services.js"></script>
   <script src="static/js/controllers.js"></script>

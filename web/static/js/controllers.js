@@ -10,9 +10,16 @@ window.angular.module('myApp.controllers', []).
 
   }])
 
+  // Controller for the main plugins list view
+  .controller('PluginsList', ['$scope', 'Plugins', function($scope, Plugins) {
+    $scope.plugins = Plugins.query();
+
+    $scope.sortOptions = {};
+    $scope.sortOptions.orderProp = 'name';  // TODO(david): Change to # stars
+  }])
+
   // Main single-page app controller
   .controller('AppController', [function() {
-
   }])
 ;
 
