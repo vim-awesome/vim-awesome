@@ -17,7 +17,7 @@ echo "Starting rethinkdb"
 rethinkdb serve -d db/rethinkdb_data &
 
 echo "Starting compass watch"
-compass watch --config conf/compass.rb &
+bundle exec compass watch --config conf/compass.rb &
 
 echo "Starting flask server"
 FLASK_CONFIG=../conf/flask_dev.py python web/server.py

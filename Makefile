@@ -14,4 +14,4 @@ deploy:
 
 clean:
 	find . -name '*.pyc' -delete
-	compass clean --config conf/compass.rb
+	bundle exec compass clean --config conf/compass.rb
