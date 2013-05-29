@@ -3,3 +3,65 @@
  * Import this file using the following HTML or equivalent:
  * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
 
+@import 'variables';
+
+$page-max-width: 1200px;
+$page-min-width: 800px;
+
+// Or this can just be a class...
+@mixin page-container {
+  max-width: $page-max-width;
+  min-width: $page-min-width;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.navbar-container {
+  @include page-container;
+}
+
+.plugins-container {
+  @include page-container;
+}
+
+.plugins {
+  margin: 0;
+
+  .plugin {
+    list-style-type: none;
+    padding: 7px 5px;
+    border-top: 1px dashed #ccc;
+
+    &:last-child {
+      border-bottom: 1px dashed #ccc;
+    }
+
+    &:hover {
+      //background-color: #FDF6E4;  // TODO(david): Get color scheme
+    }
+
+    .plugin-name {
+      margin-top: 0;
+      margin-bottom: 2px;
+      line-height: normal;
+
+      a {
+        color: #666;  // TODO(david): Change link colors in _variables.scss
+      }
+    }
+
+    .short-desc {
+      margin-bottom: 0;
+    }
+
+    .hover-buttons {
+      float: right;
+      margin-right: 10px;
+      display: none;
+    }
+
+    &:hover .hover-buttons {
+      display: block;
+    }
+  }
+}
