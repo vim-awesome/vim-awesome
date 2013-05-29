@@ -5,15 +5,14 @@ import flask
 
 app = flask.Flask(__name__)
 
-# TODO(david)
-#app.config.from_envvar('FLASK_CONFIG')
+app.config.from_envvar('FLASK_CONFIG')
 
 # TODO(david): Add logging handler
 
 
 @app.route('/')
 def index():
-    return flask.render_template('index.html')
+    return flask.render_template('index.html', env=app.config['ENV'])
 
 
 @app.route('/crash')

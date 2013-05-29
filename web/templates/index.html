@@ -1,8 +1,17 @@
 <!doctype html>
 <html lang="en" ng-app="myApp">
 <head>
+  <!-- TODO(david): Load locally for offline development -->
+  {% if env == 'prod' %}
+    <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700|Open+Sans:400,300,700' rel='stylesheet' type='text/css'>
+  {% else %}
+    <link rel="stylesheet" href="static/css/fonts.css"/>
+  {% endif %}
+
   <meta charset="utf-8">
-  <title>My AngularJS App</title>
+  <title>Vim Awesome</title>
+  <meta name="description" content="TODO(david): meta description">
+
   <link rel="stylesheet" href="static/css/styles.css"/>
   <link rel="stylesheet" href="static/css/screen.css"/>
 </head>
@@ -17,11 +26,6 @@
       </ul>
     </div>
   </div>
-
-  <ul class="menu">
-    <li><a href="#/view1">view1</a></li>
-    <li><a href="#/view2">view2</a></li>
-  </ul>
 
   <div ng-view></div>
 

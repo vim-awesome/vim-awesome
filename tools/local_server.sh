@@ -20,8 +20,7 @@ echo "Starting compass watch"
 compass watch --config conf/compass.rb &
 
 echo "Starting flask server"
-#FLASK_CONFIG=../config/flask_dev.py \
-python web/server.py
+FLASK_CONFIG=../conf/flask_dev.py python web/server.py
 
 # Only exit on terminate or interrupt signal
 while true; do

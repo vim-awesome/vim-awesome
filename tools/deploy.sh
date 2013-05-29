@@ -24,7 +24,8 @@ then
 fi
 
 echo "Restarting gunicorn"
-gunicorn --config vim-awesome/conf/gunicorn.py server:app
+FLASK_CONFIG="$HOME/vim-awesome/conf/flask_prod.py" \
+  gunicorn --config vim-awesome/conf/gunicorn.py server:app
 
 echo "Removing old vim-awesome clones"
 for old in $(ls repos/ | head -n -2)

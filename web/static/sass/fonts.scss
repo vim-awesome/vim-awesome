@@ -1,0 +1,38 @@
+// NOTE: This is intended for local dev only... ttf may not work or work well on
+//     IE (or Chrome and Windows).
+//     See http://randsco.com/index.php/2009/07/04/p680
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Open Sans Light'), local('OpenSans-Light'), url(/static/font/OpenSans-Light.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans-Regular'), url(/static/font/OpenSans-Regular.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(/static/font/OpenSans-Bold.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Serif';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Droid Serif'), local('DroidSerif-Regular'), url(/static/font/DroidSerif.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Serif';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Droid Serif Bold'), local('DroidSerif-Bold'), url(/static/font/DroidSerif-Bold.ttf) format('truetype');
+}

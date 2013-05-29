@@ -33,7 +33,7 @@ $purple:                #7a43b6;
 // Scaffolding
 // -------------------------
 $bodyBackground:        $white;
-$textColor:             $grayDark;
+$textColor:             #444;
 
 
 // Links
@@ -44,8 +44,8 @@ $linkColorHover:        darken($linkColor, 15%);
 
 // Typography
 // -------------------------
-$sansFontFamily:        "Helvetica Neue", Helvetica, Arial, sans-serif;
-$serifFontFamily:       Georgia, "Times New Roman", Times, serif;
+$sansFontFamily:        "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$serifFontFamily:       "Droid Serif", Georgia, "Times New Roman", Times, serif;
 $monoFontFamily:        Monaco, Menlo, Consolas, "Courier New", monospace;
 
 $baseFontSize:          14px;
@@ -53,7 +53,7 @@ $baseFontFamily:        $sansFontFamily;
 $baseLineHeight:        20px;
 $altFontFamily:         $serifFontFamily;
 
-$headingsFontFamily:    inherit; // empty to use BS default, $baseFontFamily
+$headingsFontFamily:    $serifFontFamily; // empty to use BS default, $baseFontFamily
 $headingsFontWeight:    bold;    // instead of browser default, bold
 $headingsColor:         inherit; // empty to use BS default, $textColor
 
