@@ -2,10 +2,19 @@ import json
 import logging
 
 import flask
+import rethinkdb as r
 
 app = flask.Flask(__name__)
 
 app.config.from_envvar('FLASK_CONFIG')
+
+
+# TODO(alpert): Read port and db from app.config?
+def r_conn(box=[None]):
+    if box[0] is None:
+        box[0] = r.connect()
+        box[0].use('vim_awesome')
+    return box[0]
 
 # TODO(david): Add logging handler
 
@@ -28,21 +37,9 @@ def crash():
 # TODO(david): Move API functions out of this file once we have too many
 @app.route('/api/plugins')
 def plugins():
-    # TODO(david): (actually Ben) actually query the db. We'll probably also
-    #     want to support various filter and sort query parameters.
-    return json.dumps([{
-        'name': 'ctrlp.vim',
-        'description': 'Full path fuzzy file, buffer, mru, tag, ... '
-            'finder for Vim.',
-        'github_url': 'https://github.com/kien/ctrlp.vim',
-        'url': 'http://kien.github.io/ctrlp.vim/',
-    },
-    {
-        'name': 'YouCompleteMe',
-        'description': 'YouCompleteMe is a fast, as-you-type, fuzzy-'
-            'search code completion engine for Vim.',
-        'github_url': 'https://github.com/Valloric/YouCompleteMe',
-    }] * 10)
+    # TODO(alpert): Support various filter and sort query parameters
+    query = r.db('vim_awesome').table('plugins').run(r_conn())
+    return json.dumps(list(query))
 
 
 if __name__ == '__main__':
