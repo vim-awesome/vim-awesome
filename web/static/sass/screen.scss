@@ -1,4 +1,4 @@
-/* Welcome to Compass.
+/*
  * In this file you should write your main styles. (or centralize your imports)
  * Import this file using the following HTML or equivalent:
  * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
@@ -7,10 +7,15 @@
 @import 'variables';
 
 ////////////////////////////////////////////////////////////////////////////////
-// Global variables and mixins
+// Global variables, mixins, and classes
 
 $page-max-width: 1200px;
 $page-min-width: 800px;
+
+$sidebar-width: 290px;
+$topbar-height: 64px;
+$content-margin-top: 10px;
+$content-margin-left: $sidebar-width + 50px;
 
 // Or this can just be a class...
 @mixin page-container {
@@ -18,39 +23,19 @@ $page-min-width: 800px;
   min-width: $page-min-width;
   margin-left: auto;
   margin-right: auto;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.tac {
+  text-align: center;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Site chrome
 
-body {
-  // TODO(david): Preview in non-retina and adjust for retina
-  background-image: url(/static/img/grainy-fdf6e3.png);
-}
-
-.navbar-inner {
-  border: none;
-  @include border-radius(0);
-
-  .navbar-container {
-    @include page-container;
-  }
-
-  .brand {
-    font-family: $headingsFontFamily;
-
-    .vim {
-      color: $cyan;
-      font-weight: bold;
-    }
-  }
-}
-
-// TODO(david): Don't copy the selector for this
-.navbar .nav > .active > a {
-  &, &:hover, &:focus {
-    @include box-shadow(none);
-  }
+.page-container {
+  @include page-container;
 }
 
 a {
@@ -64,38 +49,220 @@ a {
   }
 }
 
+#sidebar {
+  width: $sidebar-width;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  background: $base2;
+
+  .title {
+    font-size: 38px;
+    font-weight: normal;
+    text-align: center;
+    line-height: $topbar-height;
+    margin-top: 0;
+    margin-bottom: 0;
+
+    a {
+      color: $base01;
+    }
+
+    .vim {
+      color: $cyan;
+      font-weight: bold;
+      margin-right: 1px;
+    }
+
+    // TODO(david): Title entrance animation
+    //&.title-enter-setup {
+    //  opacity: 0.0;
+    //}
+
+    //&.title-enter-setup.title-enter-start {
+    //  opacity: 1.0;
+    //  @include transition(opacity 800ms cubic-bezier(0.51, 0.01, 0.37, 0.98) 100ms);
+    //}
+  }
+
+  .subtitle {
+    $fg-color: mix($base1, $base2, 60%);
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 2px;
+    font-size: 17px;
+    color: $fg-color;
+    margin-top: 5px;
+    border: 2px solid $fg-color;
+    display: inline-block;
+    padding: 10px;
+
+    .from {
+      $from-height: 22px;
+      text-transform: lowercase;
+      font-family: $serifFontFamily;
+      font-size: 15px;
+      font-style: italic;
+      letter-spacing: 0;
+      color: $fg-color;
+      background-color: $base2;
+      width: 60px;
+      position: relative;
+      left: 50%;
+      margin-left: -30px;
+      line-height: $from-height;
+
+      &:after {
+        $line-width: 250px;
+        width: $line-width;
+        height: 2px;
+        background: $fg-color;
+        position: absolute;
+        content: ' ';
+        left: 50%;
+        margin-left: -$line-width / 2;
+        z-index: -1;
+        top: $from-height / 2;
+      }
+    }
+
+    .line2 {
+      word-spacing: 5px;
+    }
+  }
+
+  .categories {
+    margin: 0;
+    margin-top: 35px;
+
+    li {
+      list-style-type: none;
+      line-height: 50px;
+      padding-left: 50px;
+      font-size: 18px;
+      font-weight: 300;
+      letter-spacing: 1px;
+      padding: 0;
+
+      a {
+        color: $textColor;
+        display: block;
+        background-color: rgba($base2, 0.0);
+        padding-left: 20px;
+        border-left: 3px solid transparent;
+        @include transition(all 0.1s ease-out);
+
+        &:hover {
+          background-color: rgba($base1, 0.1);
+          border-left: 3px solid rgba($base1, 0.1);
+          @include transition(all 0.1s ease-out);
+        }
+
+        i {
+          margin-right: 14px;
+          color: rgba($textColor, 0.8);
+        }
+      }
+    }
+  }
+}
+
+#content {
+  margin-left: $content-margin-left;
+  margin-top: $content-margin-top + 20px;
+  margin-bottom: 40px;
+}
+
+.top-bar {
+  height: $topbar-height;
+  //background: mix($base2, $base3, 70%);
+
+  .search-container {
+    margin-left: $content-margin-left;
+    margin-top: 8px;
+    font-size: 40px;
+    position: relative;
+
+    .icon-search {
+      font-size: 30px;
+      opacity: 0.6;
+
+      position: absolute;
+      z-index: 1;
+      top: 16px;
+      margin-left: 14px;
+      opacity: 0.4;
+    }
+
+    .search {
+      box-sizing: border-box;
+      width: 100%;
+      padding-bottom: 0;
+      margin-top: 7px;
+      margin-left: 0;
+      height: 50px;
+      padding-left: 56px;
+      line-height: 44px;
+      border-radius: 0;
+      border: none;
+      background-color: rgba(255,255,255, 0.9);
+      font-size: 30px;
+      font-weight: 300;
+      opacity: 0.6;
+      @include box-shadow(1px 1px 2px rgba(0, 0, 0, 0.1));
+      @include transition(all 0.2s ease-out);
+
+      &:hover, &:focus {
+        opacity: 1.0;
+        @include transition(all 0.2s ease-out);
+      }
+    }
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Plugins
-
-.plugins-container {
-  @include page-container;
-}
 
 .plugins {
   margin: 0;
 
   .plugin {
-    list-style-type: none;
-    padding: 7px 5px;
-    border-top: 1px dashed $base1;
+    $bar-vertical-padding: 7px;
+    $highlight-color: rgba($base2, 0.3);
 
-    &:last-child {
-      border-bottom: 1px dashed $base1;
+    list-style-type: none;
+    padding: $bar-vertical-padding 0;
+
+    .hover-bg {
+      position: absolute;
+      width: 100%;
+      left: 0;
+      height: 100px;
+      z-index: -1;
+      margin-top: -$bar-vertical-padding;
+      height: 68px;  // TODO(david): Don't hardcode this
     }
 
-    &:hover {
-      //background-color: #FDF6E4;  // TODO(david): Get color scheme
+    &:hover .hover-bg {
+      background: $highlight-color;
     }
 
     .plugin-name {
-      margin-top: 0;
+      font-weight: normal;
+      font-size: 24px;
       margin-bottom: 2px;
       line-height: normal;
+      display: inline-block;
+      width: 150px;
+      margin-top: 0;
+      padding-top: $bar-vertical-padding;
+      margin-top: -$bar-vertical-padding;
+      border-top: 2px solid rgba($base1, 0.3);
 
       a {
         color: $base00;
         &:hover {
-          color: $blue;
+          color: lighten($blue, 20%);
         }
       }
     }

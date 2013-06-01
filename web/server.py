@@ -42,7 +42,7 @@ def plugins():
         'description': 'YouCompleteMe is a fast, as-you-type, fuzzy-'
             'search code completion engine for Vim.',
         'github_url': 'https://github.com/Valloric/YouCompleteMe',
-    }])
+    }] * 10)
 
 
 if __name__ == '__main__':

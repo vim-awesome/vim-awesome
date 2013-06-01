@@ -15,7 +15,7 @@ window.angular.module('myApp.controllers', []).
     $scope.plugins = Plugins.query();
 
     $scope.sortOptions = {};
-    $scope.sortOptions.orderProp = 'name';  // TODO(david): Change to # stars
+    //$scope.sortOptions.orderProp = 'name';  // TODO(david): Change to # stars
   }])
 
   // Main single-page app controller
