@@ -30,15 +30,36 @@ $pink:                  #c3325f;
 $purple:                #7a43b6;
 
 
+// Solarized color scheme from https://github.com/altercation/solarized
+// NOTE: This overrides some of Bootstrap's default colors
+// ------------------------
+$base03:                #002b36;
+$base02:                #073642;
+$base01:                #586e75;
+$base00:                #657b83;
+$base0:                 #839496;
+$base1:                 #93a1a1;
+$base2:                 #eee8d5;
+$base3:                 #fdf6e3;
+$yellow:                #b58900;
+$orange:                #cb4b16;
+$red:                   #dc322f;
+$magenta:               #d33682;
+$violet:                #6c71c4;
+$blue:                  #268bd2;
+$cyan:                  #2aa198;
+$green:                 #859900;
+
+
 // Scaffolding
 // -------------------------
-$bodyBackground:        $white;
-$textColor:             #444;
+$bodyBackground:        $base3;
+$textColor:             $base01;
 
 
 // Links
 // -------------------------
-$linkColor:             #08c;
+$linkColor:             $blue;
 $linkColorHover:        darken($linkColor, 15%);
 
 
@@ -180,15 +201,15 @@ $wellBackground:                  #f5f5f5;
 $navbarCollapseWidth:             979px;
 $navbarCollapseDesktopWidth:      $navbarCollapseWidth + 1;
 
-$navbarHeight:                    40px;
-$navbarBackgroundHighlight:       #ffffff;
-$navbarBackground:                darken($navbarBackgroundHighlight, 5%);
+$navbarHeight:                    50px;
+$navbarBackgroundHighlight:       rgba($yellow, 0.02);
+$navbarBackground:                rgba($yellow, 0.02);
 $navbarBorder:                    darken($navbarBackground, 12%);
 
-$navbarText:                      #777;
-$navbarLinkColor:                 #777;
-$navbarLinkColorHover:            $grayDark;
-$navbarLinkColorActive:           $gray;
+$navbarText:                      $base01;
+$navbarLinkColor:                 $base01;
+$navbarLinkColorHover:            $base03;
+$navbarLinkColorActive:           $base02;
 $navbarLinkBackgroundHover:       transparent;
 $navbarLinkBackgroundActive:      darken($navbarBackground, 5%);
 

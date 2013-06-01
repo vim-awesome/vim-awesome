@@ -3,7 +3,11 @@
  * Import this file using the following HTML or equivalent:
  * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
 
+@import 'compass';
 @import 'variables';
+
+////////////////////////////////////////////////////////////////////////////////
+// Global variables and mixins
 
 $page-max-width: 1200px;
 $page-min-width: 800px;
@@ -16,9 +20,52 @@ $page-min-width: 800px;
   margin-right: auto;
 }
 
-.navbar-container {
-  @include page-container;
+////////////////////////////////////////////////////////////////////////////////
+// Site chrome
+
+body {
+  // TODO(david): Preview in non-retina and adjust for retina
+  background-image: url(/static/img/grainy-fdf6e3.png);
 }
+
+.navbar-inner {
+  border: none;
+  @include border-radius(0);
+
+  .navbar-container {
+    @include page-container;
+  }
+
+  .brand {
+    font-family: $headingsFontFamily;
+
+    .vim {
+      color: $cyan;
+      font-weight: bold;
+    }
+  }
+}
+
+// TODO(david): Don't copy the selector for this
+.navbar .nav > .active > a {
+  &, &:hover, &:focus {
+    @include box-shadow(none);
+  }
+}
+
+a {
+  color: $blue;
+  @include transition(color 0.2s ease-out);
+
+  &:hover, &:focus {
+    color: darken($blue, 15%);
+    text-decoration: none;
+    @include transition(color 0.2s ease-out);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Plugins
 
 .plugins-container {
   @include page-container;
@@ -30,10 +77,10 @@ $page-min-width: 800px;
   .plugin {
     list-style-type: none;
     padding: 7px 5px;
-    border-top: 1px dashed #ccc;
+    border-top: 1px dashed $base1;
 
     &:last-child {
-      border-bottom: 1px dashed #ccc;
+      border-bottom: 1px dashed $base1;
     }
 
     &:hover {
@@ -46,7 +93,10 @@ $page-min-width: 800px;
       line-height: normal;
 
       a {
-        color: #666;  // TODO(david): Change link colors in _variables.scss
+        color: $base00;
+        &:hover {
+          color: $blue;
+        }
       }
     }
 
