@@ -37,6 +37,23 @@ var Sidebar = React.createClass({
 });
 
 var SearchBox = React.createClass({
+  componentDidMount: function() {
+    window.addEventListener("keyup", this.windowKeyUp, false);
+  },
+
+  componentWillUnmount: function() {
+    window.removeEventListener("keyup", this.windowKeyUp, false);
+  },
+
+  windowKeyUp: React.autoBind(function(e) {
+    var tag = e.target.tagName;
+    var key = e.keyCode;
+    if (tag !== "INPUT" && tag !== "TEXTAREA" &&
+        key === 191 /* forward slash */) {
+      this.refs.input.getDOMNode().focus();
+    }
+  }),
+
   handleKeyUp: React.autoBind(function() {
     var input = this.refs.input.getDOMNode();
     this.props.onInput(input.value);
