@@ -49,7 +49,7 @@ a {
   }
 }
 
-#sidebar {
+.sidebar {
   width: $sidebar-width;
   position: fixed;
   top: 0;
@@ -167,55 +167,51 @@ a {
   }
 }
 
-#content {
+.content {
   margin-left: $content-margin-left;
   margin-top: $content-margin-top + 20px;
   margin-bottom: 40px;
 }
 
-.top-bar {
+.search-container {
+  font-size: 40px;
   height: $topbar-height;
-  //background: mix($base2, $base3, 70%);
+  margin-left: $content-margin-left;
+  margin-top: 8px;
+  position: relative;
 
-  .search-container {
-    margin-left: $content-margin-left;
-    margin-top: 8px;
-    font-size: 40px;
-    position: relative;
+  .icon-search {
+    font-size: 30px;
+    opacity: 0.6;
 
-    .icon-search {
-      font-size: 30px;
-      opacity: 0.6;
+    position: absolute;
+    z-index: 1;
+    top: 16px;
+    margin-left: 14px;
+    opacity: 0.4;
+  }
 
-      position: absolute;
-      z-index: 1;
-      top: 16px;
-      margin-left: 14px;
-      opacity: 0.4;
-    }
+  .search {
+    box-sizing: border-box;
+    width: 100%;
+    padding-bottom: 0;
+    margin-top: 7px;
+    margin-left: 0;
+    height: 50px;
+    padding-left: 56px;
+    line-height: 44px;
+    border-radius: 0;
+    border: none;
+    background-color: rgba(255,255,255, 0.9);
+    font-size: 30px;
+    font-weight: 300;
+    opacity: 0.6;
+    @include box-shadow(1px 1px 2px rgba(0, 0, 0, 0.1));
+    @include transition(all 0.2s ease-out);
 
-    .search {
-      box-sizing: border-box;
-      width: 100%;
-      padding-bottom: 0;
-      margin-top: 7px;
-      margin-left: 0;
-      height: 50px;
-      padding-left: 56px;
-      line-height: 44px;
-      border-radius: 0;
-      border: none;
-      background-color: rgba(255,255,255, 0.9);
-      font-size: 30px;
-      font-weight: 300;
-      opacity: 0.6;
-      @include box-shadow(1px 1px 2px rgba(0, 0, 0, 0.1));
+    &:hover, &:focus {
+      opacity: 1.0;
       @include transition(all 0.2s ease-out);
-
-      &:hover, &:focus {
-        opacity: 1.0;
-        @include transition(all 0.2s ease-out);
-      }
     }
   }
 }

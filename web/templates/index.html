@@ -1,6 +1,8 @@
 <!doctype html>
-<html lang="en" ng-app="myApp">
+<html lang="en">
 <head>
+  <meta charset="utf-8">
+
   <!-- TODO(david): Load locally for offline development -->
   {% if env == 'prod' %}
     <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,400italic,700|Open+Sans:400,300,200,700' rel='stylesheet' type='text/css'>
@@ -8,60 +10,19 @@
     <link rel="stylesheet" href="static/css/fonts.css"/>
   {% endif %}
 
-  <meta charset="utf-8">
-  <title>Vim Awesome</title>
-  <meta name="description" content="TODO(david): meta description">
-
+  <title>VimAwesome</title>
   <link rel="stylesheet" href="static/css/styles.css"/>
   <link rel="stylesheet" href="static/css/screen.css"/>
   <link rel="stylesheet" href="static/css/font-awesome.min.css"/>
 </head>
-<body ng-controller="AppController">
-  <div class="row-fluid top-bar">
-    <div class="page-container">
-      <div class="search-container">
-        <i class="icon-search"></i>
-        <input type="text" class="search" placeholder="Search">
-      </div>
-    </div>
-  </div>
+<body>
+  <script src="static/lib/js/zepto.min.js"></script>
+  <script src="static/lib/js/underscore-min.js"></script>
+  <script src="static/lib/js/backbone-min.js"></script>
+  <script src="static/lib/js/react-0.3.2.min.js"></script>
+  <script src="static/lib/js/JSXTransformer-0.3.2.js"></script>
 
-  <div class="page-container">
-    <div id="sidebar">
-      <h1 class="title">
-        <a href="#">
-          <span class="vim">Vim</span>Awesome
-        </a>
-      </h1>
-      <div class="tac">
-        <div class="subtitle">
-          <div class="line1">Awesome Vim plugins</div>
-          <div class="from">from</div>
-          <div class="line2">across the Universe</div>
-        </div>
-      </div>
-      <ul class="categories">
-        <li><a href="#/blah"><i class="icon-fighter-jet"></i>Language</a></li>
-        <li><a href="#/blah"><i class="icon-fighter-jet"></i>Syntax</a></li>
-        <li><a href="#/blah"><i class="icon-fighter-jet"></i>Navigation</a></li>
-        <li><a href="#/blah"><i class="icon-fighter-jet"></i>Movement</a></li>
-        <li><a href="#/blah"><i class="icon-fighter-jet"></i>Buffer</a></li>
-        <li><a href="#/blah"><i class="icon-fighter-jet"></i>Info</a></li>
-        <li><a href="#/blah"><i class="icon-fighter-jet"></i>Integrations</a></li>
-      </ul>
-    </div>
-    <div id="content" ng-view></div>
-  </div>
-
-  <!-- TODO(david): In production use:
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
-  -->
-  <script src="static/lib/angular/angular.js"></script>
-  <script src="static/lib/angular/angular-resource.js"></script>
-  <script src="static/js/app.js"></script>
-  <script src="static/js/services.js"></script>
-  <script src="static/js/controllers.js"></script>
-  <script src="static/js/filters.js"></script>
-  <script src="static/js/directives.js"></script>
+  <!-- TODO(alpert): In production, precompile JSX -->
+  <script src="static/js/app.js" type="text/jsx"></script>
 </body>
 </html>
