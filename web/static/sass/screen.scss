@@ -211,6 +211,7 @@ a {
 
     &:hover, &:focus {
       opacity: 1.0;
+      @include box-shadow(1px 1px 2px rgba(0, 0, 0, 0.1));
       @include transition(all 0.2s ease-out);
     }
   }
@@ -236,7 +237,7 @@ a {
       height: 100px;
       z-index: -1;
       margin-top: -$bar-vertical-padding;
-      height: 68px;  // TODO(david): Don't hardcode this
+      height: 66px;  // TODO(david): Don't hardcode this
     }
 
     &:hover .hover-bg {
@@ -244,16 +245,25 @@ a {
     }
 
     .plugin-name {
+      position: relative;
       font-weight: normal;
       font-size: 24px;
       margin-bottom: 2px;
       line-height: normal;
       display: inline-block;
-      width: 150px;
       margin-top: 0;
       padding-top: $bar-vertical-padding;
       margin-top: -$bar-vertical-padding;
-      border-top: 2px solid rgba($base1, 0.3);
+
+      &:after {
+        content: ' ';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 150px;
+        height: 2px;
+        background: rgba($base1, 0.3);
+      }
 
       a {
         color: $base00;
