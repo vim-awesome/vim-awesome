@@ -59,22 +59,31 @@ var PluginList = React.createClass({
   },
 
   componentDidMount: function() {
-    var component = this;
+    this.fetchPlugins(this.props.searchQuery);
+  },
+
+  componentDidUpdate: function(prevProps) {
+    if (prevProps.searchQuery !== this.props.searchQuery) {
+      this.fetchPlugins(this.props.searchQuery);
+    }
+  },
+
+  fetchPlugins: function(query) {
     $.ajax({
       url: "/api/plugins",
       dataType: "json",
+      data: {query: query},
       success: function(data) {
-        component.setState({plugins: data});
-      }
+        if (query === this.props.searchQuery) {
+          this.setState({plugins: data});
+        }
+      }.bind(this)
     });
   },
 
   render: function() {
     var query = this.props.searchQuery.toLowerCase();
     var plugins = _.chain(this.state.plugins)
-      .filter(function(plugin) {
-        return plugin.name.toLowerCase().indexOf(query) !== -1;
-      })
       .sortBy("github_stars")
       .reverse()
       .map(function(plugin) {

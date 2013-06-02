@@ -1,1 +1,2 @@
 rethinkdb==1.5.0-0
+Flask==0.9

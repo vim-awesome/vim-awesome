@@ -1,7 +1,9 @@
 import json
 import logging
+import re
 
 import flask
+from flask import request
 import rethinkdb as r
 
 app = flask.Flask(__name__)
@@ -37,9 +39,30 @@ def crash():
 # TODO(david): Move API functions out of this file once we have too many
 @app.route('/api/plugins')
 def plugins():
-    # TODO(alpert): Support various filter and sort query parameters
-    query = r.db('vim_awesome').table('plugins').run(r_conn())
-    return json.dumps(list(query))
+    search = request.args.get('query', '')
+    query = r.db('vim_awesome').table('plugins')
+
+    if search:
+        needles = [t.lower() for t in re.findall(r'\w+', search)]
+        needles.sort()
+        query = query.filter(r.js(r"""(function(row) {
+            var needles = %s;
+
+            var name = row.name || "";
+            var desc = row.short_desc || "";
+            var tokens = (name + " " + desc).toLowerCase().match(/\w+/g) || [];
+            tokens.sort();
+            tokens.forEach(function(token) {
+                // if needles and token.startswith(needles[0]):
+                if (needles.length && token.lastIndexOf(needles[0], 0) === 0) {
+                    needles.shift();
+                }
+            });
+
+            return needles.length === 0;
+        })""" % json.dumps(needles)))
+
+    return json.dumps(list(query.run(r_conn())))
 
 
 if __name__ == '__main__':
