@@ -119,7 +119,7 @@ var PluginList = React.createClass({
       })
       .value();
 
-    return <div class="content row-fluid">
+    return <div class="content">
       <ul class="plugins">{plugins}</ul>
     </div>;
   }
