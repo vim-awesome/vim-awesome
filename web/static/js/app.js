@@ -2,6 +2,23 @@
 (function() {
 "use strict";
 
+var clamp = function(num, min, max) {
+  return Math.min(Math.max(num, min), max);
+};
+
+var scrollToNode = function(domNode) {
+  var windowTop = $(window).scrollTop();
+  var windowBottom = $(window).height() + windowTop;
+  var elementTop = $(domNode).offset().top;
+  var elementBottom = elementTop + $(domNode).height();
+
+  if (elementBottom > windowBottom) {
+    domNode.scrollIntoView(false /* alignWithTop */);
+  } else if (elementTop < windowTop) {
+    domNode.scrollIntoView(true /* alignWithTop */);
+  }
+};
+
 var Sidebar = React.createClass({
   render: function() {
     var categories = _.map([
@@ -54,9 +71,14 @@ var SearchBox = React.createClass({
     }
   }),
 
-  handleKeyUp: React.autoBind(function() {
+  handleKeyUp: React.autoBind(function(e) {
     var input = this.refs.input.getDOMNode();
-    this.props.onInput(input.value);
+
+    if (e.nativeEvent.keyCode === 27 /* escape */) {
+      input.blur();
+    } else {
+      this.props.onInput(input.value);
+    }
   }),
 
   render: function() {
@@ -71,19 +93,73 @@ var SearchBox = React.createClass({
 var PluginList = React.createClass({
   getInitialState: function() {
     return {
-      plugins: []
+      plugins: [],
+      selectedIndex: -1,
+      hoverDisabled: false
     };
   },
 
   componentDidMount: function() {
     this.fetchPlugins(this.props.searchQuery);
+    window.addEventListener("keydown", this.onWindowKeyDown, false);
   },
 
   componentDidUpdate: function(prevProps) {
     if (prevProps.searchQuery !== this.props.searchQuery) {
       this.fetchPlugins(this.props.searchQuery);
     }
+
+    // Scroll to the navigated plugin if available
+    if (this.refs.navFocus) {
+      scrollToNode(this.refs.navFocus.getDOMNode());
+    }
   },
+
+  componentWillUnmount: function() {
+    window.removeEventListener("keydown", this.onWindowKeyDown, false);
+  },
+
+  resetSelection: function() {
+    if (this.state.selectedIndex !== -1) {
+      this.setState({selectedIndex: -1});
+    }
+  },
+
+  onWindowKeyDown: React.autoBind(function(e) {
+    // TODO(david): Duplicated code from SearchBox
+    // TODO(david): Enter key to go to plugin page
+    var tag = e.target.tagName;
+    var key = e.keyCode;
+    var J_KEYCODE = 74, K_KEYCODE = 75;
+
+    if (tag !== "INPUT" && tag !== "TEXTAREA" &&
+        (key === J_KEYCODE || key === K_KEYCODE)) {
+      // Go to next or previous plugin
+      var direction = (key === J_KEYCODE ? 1 : -1);
+      var maxIndex = this.state.plugins.length - 1;
+      var newIndex = clamp(this.state.selectedIndex + direction, 0, maxIndex);
+
+      // Disable hover when navigating plugins, because when the screen scrolls,
+      // a MouseEnter event will be fired if the mouse is over a plugin, causing
+      // the selection to jump back.
+      this.setState({selectedIndex: newIndex, hoverDisabled: true});
+
+      // Re-enable hover after a delay
+      clearTimeout(this.reenableHoverTimeout);
+      this.reenableHoverTimeout = setTimeout(function() {
+        this.setState({hoverDisabled: false});
+      }.bind(this), 100);
+    }
+  }),
+
+  onMouseEnter: React.autoBind(function(e, currentTargetId) {
+    // TODO(david): Should use e.currentTarget, but it seems like there may be
+    //     a react bug that makes this property not available.
+    // TODO(david): This is not as quick/snappy as CSS :hover ...
+    if (this.state.hoverDisabled) return;
+    var currentTarget = document.getElementById(currentTargetId);
+    this.setState({selectedIndex: $(currentTarget).index()});
+  }),
 
   fetchPlugins: function(query) {
     $.ajax({
@@ -103,8 +179,12 @@ var PluginList = React.createClass({
     var plugins = _.chain(this.state.plugins)
       .sortBy("github_stars")
       .reverse()
-      .map(function(plugin) {
-        return <li class="plugin">
+      .map(function(plugin, index) {
+        var hasNavFocus = (index === this.state.selectedIndex);
+        return <li
+            class={"plugin" + (hasNavFocus ? " nav-focus" : "")}
+            ref={hasNavFocus ? "navFocus" : ""}
+            onMouseEnter={this.onMouseEnter}>
           <div class="hover-bg"></div>
           <div class="hover-buttons">
             <a class="github-link" target="_blank" href={plugin.github_url}>
@@ -116,12 +196,10 @@ var PluginList = React.createClass({
           </h3>
           <p class="short-desc">{plugin.short_desc}</p>
         </li>
-      })
+      }, this)
       .value();
 
-    return <div class="content">
-      <ul class="plugins">{plugins}</ul>
-    </div>;
+    return <ul class="plugins">{plugins}</ul>;
   }
 });
 
@@ -132,15 +210,20 @@ var Page = React.createClass({
 
   onSearchInput: React.autoBind(function(query) {
     this.setState({searchQuery: query});
+    this.refs.pluginList.resetSelection();
   }),
 
   render: function() {
     // TODO(alpert): Support multiple pages, not just the plugin list
     return <div class="page-container">
       <Sidebar />
-      <div>
+      <div class="content">
         <SearchBox onInput={this.onSearchInput} />
-        <PluginList searchQuery={this.state.searchQuery} />
+        <div class="keyboard-tips">
+          Tip: try <code>/</code> to search and
+          <code>ESC</code>, <code>j</code>, <code>k</code> to navigate
+        </div>
+        <PluginList ref="pluginList" searchQuery={this.state.searchQuery} />
       </div>
     </div>;
   }

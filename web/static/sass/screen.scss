@@ -7,7 +7,7 @@
 @import 'variables';
 
 ////////////////////////////////////////////////////////////////////////////////
-// Global variables, mixins, and classes
+// Global variables, mixins, and utility classes
 
 $page-max-width: 1200px;
 $page-min-width: 800px;
@@ -32,7 +32,7 @@ $content-margin-left: $sidebar-width + 50px;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Site chrome
+// Site chrome and theme
 
 .page-container {
   @include page-container;
@@ -47,6 +47,14 @@ a {
     text-decoration: none;
     @include transition(color 0.2s ease-out);
   }
+}
+
+code {
+  padding: 1px 3px;
+  background-color: $base2;
+  color: $base0;
+  border: none;
+  @include border-radius(0);
 }
 
 .sidebar {
@@ -169,14 +177,16 @@ a {
 
 .content {
   margin-left: $content-margin-left;
-  margin-top: $content-margin-top + 20px;
+  margin-top: $content-margin-top;
   margin-bottom: 40px;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Homepage
 
 .search-container {
   font-size: 40px;
   height: $topbar-height;
-  margin-left: $content-margin-left;
   margin-top: 8px;
   position: relative;
 
@@ -217,6 +227,17 @@ a {
   }
 }
 
+.keyboard-tips {
+  margin-top: 5px;
+  margin-bottom: 25px;
+  font-size: 14px;
+  color: $base1;
+
+  code {
+    font-size: 12px;
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Plugins
 
@@ -240,8 +261,14 @@ a {
       height: 66px;  // TODO(david): Don't hardcode this
     }
 
-    &:hover .hover-bg {
-      background: $highlight-color;
+    &.nav-focus {
+      .hover-bg {
+        background: $highlight-color;
+      }
+
+      .hover-buttons {
+        display: block;
+      }
     }
 
     .plugin-name {
@@ -281,10 +308,6 @@ a {
       float: right;
       margin-right: 10px;
       display: none;
-    }
-
-    &:hover .hover-buttons {
-      display: block;
     }
   }
 }
