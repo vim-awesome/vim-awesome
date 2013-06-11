@@ -181,20 +181,22 @@ var PluginList = React.createClass({
       .reverse()
       .map(function(plugin, index) {
         var hasNavFocus = (index === this.state.selectedIndex);
+        // TODO(david): Map color from tag/category or just hash of name
+        var color = 'accent-' + (index % 9);
         return <li
             class={"plugin" + (hasNavFocus ? " nav-focus" : "")}
             ref={hasNavFocus ? "navFocus" : ""}
             onMouseEnter={this.onMouseEnter}>
-          <div class="hover-bg"></div>
-          <div class="hover-buttons">
-            <a class="github-link" target="_blank" href={plugin.github_url}>
-              github link
-            </a>
-          </div>
-          <h3 class="plugin-name">
-            <a href={"#/plugin/" + plugin.name}>{plugin.name}</a>
-          </h3>
-          <p class="short-desc">{plugin.short_desc}</p>
+          <a href={"#/plugin/" + plugin.name}>
+            <div class="hover-bg"></div>
+            <h3 class={"plugin-name " + color}>{plugin.name}</h3>
+            <span class="by">by</span>
+            <span class="author"> Abraham Lincoln</span>
+            <div class="github-stars">
+              {plugin.github_stars} <i class="icon-star"></i>
+            </div>
+            <p class="short-desc">{plugin.short_desc}</p>
+          </a>
         </li>
       }, this)
       .value();
