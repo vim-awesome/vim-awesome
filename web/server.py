@@ -20,9 +20,10 @@ def r_conn(box=[None]):
 
 # TODO(david): Add logging handler
 
-
-@app.route('/')
-def index():
+# Catch-all route for single-page app
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def index(path):
     return flask.render_template('index.html', env=app.config['ENV'])
 
 

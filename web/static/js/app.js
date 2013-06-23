@@ -37,7 +37,7 @@ var Sidebar = React.createClass({
 
     return <div class="sidebar">
       <h1 class="title">
-        <a href="#">
+        <a href="/">
           <span class="vim">Vim</span>Awesome
         </a>
       </h1>
@@ -187,7 +187,7 @@ var PluginList = React.createClass({
             class={"plugin" + (hasNavFocus ? " nav-focus" : "")}
             ref={hasNavFocus ? "navFocus" : ""}
             onMouseEnter={this.onMouseEnter}>
-          <a href={"#/plugin/" + plugin.name}>
+          <a href={"plugin/" + plugin.name}>
             <div class="hover-bg"></div>
             <h3 class={"plugin-name " + color}>{plugin.name}</h3>
             <span class="by">by</span>
@@ -205,7 +205,15 @@ var PluginList = React.createClass({
   }
 });
 
-var Page = React.createClass({
+var PluginPage = React.createClass({
+  render: function() {
+    return <div>
+      plugin page for {this.props.name}
+    </div>;
+  }
+});
+
+var PluginListPage = React.createClass({
   getInitialState: function() {
     return {searchQuery: ""};
   },
@@ -216,16 +224,23 @@ var Page = React.createClass({
   }),
 
   render: function() {
-    // TODO(alpert): Support multiple pages, not just the plugin list
+    return <div>
+      <SearchBox onInput={this.onSearchInput} />
+      <div class="keyboard-tips">
+        Tip: try <code>/</code> to search and
+        <code>ESC</code>, <code>j</code>, <code>k</code> to navigate
+      </div>
+      <PluginList ref="pluginList" searchQuery={this.state.searchQuery} />
+    </div>;
+  }
+});
+
+var Page = React.createClass({
+  render: function() {
     return <div class="page-container">
       <Sidebar />
       <div class="content">
-        <SearchBox onInput={this.onSearchInput} />
-        <div class="keyboard-tips">
-          Tip: try <code>/</code> to search and
-          <code>ESC</code>, <code>j</code>, <code>k</code> to navigate
-        </div>
-        <PluginList ref="pluginList" searchQuery={this.state.searchQuery} />
+        {this.props.content}
       </div>
     </div>;
   }
@@ -234,15 +249,39 @@ var Page = React.createClass({
 // TODO(alpert): Get rid of Backbone?
 var Router = Backbone.Router.extend({
   routes: {
-    "": "home"
+    "": "home",
+    "plugin/:name": "plugin"
+  },
+
+  _showPage: function(component) {
+    React.renderComponent(<Page content={component} />, document.body);
   },
 
   home: function() {
-    React.renderComponent(<Page />, document.body);
+    this._showPage(<PluginListPage />);
+  },
+
+  plugin: function(name) {
+    this._showPage(<PluginPage name={name} />);
   }
 });
 
 new Router();
 Backbone.history.start({pushState: true});
+
+// Hijack internal nav links to use Backbone router to navigate between pages
+// Adapted from https://gist.github.com/tbranyen/1142129
+if (Backbone.history && Backbone.history._hasPushState) {
+  $(document).on("click", "a", function(evt) {
+    var href = $(this).attr("href");
+    var protocol = this.protocol + "//";
+
+    // Only hijack URL to use Backbone router if it's relative (internal link).
+    if (href.slice(protocol.length) !== protocol) {
+      evt.preventDefault();
+      Backbone.history.navigate(href, true);
+    }
+  });
+}
 
 })();
