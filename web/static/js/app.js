@@ -90,6 +90,32 @@ var SearchBox = React.createClass({
   }
 });
 
+var Plugin = React.createClass({
+  render: function() {
+    // TODO(david): Animations on initial render
+    var plugin = this.props.plugin;
+    if (!plugin || !plugin.name) return <li class="plugin"></li>;
+
+    var hasNavFocus = this.props.hasNavFocus;
+    // TODO(david): Map color from tag/category or just hash of name
+    var color = 'accent-' + (plugin.name.charCodeAt(0) % 9);
+    return <li
+        class={"plugin" + (hasNavFocus ? " nav-focus" : "")}
+        onMouseEnter={this.props.onMouseEnter}>
+      <a href={"plugin/" + plugin.name}>
+        <div class="hover-bg"></div>
+        <h3 class={"plugin-name " + color}>{plugin.name}</h3>
+        <span class="by">by</span>
+        <span class="author"> Abraham Lincoln</span>
+        <div class="github-stars">
+          {plugin.github_stars} <i class="icon-star"></i>
+        </div>
+        <p class="short-desc">{plugin.short_desc}</p>
+      </a>
+    </li>;
+  }
+});
+
 var PluginList = React.createClass({
   getInitialState: function() {
     return {
@@ -152,7 +178,7 @@ var PluginList = React.createClass({
     }
   }),
 
-  onMouseEnter: React.autoBind(function(e, currentTargetId) {
+  onPluginMouseEnter: React.autoBind(function(e, currentTargetId) {
     // TODO(david): Should use e.currentTarget, but it seems like there may be
     //     a react bug that makes this property not available.
     // TODO(david): This is not as quick/snappy as CSS :hover ...
@@ -181,23 +207,11 @@ var PluginList = React.createClass({
       .reverse()
       .map(function(plugin, index) {
         var hasNavFocus = (index === this.state.selectedIndex);
-        // TODO(david): Map color from tag/category or just hash of name
-        var color = 'accent-' + (index % 9);
-        return <li
-            class={"plugin" + (hasNavFocus ? " nav-focus" : "")}
+        return <Plugin
             ref={hasNavFocus ? "navFocus" : ""}
-            onMouseEnter={this.onMouseEnter}>
-          <a href={"plugin/" + plugin.name}>
-            <div class="hover-bg"></div>
-            <h3 class={"plugin-name " + color}>{plugin.name}</h3>
-            <span class="by">by</span>
-            <span class="author"> Abraham Lincoln</span>
-            <div class="github-stars">
-              {plugin.github_stars} <i class="icon-star"></i>
-            </div>
-            <p class="short-desc">{plugin.short_desc}</p>
-          </a>
-        </li>
+            hasNavFocus={hasNavFocus}
+            plugin={plugin}
+            onMouseEnter={this.onPluginMouseEnter} />;
       }, this)
       .value();
 
@@ -206,9 +220,19 @@ var PluginList = React.createClass({
 });
 
 var PluginPage = React.createClass({
+  componentDidMount: function() {
+    this.fetchPlugin();
+  },
+
+  fetchPlugin: function() {
+    $.getJSON("/api/plugins/" + this.props.name, function(data) {
+      this.setState(data);
+    }.bind(this));
+  },
+
   render: function() {
     return <div>
-      plugin page for {this.props.name}
+      <Plugin plugin={this.state} />
     </div>;
   }
 });

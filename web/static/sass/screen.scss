@@ -243,137 +243,137 @@ code {
 
 .plugins {
   margin: 0;
+}
 
-  .plugin {
-    $bar-vertical-padding: 10px;
-    $bar-horizontal-padding: 20px;
+.plugin {
+  $bar-vertical-padding: 10px;
+  $bar-horizontal-padding: 20px;
 
-    list-style-type: none;
-    background-color: $base2;
-    margin-bottom: 10px;
+  list-style-type: none;
+  background-color: $base2;
+  margin-bottom: 10px;
 
-    > a {
-      padding: $bar-vertical-padding $bar-horizontal-padding;
-      display: block;
+  > a {
+    padding: $bar-vertical-padding $bar-horizontal-padding;
+    display: block;
+  }
+
+  .hover-bg {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    z-index: -1;
+    margin-top: -$bar-vertical-padding;
+    height: 85px;  // TODO(david): Don't hardcode this
+  }
+
+  .plugin-name {
+    $left-offset: 5px;
+    position: relative;
+    font-weight: normal;
+    font-size: 24px;
+    margin-bottom: 2px;
+    line-height: normal;
+    display: inline-block;
+    margin-top: 0;
+    margin-left: -$bar-horizontal-padding - $left-offset;
+    padding: 5px 10px 5px ($bar-horizontal-padding + $left-offset);
+    color: white;
+
+    // Pre-animation setup
+    @include transition(all 0.1s ease-out);
+    opacity: 0.8;
+
+    &:before {
+      color: white;
+      content: '»';
+      position: absolute;
+      opacity: 0.0;
+      left: -5px;
+      top: 4px;
+      @include transition(all 0.1s ease-out);
     }
 
-    .hover-bg {
+    &:after {
+      content: " ";
+      display: block;
+      border-bottom: 4px solid #CCC;
+      width: 0;
+      height: 0;
       position: absolute;
-      width: 100%;
+      top: -4px;
+      border-left: $left-offset solid transparent;
       left: 0;
-      z-index: -1;
-      margin-top: -$bar-vertical-padding;
-      height: 85px;  // TODO(david): Don't hardcode this
+    }
+
+    $accent-colors: $yellow $orange $red $magenta $violet $blue $cyan $green
+        $gray;
+    @for $i from 0 to length($accent-colors) {
+      &.accent-#{$i} {
+        background-color: nth($accent-colors, $i + 1);
+        &:after {
+          border-bottom-color: darken(nth($accent-colors, $i + 1), 10%);
+        }
+      }
+    }
+  }
+
+  &.nav-focus {
+    .hover-bg {
+      background: rgba($base2, 1.0);
     }
 
     .plugin-name {
-      $left-offset: 5px;
-      position: relative;
-      font-weight: normal;
-      font-size: 24px;
-      margin-bottom: 2px;
-      line-height: normal;
-      display: inline-block;
-      margin-top: 0;
-      margin-left: -$bar-horizontal-padding - $left-offset;
-      padding: 5px 10px 5px ($bar-horizontal-padding + $left-offset);
-      color: white;
-
-      // Pre-animation setup
       @include transition(all 0.1s ease-out);
-      opacity: 0.8;
+      opacity: 1.0;
 
       &:before {
-        color: white;
-        content: '»';
-        position: absolute;
-        opacity: 0.0;
-        left: -5px;
-        top: 4px;
         @include transition(all 0.1s ease-out);
+        opacity: 1.0;
+        left: 7px;
       }
 
       &:after {
-        content: " ";
-        display: block;
-        border-bottom: 4px solid #CCC;
-        width: 0;
-        height: 0;
-        position: absolute;
-        top: -4px;
-        border-left: $left-offset solid transparent;
-        left: 0;
-      }
-
-      $accent-colors: $yellow $orange $red $magenta $violet $blue $cyan $green
-          $gray;
-      @for $i from 0 to length($accent-colors) {
-        &.accent-#{$i} {
-          background-color: nth($accent-colors, $i + 1);
-          &:after {
-            border-bottom-color: darken(nth($accent-colors, $i + 1), 10%);
-          }
-        }
+        display: none;
       }
     }
+  }
 
-    &.nav-focus {
-      .hover-bg {
-        background: rgba($base2, 1.0);
-      }
+  .by {
+    color: mix($base1, $base2, 40%);
+    margin-left: 9px;
+    font-family: $serifFontFamily;
+    font-style: italic;
+    font-size: 14px;
+  }
 
-      .plugin-name {
-        @include transition(all 0.1s ease-out);
-        opacity: 1.0;
+  .author {
+    color: mix($base1, $base2, 50%);
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
 
-        &:before {
-          @include transition(all 0.1s ease-out);
-          opacity: 1.0;
-          left: 7px;
-        }
+  .short-desc {
+    margin-bottom: 0;
+    font-size: 16px;
+    font-weight: 300;
+    margin-top: 5px;
+    color: $base00;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 
-        &:after {
-          display: none;
-        }
-      }
-    }
+  .github-stars {
+    float: right;
+    background-color: mix($base1, $base2, 20%);
+    margin-top: -$bar-vertical-padding;
+    padding: 8px 14px;
+    color: mix($base0, $base2, 80%);
 
-    .by {
-      color: mix($base1, $base2, 40%);
-      margin-left: 9px;
-      font-family: $serifFontFamily;
-      font-style: italic;
-      font-size: 14px;
-    }
-
-    .author {
-      color: mix($base1, $base2, 50%);
-      text-transform: uppercase;
-      font-size: 14px;
-      letter-spacing: 2px;
-    }
-
-    .short-desc {
-      margin-bottom: 0;
-      font-size: 16px;
-      font-weight: 300;
-      margin-top: 5px;
-      color: $base00;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    .github-stars {
-      float: right;
-      background-color: mix($base1, $base2, 20%);
-      margin-top: -$bar-vertical-padding;
-      padding: 8px 14px;
-      color: mix($base0, $base2, 80%);
-
-      i {
-        margin-left: 7px;
-      }
+    i {
+      margin-left: 7px;
     }
   }
 }

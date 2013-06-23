@@ -6,17 +6,13 @@ import flask
 from flask import request
 import rethinkdb as r
 
+import util
+
 app = flask.Flask(__name__)
 
 app.config.from_envvar('FLASK_CONFIG')
 
-
-# TODO(alpert): Read port and db from app.config?
-def r_conn(box=[None]):
-    if box[0] is None:
-        box[0] = r.connect()
-        box[0].use('vim_awesome')
-    return box[0]
+r_conn = util.r_conn
 
 # TODO(david): Add logging handler
 
@@ -38,10 +34,10 @@ def crash():
 
 
 # TODO(david): Move API functions out of this file once we have too many
-@app.route('/api/plugins')
-def plugins():
+@app.route('/api/plugins', methods=['GET'])
+def get_plugins():
     search = request.args.get('query', '')
-    query = r.db('vim_awesome').table('plugins')
+    query = r.table('plugins')
 
     if search:
         needles = [t.lower() for t in re.findall(r'\w+', search)]
@@ -64,6 +60,15 @@ def plugins():
         })""" % json.dumps(needles)))
 
     return json.dumps(list(query.run(r_conn())))
+
+
+@app.route('/api/plugins/<name>', methods=['GET'])
+def get_plugin(name):
+    plugin = util.db_get_first(r.table('plugins').filter({'name': name}))
+    if plugin:
+        return json.dumps(plugin)
+    else:
+        return util.api_not_found('No plugin with name %s' % name)
 
 
 if __name__ == '__main__':
