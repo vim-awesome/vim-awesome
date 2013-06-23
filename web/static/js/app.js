@@ -30,7 +30,7 @@ var Sidebar = React.createClass({
       "Info",
       "Integrations"
     ], function(cat) {
-      return <li>
+      return <li key={cat}>
         <a href="#/blah"><i class="icon-fighter-jet"></i> {cat}</a>
       </li>;
     });
@@ -178,14 +178,11 @@ var PluginList = React.createClass({
     }
   }),
 
-  onPluginMouseEnter: React.autoBind(function(e, currentTargetId) {
-    // TODO(david): Should use e.currentTarget, but it seems like there may be
-    //     a react bug that makes this property not available.
+  onPluginMouseEnter: function(index, e) {
     // TODO(david): This is not as quick/snappy as CSS :hover ...
     if (this.state.hoverDisabled) return;
-    var currentTarget = document.getElementById(currentTargetId);
-    this.setState({selectedIndex: $(currentTarget).index()});
-  }),
+    this.setState({selectedIndex: index});
+  },
 
   fetchPlugins: function(query) {
     $.ajax({
@@ -209,9 +206,10 @@ var PluginList = React.createClass({
         var hasNavFocus = (index === this.state.selectedIndex);
         return <Plugin
             ref={hasNavFocus ? "navFocus" : ""}
+            key={plugin.id}
             hasNavFocus={hasNavFocus}
             plugin={plugin}
-            onMouseEnter={this.onPluginMouseEnter} />;
+            onMouseEnter={this.onPluginMouseEnter.bind(this, index)} />;
       }, this)
       .value();
 
