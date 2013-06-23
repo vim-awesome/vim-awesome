@@ -11,7 +11,7 @@ def prompt_for_auth():
     """Retrieve authentication information from the user"""
     global auth
     if not auth:
-        print "Username:",
+        print "GitHub username:",
         user = raw_input()
         password = getpass.getpass()
         auth = (user, password)
@@ -71,6 +71,8 @@ def get_requests_left():
 def get_vim_scripts_repos():
     """Retrieve all of the repos in the vim-scripts group"""
     _, user_data = get_api_page('users/vim-scripts')
+
+    print "Fetching repositories from https://github.com/vim-scripts ..."
 
     # calculate how many pages of repositories there are
     num_pages = (user_data['public_repos'] + 99) / 100

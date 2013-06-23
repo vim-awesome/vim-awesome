@@ -4,15 +4,22 @@ import rethinkdb as r
 def main():
     conn = r.connect()
 
-    r.db_create('vim_awesome').run(conn)
+    try:
+        r.db_create('vim_awesome').run(conn)
+    except r.RqlRuntimeError:
+        pass  # Ignore db already created
     conn.use('vim_awesome')
 
-    r.table_create('plugins').run(conn)
+    try:
+        r.table_create('plugins').run(conn)
+    except r.RqlRuntimeError:
+        pass  # Ignore table already created
     r.table('plugins').insert([
         {
+            'id': 'ctrlp-example-plugin',
             'name': 'ctrlp.vim',
             'github_url': 'https://github.com/kien/ctrlp.vim',
-            'vim_script_id': 3736
+            'vim_script_id': 3736,
             'short_desc': 'Fuzzy file, buffer, mru, tag, etc finder.',
             'long_desc': """# ctrlp.vim
                 Full path fuzzy __file__, __buffer__, __mru__, __tag__, __...__
@@ -29,10 +36,11 @@ def main():
             'homepage': 'http://kien.github.io/ctrlp.vim/',
         },
         {
+            'id': 'youcompleteme-example-plugin',
             'name': 'YouCompleteMe',
             'github_url': 'https://github.com/Valloric/YouCompleteMe',
             'vim_script_id': None,
-            'description': 'A code-completion engine for Vim',
+            'short_desc': 'A code-completion engine for Vim',
             'long_desc': """YouCompleteMe is a fast, as-you-type, fuzzy-search
             code completion engine for [Vim][]. It has several completion
             engines: an identifier-based engine that works with every
@@ -46,7 +54,7 @@ def main():
             'github_stars': 1723,
             'homepage': 'http://valloric.github.io/YouCompleteMe/',
         },
-    ]).run(conn)
+    ], upsert=True).run(conn)
 
 
 if __name__ == '__main__':
