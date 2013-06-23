@@ -29,22 +29,22 @@ var visitors = require('./fbtransform/visitors').transformVisitors;
 var transform = transform.bind(null, visitors.react);
 var docblock = require('./fbtransform/lib/docblock');
 
+var headEl = document.getElementsByTagName('head')[0];
+
 exports.transform = transform;
+
 exports.exec = function(code) {
   return eval(transform(code));
 };
-var run = exports.run = function(code) {
-  var moduleName =
-    docblock.parseAsObject(docblock.extract(code)).providesModule;
-  var jsx =
-    docblock.parseAsObject(docblock.extract(code)).jsx;
 
-  window.moduleLoads = (window.moduleLoads || []).concat(moduleName);
-  window.startTime = Date.now();
+var run = exports.run = function(code) {
+  var jsx = docblock.parseAsObject(docblock.extract(code)).jsx;
+
   var functionBody = jsx ? transform(code).code : code;
-  Function('require', 'module', 'exports', functionBody)(require, module, exports);
-  window.endTime = Date.now();
-  require[moduleName] = module.exports;
+  var scriptEl = document.createElement('script');
+
+  scriptEl.innerHTML = functionBody;
+  headEl.appendChild(scriptEl);
 };
 
 if (typeof window === "undefined" || window === null) {
@@ -53,15 +53,17 @@ if (typeof window === "undefined" || window === null) {
 
 var load = exports.load = function(url, callback) {
   var xhr;
-  xhr = window.ActiveXObject ? new window.ActiveXObject('Microsoft.XMLHTTP') : new XMLHttpRequest();
+  xhr = window.ActiveXObject ? new window.ActiveXObject('Microsoft.XMLHTTP')
+                             : new XMLHttpRequest();
+  // Disable async since we need to execute scripts in the order they are in the
+  // DOM to mirror normal script loading.
   xhr.open('GET', url, false);
   if ('overrideMimeType' in xhr) {
     xhr.overrideMimeType('text/plain');
   }
   xhr.onreadystatechange = function() {
-    var _ref;
     if (xhr.readyState === 4) {
-      if ((_ref = xhr.status) === 0 || _ref === 200) {
+      if (xhr.status === 0 || xhr.status === 200) {
         run(xhr.responseText);
       } else {
         throw new Error("Could not load " + url);
@@ -75,37 +77,19 @@ var load = exports.load = function(url, callback) {
 };
 
 runScripts = function() {
-  var jsxes, execute, index, length, s, scripts;
-  scripts = document.getElementsByTagName('script');
-  jsxes = (function() {
-    var _i, _len, _results;
-    _results = [];
-    for (_i = 0, _len = scripts.length; _i < _len; _i++) {
-      s = scripts[_i];
-      if (s.type === 'text/jsx') {
-        _results.push(s);
-      }
-    }
-    return _results;
-  })();
-  index = 0;
-  length = jsxes.length;
-  (execute = function(j) {
-    var script;
-    script = jsxes[j];
-    if ((script != null ? script.type : void 0) === 'text/jsx') {
-      if (script.src) {
-         return load(script.src, execute);
-      } else {
-        run(script.innerHTML);
-        return execute();
-      }
+  var scripts = document.getElementsByTagName('script');
+  scripts = Array.prototype.slice.call(scripts);
+  var jsxScripts = scripts.filter(function(script) {
+    return script.type === 'text/jsx';
+  });
+
+  jsxScripts.forEach(function(script) {
+    if (script.src) {
+      load(script.src);
+    } else {
+      run(script.innerHTML);
     }
   });
-  for (var i = 0; i < jsxes.length; i++) {
-    execute(i);
-  }
-  return null;
 };
 
 if (window.addEventListener) {
@@ -685,7 +669,13 @@ function walker(traverse, object, path, state) {
 }
 
 function runPass(source, visitors, options) {
-  var ast = esprima.parse(source, { comment: true, loc: true, range: true });
+  var ast;
+  try {
+    ast = esprima.parse(source, { comment: true, loc: true, range: true });
+  } catch (e) {
+    e.message = 'Parse Error: ' + e.message;
+    throw e;
+  }
   var state = createState(source, options);
   state.g.originalProgramAST = ast;
   state.g.visitors = visitors;
@@ -935,8 +925,8 @@ parseYieldExpression: true
     };
 
     ClassPropertyType = {
-        static: 1,
-        prototype: 2
+        static: 'static',
+        prototype: 'prototype'
     };
 
     // Error messages should be identical to V8.
@@ -5105,7 +5095,7 @@ parseYieldExpression: true
     function parseMethodDefinition(existingPropNames) {
         var token, key, param, propType, isValidDuplicateProp = false;
 
-        if (strict ? matchKeyword('static') : matchContextualKeyword('static')) {
+        if (lookahead.value === 'static') {
             propType = ClassPropertyType.static;
             lex();
         } else {
@@ -5911,6 +5901,7 @@ parseYieldExpression: true
                 ch = source[index++];
                 if (isLineTerminator(ch.charCodeAt(0))) {
                     ++lineNumber;
+                    lineStart = index;
                 }
                 str += ch;
             }
@@ -6236,6 +6227,11 @@ parseYieldExpression: true
         };
 
         marker.apply = function (node) {
+            var nodeType = typeof node;
+            assert(nodeType === "object",
+                "Applying location marker to an unexpected node type: " +
+                    nodeType);
+
             if (extra.range) {
                 node.range = [this.range[0], this.range[1]];
             }
@@ -7810,14 +7806,10 @@ function visitReactTag(traverse, object, path, state) {
     move(object.openingElement.range[1], state);
   }
 
-  // separate props and children arguments
-  append(', ', state);
-
   // filter out whitespace
   if (childrenToRender.length > 0) {
-    if (childrenToRender.length > 1) {
-      append('[', state);
-    }
+    append(', ', state);
+
     object.children.forEach(function(child) {
       if (child.type === Syntax.Literal && !child.value.match(/\S/)) {
         return;
@@ -7840,8 +7832,6 @@ function visitReactTag(traverse, object, path, state) {
 
       catchup(child.range[1], state);
     });
-  } else {
-    append('null', state);
   }
 
   if (object.selfClosing) {
@@ -7854,11 +7844,6 @@ function visitReactTag(traverse, object, path, state) {
     move(object.closingElement.range[1], state);
   }
 
-  if (childrenToRender.length > 0) {
-    if (childrenToRender.length > 1) {
-      append(']', state);
-    }
-  }
   append(')', state);
   return false;
 }
