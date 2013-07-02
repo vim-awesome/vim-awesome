@@ -105,11 +105,11 @@ var Plugin = React.createClass({
       <a href={"plugin/" + plugin.name}>
         <div class="hover-bg"></div>
         <h3 class={"plugin-name " + color}>{plugin.name}</h3>
-        <span class="by">by</span>
-        <span class="author"> Abraham Lincoln</span>
-        <div class="github-stars">
+        {plugin.author && <span class="by">by</span>}
+        {plugin.author && <span class="author">{" " + plugin.author}</span>}
+        {plugin.github_stars && <div class="github-stars">
           {plugin.github_stars} <i class="icon-star"></i>
-        </div>
+        </div>}
         <p class="short-desc">{plugin.short_desc}</p>
       </a>
     </li>;
@@ -200,6 +200,7 @@ var PluginList = React.createClass({
   render: function() {
     var query = this.props.searchQuery.toLowerCase();
     var plugins = _.chain(this.state.plugins)
+      .sortBy("vimorg_rating")
       .sortBy("github_stars")
       .reverse()
       .map(function(plugin, index) {
