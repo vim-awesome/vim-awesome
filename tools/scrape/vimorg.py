@@ -14,12 +14,15 @@ class HTMLParser(lxml.html.html5parser.HTMLParser):
 PARSER = HTMLParser()
 
 
-def get_plugin_list(num=100):
+def get_plugin_list(num=None):
     """Get plugin information from vim.org
 
     This scrapes a given number of scripts (reverse ordered by vim.org id) and
     returns a dict of the important data about the plugin.
     """
+    if not num:
+        num = 5000
+
     res = requests.get(
             'http://www.vim.org/scripts/script_search_results.php?show_me=%d' %
                 num)
