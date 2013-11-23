@@ -9,7 +9,7 @@ deploy:
 	@if [ `whoami` = 'vim' ]; then \
 		tools/deploy.sh; \
 	else \
-		cat tools/deploy.sh | ssh vim@vim.benalpert.com sh; \
+		cat tools/deploy.sh | ssh vim@vimawesome.com sh; \
 	fi
 
 seed_data:
