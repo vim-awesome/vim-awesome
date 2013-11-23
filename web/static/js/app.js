@@ -374,6 +374,10 @@ if (Backbone.history && Backbone.history._hasPushState) {
     if (href.substr(0, protocol.length) !== protocol) {
       evt.preventDefault();
       Backbone.history.navigate(href, true);
+
+      // Scroll to top. Chrome has this weird issue where it will retain the
+      // current scroll position, even if it's beyond the document's height.
+      window.scrollTo(0, 0);
     }
   });
 }
