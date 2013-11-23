@@ -29,9 +29,9 @@ var Sidebar = React.createClass({
       "Buffer",
       "Info",
       "Integrations"
-    ], function(cat) {
-      return <li key={cat}>
-        <a href="#/blah"><i class="icon-fighter-jet"></i> {cat}</a>
+    ], function(category) {
+      return <li key={category}>
+        <a href="#/blah"><i class="icon-fighter-jet"></i> {category}</a>
       </li>;
     });
 
@@ -219,6 +219,14 @@ var PluginList = React.createClass({
 });
 
 var PluginPage = React.createClass({
+  getInitialState: function() {
+    return {
+      // TODO(david): placeholders
+      created_date: 1286809444566,
+      updated_date: 1371265409091
+    };
+  },
+
   componentDidMount: function() {
     this.fetchPlugin();
   },
@@ -230,8 +238,71 @@ var PluginPage = React.createClass({
   },
 
   render: function() {
-    return <div>
+    // TODO(david): Should only run markdown on readme.md, not generic long_desc
+    var readmeHtml = marked(this.state.long_desc || '');
+
+    return <div class="plugin-page">
       <Plugin plugin={this.state} />
+
+      <div class="row-fluid">
+        <div class="span10">
+          <div class="row-fluid">
+
+            <div class="span8 accent-box dates">
+              <div class="row-fluid">
+                <div class="span6">
+                  <h3 class="date-label">Created</h3>
+                  <div class="date-value">
+                    {moment(this.state.created_date).fromNow()}
+                  </div>
+                </div>
+                <div class="span6">
+                  <h3 class="date-label">Updated</h3>
+                  <div class="date-value">
+                    {moment(this.state.updated_date).fromNow()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="span4 accent-box links">
+              <a href="http://www.vim.org" target="_blank" class="vim-link">
+                <i class="vim-icon dark"></i>
+                <i class="vim-icon light"></i>
+                Vim.org
+              </a>
+              <a href={this.state.github_url} target="_blank" class="github-link">
+                <i class="github-icon dark"></i>
+                <i class="github-icon light"></i>
+                GitHub
+              </a>
+            </div>
+
+          </div>
+          <div class="row-fluid">
+
+            <div class="span12 install accent-box">
+              <h3 class="accent-box-label">Install</h3>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="span2 accent-box tags">
+          <h3 class="tags-label">Tags</h3>
+          <a href="/tags/navigation" class="tag">Navigation</a>
+          <a href="/tags/buffer" class="tag">Buffer</a>
+          <a href="/tags/file" class="tag">File</a>
+        </div>
+
+      </div>
+      <div class="row-fluid">
+
+        <div class="span12 long-desc"
+            dangerouslySetInnerHTML={{__html: readmeHtml}}>
+        </div>
+
+      </div>
     </div>;
   }
 });
@@ -250,7 +321,7 @@ var PluginListPage = React.createClass({
     return <div>
       <SearchBox onInput={this.onSearchInput} />
       <div class="keyboard-tips">
-        Tip: try <code>/</code> to search and
+        Tip: use <code>/</code> to search and
         <code>ESC</code>, <code>j</code>, <code>k</code> to navigate
       </div>
       <PluginList ref="pluginList" searchQuery={this.state.searchQuery} />
@@ -300,7 +371,7 @@ if (Backbone.history && Backbone.history._hasPushState) {
     var protocol = this.protocol + "//";
 
     // Only hijack URL to use Backbone router if it's relative (internal link).
-    if (href.slice(protocol.length) !== protocol) {
+    if (href.substr(0, protocol.length) !== protocol) {
       evt.preventDefault();
       Backbone.history.navigate(href, true);
     }
