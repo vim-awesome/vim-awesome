@@ -298,7 +298,7 @@ var Tags = React.createClass({
       //     description maybe
       // TODO(david): Should get tag name from map of tags that we send down.
       var tagName = capitalizeFirstLetter(tag);
-      return <li className="tag">
+      return <li key={tag} className="tag">
         <a className="tag-link" href={"/tags/" + tag}>{tagName}</a>
         <i onClick={this.onRemoveBtnClick.bind(this, tag)}
             className="icon-remove-sign remove-btn"></i>
@@ -338,7 +338,7 @@ var PluginPage = React.createClass({
 
   // TODO(david): Should we adopt the "handleTagsChange" naming convention?
   onTagsChange: function(tags) {
-    this.setState({tags: tags});
+    this.setState({tags: _.uniq(tags)});
   },
 
   onTagsSave: function() {
