@@ -2,8 +2,14 @@
 (function() {
 "use strict";
 
+// TODO(david): We might want to split up this file eventually.
+
 var clamp = function(num, min, max) {
   return Math.min(Math.max(num, min), max);
+};
+
+var capitalizeFirstLetter = function(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
 var scrollToNode = function(domNode) {
@@ -98,7 +104,7 @@ var Plugin = React.createClass({
 
     var hasNavFocus = this.props.hasNavFocus;
     // TODO(david): Map color from tag/category or just hash of name
-    var color = 'accent-' + (plugin.name.charCodeAt(0) % 9);
+    var color = "accent-" + (plugin.name.charCodeAt(0) % 9);
     return <li
         class={"plugin" + (hasNavFocus ? " nav-focus" : "")}
         onMouseEnter={this.props.onMouseEnter}>
@@ -218,6 +224,100 @@ var PluginList = React.createClass({
   }
 });
 
+// This is the tags widget on the details page.
+var Tags = React.createClass({
+  getInitialState: function() {
+    return {
+      isEditing: false
+    };
+  },
+
+  componentDidMount: function() {
+    this.fetchAllTags();
+  },
+
+  componentDidUpdate: function() {
+    if (this.refs && this.refs.tagInput) {
+      this.refs.tagInput.getDOMNode().focus();
+    }
+  },
+
+  fetchAllTags: function() {
+    // TODO(david): This call should be cached across page views (yay
+    //     single-page app)
+    // TODO(david): this is for autocomplete of tags
+    //$.getJSON("/api/tags", function(data) {
+      //this.setState(data);
+    //}.bind(this));
+  },
+
+  onEditBtnClick: React.autoBind(function() {
+    this.setState({isEditing: true});
+  }),
+
+  onDoneBtnClick: React.autoBind(function() {
+    this.setState({isEditing: false});
+    this.props.onTagsSave();
+  }),
+
+  onRemoveBtnClick: function(tag, e) {
+    this.props.onTagsChange(_.without(this.props.tags, tag));
+  },
+
+  onKeyUp: React.autoBind(function(e) {
+    var key = e.keyCode;
+    if (key === 13 /* enter */ || key === 9 /* tab */ ||
+        key === 188 /* comma */) {
+      var $input = $(this.refs.tagInput.getDOMNode());
+      // TODO(david): This needs to use autocomplete
+      var tagId = $input.val().replace(/,$/, "").toLowerCase();
+      if (!tagId) return;
+      $input.val("");
+      this.props.onTagsChange(this.props.tags.concat(tagId));
+    }
+  }),
+
+  render: function() {
+    var MAX_TAGS = 5;
+
+    var actionBtn;
+    if (this.state.isEditing) {
+      actionBtn = <button
+          onClick={this.onDoneBtnClick} class="action-btn done-btn">
+        <i class="icon-check"></i> Done
+      </button>;
+    } else {
+      actionBtn = <button
+          onClick={this.onEditBtnClick} class="action-btn edit-btn">
+        <i class="icon-edit"></i> Edit
+      </button>;
+    }
+
+    var tags = _.map(this.props.tags, function(tag) {
+      // TODO(david): Have more info for each tag... # of other plugins maybe,
+      //     description maybe
+      // TODO(david): Should get tag name from map of tags that we send down.
+      var tagName = capitalizeFirstLetter(tag);
+      return <li class="tag">
+        <a class="tag-link" href={"/tags/" + tag}>{tagName}</a>
+        <i onClick={this.onRemoveBtnClick.bind(this, tag)}
+            class="icon-remove-sign remove-btn"></i>
+      </li>;
+    }.bind(this));
+
+    // TODO(david): Tags should be colored appropriately
+    // TODO(david): React bug? maxLength and maxlength attrs not recognized
+    return <div class={"tags" + (this.state.isEditing ? " editing" : "")}>
+      <h3 class="tags-label">Tags</h3>
+      <ul class="tags-list">{tags}</ul>
+      {this.state.isEditing && this.props.tags.length < MAX_TAGS &&
+          <input ref="tagInput" onKeyUp={this.onKeyUp} type="text"
+             maxLength="12" class="tag-input" placeholder="Add tag" />}
+      {actionBtn}
+    </div>;
+  }
+});
+
 var PluginPage = React.createClass({
   getInitialState: function() {
     return {
@@ -237,9 +337,27 @@ var PluginPage = React.createClass({
     }.bind(this));
   },
 
+  // TODO(david): Should we adopt the "handleTagsChange" naming convention?
+  onTagsChange: React.autoBind(function(tags) {
+    this.setState({tags: tags});
+  }),
+
+  onTagsSave: React.autoBind(function() {
+    $.ajax({
+      url: "/api/plugins/" + this.props.name + "/tags",
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
+      data: JSON.stringify({tags: this.state.tags}),
+      success: function(data) {
+        this.setState({tags: data.tags})
+      }.bind(this)
+    });
+  }),
+
   render: function() {
     // TODO(david): Should only run markdown on readme.md, not generic long_desc
-    var readmeHtml = marked(this.state.long_desc || '');
+    var readmeHtml = marked(this.state.long_desc || "");
 
     return <div class="plugin-page">
       <Plugin plugin={this.state} />
@@ -288,11 +406,9 @@ var PluginPage = React.createClass({
           </div>
         </div>
 
-        <div class="span2 accent-box tags">
-          <h3 class="tags-label">Tags</h3>
-          <a href="/tags/navigation" class="tag">Navigation</a>
-          <a href="/tags/buffer" class="tag">Buffer</a>
-          <a href="/tags/file" class="tag">File</a>
+        <div class="span2">
+          <Tags tags={this.state.tags} onTagsSave={this.onTagsSave}
+              onTagsChange={this.onTagsChange} />
         </div>
 
       </div>

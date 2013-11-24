@@ -46,8 +46,8 @@ a {
 
 code {
   padding: 2px 3px;
-  background-color: $base2;
-  color: $base00;
+  background-color: $bg-light-2;
+  color: $content-3;
   border: none;
   @include border-radius(0);
 }
@@ -57,7 +57,7 @@ code {
   position: fixed;
   top: 0;
   bottom: 0;
-  background: $base2;
+  background: $bg-light-2;
 
   .title {
     font-size: 38px;
@@ -68,7 +68,7 @@ code {
     margin-bottom: 0;
 
     a {
-      color: $base01;
+      color: $content-4;
     }
 
     .vim {
@@ -89,7 +89,7 @@ code {
   }
 
   .subtitle {
-    $fg-color: mix($base1, $base2, 60%);
+    $fg-color: mix($content-1, $bg-light-2, 60%);
     text-transform: uppercase;
     text-align: center;
     letter-spacing: 2px;
@@ -108,7 +108,7 @@ code {
       font-style: italic;
       letter-spacing: 0;
       color: $fg-color;
-      background-color: $base2;
+      background-color: $bg-light-2;
       width: 60px;
       position: relative;
       left: 50%;
@@ -150,14 +150,14 @@ code {
       a {
         color: $textColor;
         display: block;
-        background-color: rgba($base2, 0.0);
+        background-color: rgba($bg-light-2, 0.0);
         padding-left: 20px;
         border-left: 3px solid transparent;
         @include transition(all 0.1s ease-out);
 
         &:hover {
-          background-color: rgba($base1, 0.1);
-          border-left: 3px solid rgba($base1, 0.1);
+          background-color: rgba($content-1, 0.1);
+          border-left: 3px solid rgba($content-1, 0.1);
           @include transition(all 0.1s ease-out);
         }
 
@@ -226,7 +226,7 @@ code {
   margin-top: 5px;
   margin-bottom: 25px;
   font-size: 14px;
-  color: $base1;
+  color: $content-1;
 
   code {
     font-size: 12px;
@@ -245,7 +245,7 @@ code {
   $bar-horizontal-padding: 20px;
 
   list-style-type: none;
-  background-color: $base2;
+  background-color: $bg-light-2;
   margin-bottom: 10px;
 
   > a {
@@ -315,7 +315,7 @@ code {
 
   &.nav-focus {
     .hover-bg {
-      background: rgba($base2, 1.0);
+      background: rgba($bg-light-2, 1.0);
     }
 
     .plugin-name {
@@ -335,7 +335,7 @@ code {
   }
 
   .by {
-    color: mix($base1, $base2, 40%);
+    color: mix($content-1, $bg-light-2, 40%);
     margin-left: 9px;
     font-family: $serifFontFamily;
     font-style: italic;
@@ -343,7 +343,7 @@ code {
   }
 
   .author {
-    color: mix($base1, $base2, 50%);
+    color: mix($content-1, $bg-light-2, 50%);
     text-transform: uppercase;
     font-size: 14px;
     letter-spacing: 2px;
@@ -354,7 +354,7 @@ code {
     font-size: 16px;
     font-weight: 300;
     margin-top: 5px;
-    color: $base00;
+    color: $content-3;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -362,10 +362,10 @@ code {
 
   .github-stars {
     float: right;
-    background-color: mix($base1, $base2, 20%);
+    background-color: mix($content-1, $bg-light-2, 20%);
     margin-top: -$bar-vertical-padding;
     padding: 8px 14px;
-    color: mix($base0, $base2, 80%);
+    color: mix($content-2, $bg-light-2, 80%);
 
     i {
       margin-left: 7px;
@@ -501,28 +501,32 @@ code {
     }
   }
 
-  $install-height: 110px;
+  $install-height: 150px;
   .install {
     margin-top: $box-margin;
     height: $install-height;
   }
 
   .tags {
+    @extend .accent-box;
     height: $box-height + $box-margin + $install-height;
+    box-sizing: border-box;
+    position: relative;
 
     .tags-label {
       @extend .accent-box-label;
     }
 
+    .tags-list {
+      margin: 0;
+    }
+
     .tag {
-      padding: 3px 4px;
-      line-height: normal;
-      background-color: white;
       margin-bottom: 5px;
       margin-right: 5px;
       display: inline-block;
       background-color: rgba($bg-dark-1, 0.1);
-      color: $content-4;
+      white-space: nowrap;
 
       @include transition(all 0.2s ease-out);
       opacity: 0.7;
@@ -531,6 +535,84 @@ code {
         @include transition(all 0.2s ease-out);
         opacity: 1.0;
       }
+    }
+
+    .remove-btn {
+      display: none;
+    }
+
+    &.editing .remove-btn {
+      display: inline-block;
+      padding: 3px 4px 3px 0;
+      color: $content-1;
+
+      &:hover {
+        color: $orange;
+        cursor: pointer;
+      }
+    }
+
+    .tag-link {
+      color: $content-4;
+      padding: 3px 5px;
+      line-height: normal;
+      display: inline-block;
+    }
+
+    .action-btn {
+      $vertical-padding: 8px;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      border: none;
+      background: rgba($bg-dark-1, 0.1);
+      color: $content-4;
+      text-shadow: none;
+      border-radius: 0;
+      box-shadow: none;
+      text-transform: uppercase;
+      font-size: 12px;
+      line-height: 12px;
+      text-align: left;
+      padding: $vertical-padding 0 $vertical-padding $box-padding;
+      margin-bottom: $box-padding - $vertical-padding;
+      outline: 0;
+
+      @include transition(all 0.2s ease-out);
+      opacity: 0.5;
+      background: none;
+
+      &.done-btn {
+        background: $cyan;
+        color: white;
+      }
+
+      i {
+        margin-right: 3px;
+      }
+    }
+
+    &:hover .action-btn {
+      opacity: 0.7;
+
+      &.edit-btn {
+        background: rgba($bg-dark-1, 0.1);
+      }
+
+      &:hover {
+        @include transition(all 0.2s ease-out);
+        opacity: 1.0;
+      }
+    }
+
+    .tag-input {
+      padding: 15px 5px;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      width: 100%;
+      box-sizing: border-box;
     }
   }
 
@@ -546,7 +628,7 @@ code {
       margin-bottom: 25px;
       text-transform: uppercase;
       padding-top: 7px;
-      border-top: 2px solid $content-1;
+      border-top: 2px solid rgba($content-1, 0.5);
       font-weight: normal;
 
       &:first-child {
@@ -574,11 +656,11 @@ code {
     }
 
     pre {
-      background-color: $base2;
+      background-color: $bg-light-2;
       border-radius: 0;
       border: none;
-      color: $base01;
-      border-left: 6px solid mix($base2, black, 92%);
+      color: $content-4;
+      border-left: 6px solid mix($bg-light-2, black, 92%);
     }
   }
 }

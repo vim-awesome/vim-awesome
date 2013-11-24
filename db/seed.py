@@ -3,6 +3,9 @@ import os
 
 import rethinkdb as r
 
+import tags
+import util
+
 
 def main():
     conn = r.connect()
@@ -13,10 +16,7 @@ def main():
         pass  # Ignore db already created
     conn.use('vim_awesome')
 
-    try:
-        r.table_create('plugins').run(conn)
-    except r.RqlRuntimeError:
-        pass  # Ignore table already created
+    util.db_create_table('plugins')
 
     def read_file(filename):
         full_path = os.path.join(os.path.dirname(__file__), filename)
@@ -36,6 +36,7 @@ def main():
             'long_desc': ctrlp_readme,
             'github_stars': 2021,
             'homepage': 'http://kien.github.io/ctrlp.vim/',
+            'tags': ['buffer', 'file', 'mru', 'fuzzy', 'finder'],
         },
         {
             'id': 'youcompleteme-example-plugin',
@@ -46,9 +47,18 @@ def main():
             'long_desc': youcompleteme_readme,
             'github_stars': 1723,
             'homepage': 'http://valloric.github.io/YouCompleteMe/',
+            'tags': ['autocomplete', 'fuzzy', 'C'],
         },
     ], upsert=True).run(conn)
 
+    util.db_create_table('tags')
+    # TODO(david): Add other fields like friendly name, description
+    r.table('tags').insert([{
+        'id': 'buffer',
+        'count': 1,
+    }])
+
+    tags.aggregate_tags()
 
 if __name__ == '__main__':
     main()

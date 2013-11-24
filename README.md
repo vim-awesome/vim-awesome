@@ -1,5 +1,6 @@
 TODO(david): description of what this repo does
 
+<!-- TODO(david): This section should be in its own file, CONTRIBUTING.md. -->
 # Contributing
 
 1. Install RethinkDB from http://rethinkdb.com/docs/install/.

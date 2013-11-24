@@ -6,6 +6,7 @@ import flask
 from flask import request
 import rethinkdb as r
 
+import db
 import util
 
 app = flask.Flask(__name__)
@@ -34,6 +35,7 @@ def crash():
 
 
 # TODO(david): Move API functions out of this file once we have too many
+# TODO(david): API functions should return content-type header JSON
 @app.route('/api/plugins', methods=['GET'])
 def get_plugins():
     search = request.args.get('query', '')
@@ -64,11 +66,21 @@ def get_plugins():
 
 @app.route('/api/plugins/<name>', methods=['GET'])
 def get_plugin(name):
-    plugin = util.db_get_first(r.table('plugins').filter({'name': name}))
+    plugin = db.plugins.get_for_name(name)
     if plugin:
         return json.dumps(plugin)
     else:
         return util.api_not_found('No plugin with name %s' % name)
+
+
+# TODO(david): Make it not so easy for an attacker to completely obliterate all
+#     of our tags, or at least be able to recover from it.
+@app.route('/api/plugins/<name>/tags', methods=['POST', 'PUT'])
+def update_plugin_tags(name):
+    data = json.loads(flask.request.data)
+    plugin = db.plugins.get_for_name(name)
+    db.plugins.update_tags(plugin, data['tags'])
+    return json.dumps({'tags': plugin['tags']})
 
 
 if __name__ == '__main__':
