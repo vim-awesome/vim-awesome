@@ -290,7 +290,6 @@ var Tags = React.createClass({
 
   onDoneBtnClick: function() {
     this.setState({isEditing: false});
-    this.props.onTagsSave();
   },
 
   onRemoveBtnClick: function(tag, e) {
@@ -369,16 +368,14 @@ var PluginPage = React.createClass({
 
   // TODO(david): Should we adopt the "handleTagsChange" naming convention?
   onTagsChange: function(tags) {
-    this.setState({tags: _.uniq(tags)});
-  },
-
-  onTagsSave: function() {
+    var newTags = _.uniq(tags);
+    this.setState({tags: newTags});
     $.ajax({
       url: "/api/plugins/" + this.props.name + "/tags",
       type: "POST",
       contentType: "application/json",
       dataType: "json",
-      data: JSON.stringify({tags: this.state.tags}),
+      data: JSON.stringify({tags: newTags}),
       success: function(data) {
         this.setState({tags: data.tags})
       }.bind(this)
@@ -428,8 +425,7 @@ var PluginPage = React.createClass({
           <h3 className="accent-box-label">Install</h3>
         </div>
         <div className="span4">
-          <Tags tags={this.state.tags} onTagsSave={this.onTagsSave}
-              onTagsChange={this.onTagsChange} />
+          <Tags tags={this.state.tags} onTagsChange={this.onTagsChange} />
         </div>
       </div>
 
