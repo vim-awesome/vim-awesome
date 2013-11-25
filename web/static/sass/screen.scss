@@ -10,7 +10,7 @@
 // Global variables, mixins, and utility classes
 
 $page-max-width: 1200px;
-$page-min-width: 800px;
+$page-min-width: 1000px;
 
 $sidebar-width: 290px;
 $topbar-height: 64px;
@@ -501,7 +501,7 @@ code {
     }
   }
 
-  $install-height: 150px;
+  $install-height: 200px;
   .install {
     margin-top: $box-margin;
     height: $install-height;
@@ -509,7 +509,8 @@ code {
 
   .tags {
     @extend .accent-box;
-    height: $box-height + $box-margin + $install-height;
+    margin-top: $box-margin;
+    height: $install-height;
     box-sizing: border-box;
     position: relative;
 
@@ -613,6 +614,27 @@ code {
       box-shadow: none;
       width: 100%;
       box-sizing: border-box;
+    }
+
+    .typeahead {
+      border-radius: 0;
+      border: none;
+      background: rgba(white, 0.9);
+
+      .count {
+        float: right;
+        color: mix($content-1, white, 50%);
+        font-size: 10px;
+      }
+
+      > li > a {
+        color: $content-4;
+      }
+
+      .active > a {
+        background: $blue;
+        color: white;
+      }
     }
   }
 

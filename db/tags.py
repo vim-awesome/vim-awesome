@@ -31,7 +31,11 @@ def remove_tag(tag_id):
 
 
 def aggregate_tags():
-    """Aggregate the counts of all tags from each plugin."""
+    """Aggregate the counts of all tags from each plugin.
+
+    This is intended to be run daily in a cron job to mitigate the effects of
+    race conditions and to clear out 0-count tags.
+    """
     util.db_create_table('tags')
     r.table('tags').update({'count': 0}).run(r_conn())
 

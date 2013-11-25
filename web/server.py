@@ -83,6 +83,12 @@ def update_plugin_tags(name):
     return json.dumps({'tags': plugin['tags']})
 
 
+@app.route('/api/tags', methods=['GET'])
+def get_tags():
+    tags = r.table('tags').filter({}).run(r_conn())
+    return json.dumps(list(tags))
+
+
 if __name__ == '__main__':
     app.debug = True
     app.run(port=5001)

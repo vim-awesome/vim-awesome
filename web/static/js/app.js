@@ -4,6 +4,9 @@
 
 // TODO(david): We might want to split up this file eventually.
 
+// A cache of all tag IDs and their counts.
+var allTags = {};
+
 var clamp = function(num, min, max) {
   return Math.min(Math.max(num, min), max);
 };
@@ -238,17 +241,47 @@ var Tags = React.createClass({
 
   componentDidUpdate: function() {
     if (this.refs && this.refs.tagInput) {
-      this.refs.tagInput.getDOMNode().focus();
+      var $input = $(this.refs.tagInput.getDOMNode());
+      $input.focus();
+      this.initTypeahead($input);
     }
   },
 
+  initTypeahead: function($input) {
+    // Uses Bootstrap's lightweight typeahead:
+    // http://getbootstrap.com/2.3.2/javascript.html#typeahead
+    $input.typeahead({
+      source: _.keys(allTags),
+
+      sorter: function(items) {
+        return _.sortBy(items, function(tagId) {
+          return -allTags[tagId].count;
+        });
+      },
+
+      highlighter: function(item) {
+        var Typeahead = $.fn.typeahead.Constructor;
+        var tagName = capitalizeFirstLetter(item);
+        var highlighted = Typeahead.prototype.highlighter.call(this, tagName);
+        return highlighted + "<span class=\"count\">&times; " +
+            allTags[item].count + "</span>";
+      },
+
+      updater: function(item) {
+        return capitalizeFirstLetter(item);
+      }
+    });
+  },
+
   fetchAllTags: function() {
-    // TODO(david): This call should be cached across page views (yay
-    //     single-page app)
-    // TODO(david): this is for autocomplete of tags
-    //$.getJSON("/api/tags", function(data) {
-      //this.setState(data);
-    //}.bind(this));
+    if (!_.isEmpty(allTags)) return;
+
+    $.getJSON("/api/tags", function(data) {
+      allTags = {};
+      _.each(data, function(tag) {
+        allTags[tag.id] = tag;
+      });
+    });
   },
 
   onEditBtnClick: function() {
@@ -294,8 +327,6 @@ var Tags = React.createClass({
     }
 
     var tags = _.map(this.props.tags, function(tag) {
-      // TODO(david): Have more info for each tag... # of other plugins maybe,
-      //     description maybe
       // TODO(david): Should get tag name from map of tags that we send down.
       var tagName = capitalizeFirstLetter(tag);
       return <li key={tag} className="tag">
@@ -362,62 +393,52 @@ var PluginPage = React.createClass({
       <Plugin plugin={this.state} />
 
       <div className="row-fluid">
-        <div className="span10">
+        <div className="span8 accent-box dates">
           <div className="row-fluid">
-
-            <div className="span8 accent-box dates">
-              <div className="row-fluid">
-                <div className="span6">
-                  <h3 className="date-label">Created</h3>
-                  <div className="date-value">
-                    {moment(this.state.created_date).fromNow()}
-                  </div>
-                </div>
-                <div className="span6">
-                  <h3 className="date-label">Updated</h3>
-                  <div className="date-value">
-                    {moment(this.state.updated_date).fromNow()}
-                  </div>
-                </div>
+            <div className="span6">
+              <h3 className="date-label">Created</h3>
+              <div className="date-value">
+                {moment(this.state.created_date).fromNow()}
               </div>
             </div>
-
-            <div className="span4 accent-box links">
-              <a href="http://www.vim.org" target="_blank" className="vim-link">
-                <i className="vim-icon dark"></i>
-                <i className="vim-icon light"></i>
-                Vim.org
-              </a>
-              <a href={this.state.github_url} target="_blank" className="github-link">
-                <i className="github-icon dark"></i>
-                <i className="github-icon light"></i>
-                GitHub
-              </a>
+            <div className="span6">
+              <h3 className="date-label">Updated</h3>
+              <div className="date-value">
+                {moment(this.state.updated_date).fromNow()}
+              </div>
             </div>
-
-          </div>
-          <div className="row-fluid">
-
-            <div className="span12 install accent-box">
-              <h3 className="accent-box-label">Install</h3>
-            </div>
-
           </div>
         </div>
+        <div className="span4 accent-box links">
+          <a href="http://www.vim.org" target="_blank" className="vim-link">
+            <i className="vim-icon dark"></i>
+            <i className="vim-icon light"></i>
+            Vim.org
+          </a>
+          <a href={this.state.github_url} target="_blank" className="github-link">
+            <i className="github-icon dark"></i>
+            <i className="github-icon light"></i>
+            GitHub
+          </a>
+        </div>
+      </div>
 
-        <div className="span2">
+      <div className="row-fluid">
+        <div className="span8 install accent-box">
+          <h3 className="accent-box-label">Install</h3>
+        </div>
+        <div className="span4">
           <Tags tags={this.state.tags} onTagsSave={this.onTagsSave}
               onTagsChange={this.onTagsChange} />
         </div>
-
       </div>
-      <div className="row-fluid">
 
+      <div className="row-fluid">
         <div className="span12 long-desc"
             dangerouslySetInnerHTML={{__html: readmeHtml}}>
         </div>
-
       </div>
+
     </div>;
   }
 });
