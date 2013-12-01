@@ -19,6 +19,9 @@ seed_data:
 	@echo "Scraping some repos from the vim-scripts GitHub org"
 	python tools/scrape/scrape.py 40
 
+aggregate_tags:
+	PYTHONPATH=. python tools/aggregate.py
+
 clean:
 	find . -name '*.pyc' -delete
 	bundle exec compass clean --config conf/compass.rb

@@ -37,6 +37,11 @@ def aggregate_tags():
     race conditions and to clear out 0-count tags.
     """
     util.db_create_table('tags')
+
+    # Clear out all 0-count tags.
+    r.table('tags').filter({'count': 0}).delete().run(r_conn())
+
+    # Reset all counts.
     r.table('tags').update({'count': 0}).run(r_conn())
 
     # TODO(david): This can definitely be optimized if necessary, eg. by
@@ -44,6 +49,8 @@ def aggregate_tags():
     #     to aggregate counts in-memory first
     all_plugins = r.table('plugins').filter({}).run(r_conn())
     for plugin in all_plugins:
-        if 'tags' not in plugin: continue
+        if 'tags' not in plugin:
+            plugin['tags'] = []
+            r.table('plugins').update(plugin).run(r_conn())
         for tag in plugin['tags']:
             add_tag(tag)
