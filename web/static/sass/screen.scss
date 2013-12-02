@@ -44,9 +44,19 @@ a {
   }
 }
 
+pre {
+  background-color: rgba($bg-dark-1, 0.05);
+  border-radius: 0;
+  border: none;
+  padding: 5px 5px 5px 10px;
+  color: $content-4;
+  font-size: 13px;
+  margin: 12px 0;
+}
+
 code {
   padding: 2px 3px;
-  background-color: $bg-light-2;
+  background-color: rgba($bg-dark-1, 0.05);
   color: $content-3;
   border: none;
   @include border-radius(0);
@@ -142,7 +152,7 @@ code {
       list-style-type: none;
       line-height: 50px;
       padding-left: 50px;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 300;
       letter-spacing: 1px;
       padding: 0;
@@ -381,6 +391,7 @@ code {
   $box-padding: 18px;
   $box-margin: 20px;
   $box-height: 110px;
+  $box-bg-color: $bg-light-2;
 
   .plugin {
     margin: $box-margin 0;
@@ -388,10 +399,8 @@ code {
 
   .accent-box {
     padding: $box-padding;
-    color: white;
     height: $box-height;
-
-    background-color: $bg-light-2;
+    background-color: $box-bg-color;
     color: $content-3;
   }
 
@@ -503,8 +512,60 @@ code {
 
   $install-height: 200px;
   .install {
+    @extend .accent-box;
     margin-top: $box-margin;
     height: $install-height;
+    box-sizing: border-box;
+    position: relative;
+    padding: 0;
+
+    .install-label {
+      @extend .accent-box-label;
+      margin: 0;
+      padding: $box-padding;
+    }
+
+    .tabs-column {
+      background: mix($box-bg-color, $bg-dark-1, 90%);
+      height: 100%;
+      float: left;
+      width: 120px;
+    }
+
+    .install-tabs {
+      margin: 0;
+
+      li {
+        display: block;
+        list-style-type: none;
+        padding-left: $box-padding;
+        line-height: 49px;
+        color: $content-1;
+        font-size: 18px;
+        font-weight: 300;
+        @include transition(all 0.1s ease-out);
+
+        &:hover {
+          cursor: pointer;
+          background: mix($box-bg-color, $bg-dark-1, 95%);
+          color: $content-2;
+          @include transition(all 0.1s ease-out);
+        }
+
+        &.active {
+          background: $box-bg-color;
+          color: $content-4;
+        }
+      }
+    }
+
+    .content-column {
+      height: 100%;
+    }
+
+    .tab-content {
+      padding: $box-padding;
+    }
   }
 
   .tags {

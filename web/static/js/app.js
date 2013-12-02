@@ -227,6 +227,98 @@ var PluginList = React.createClass({
   }
 });
 
+// Instructions for installing a plugin with Vundle.
+var VundleInstructions = React.createClass({
+  render: function() {
+    var urlPath = (this.props.github_url || "").replace(
+        /^https?:\/\/github.com\//, "");
+    var vundleUri = urlPath.replace(/^vim-scripts\//, "");
+
+    return <div>
+      <p>Place this in your <code>.vimrc:</code></p>
+      <pre>Bundle '{vundleUri}'</pre>
+      <p>&hellip; then run the following in Vim:</p>
+      <pre>:source %<br/>:BundleInstall</pre>
+      {/* Hack to get triple-click in Chrome to not over-select. */}
+      <div>{'\u00a0' /* &nbsp; */}</div>
+    </div>;
+  }
+});
+
+// Instructions for installing a plugin with Pathogen.
+var PathogenInstructions = React.createClass({
+  render: function() {
+    return <div>
+      <p>Run the following in a terminal:</p>
+      <pre>cd ~/.vim/bundle<br/>git clone {this.props.github_url}
+      </pre>
+      {/* Hack to get triple-click in Chrome to not over-select. */}
+      <div>{'\u00a0' /* &nbsp; */}</div>
+    </div>;
+  }
+});
+
+// Instructions for installing a plugin manually (downloading an archive).
+var ManualInstructions = React.createClass({
+  render: function() {
+    return <div>
+      TODO: How to install manually
+    </div>;
+  }
+});
+
+// The installation instructions (via Vundle, etc.) widget on the details page.
+var Install = React.createClass({
+  getInitialState: function() {
+    return {
+      tabActive: "vundle"
+    };
+  },
+
+  onTabClick: function(installMethod) {
+    this.setState({tabActive: installMethod});
+  },
+
+  render: function() {
+    return <div className="install row-fluid">
+      <div className="tabs-column">
+        <h3 className="install-label">Install from</h3>
+        <ul className="install-tabs">
+          <li onClick={this.onTabClick.bind(this, "vundle")}
+              className={this.state.tabActive === "vundle" ? "active" : ""}>
+            Vundle
+          </li>
+          <li onClick={this.onTabClick.bind(this, "pathogen")}
+              className={this.state.tabActive === "pathogen" ? "active" : ""}>
+            Pathogen
+          </li>
+          <li onClick={this.onTabClick.bind(this, "manual")}
+              className={this.state.tabActive === "manual" ? "active" : ""}>
+            Archive
+          </li>
+        </ul>
+      </div>
+      <div className="content-column">
+        {this.state.tabActive === "vundle" &&
+          <div className="tab-content">
+            <VundleInstructions github_url={this.props.github_url} />
+          </div>
+        }
+        {this.state.tabActive === "pathogen" &&
+          <div className="tab-content">
+            <PathogenInstructions github_url={this.props.github_url} />
+          </div>
+        }
+        {this.state.tabActive === "manual" &&
+          <div className="tab-content">
+            <ManualInstructions />
+          </div>
+        }
+      </div>
+    </div>;
+  }
+});
+
 // This is the tags widget on the details page.
 var Tags = React.createClass({
   getInitialState: function() {
@@ -390,7 +482,7 @@ var PluginPage = React.createClass({
       <Plugin plugin={this.state} />
 
       <div className="row-fluid">
-        <div className="span8 accent-box dates">
+        <div className="span9 accent-box dates">
           <div className="row-fluid">
             <div className="span6">
               <h3 className="date-label">Created</h3>
@@ -406,7 +498,7 @@ var PluginPage = React.createClass({
             </div>
           </div>
         </div>
-        <div className="span4 accent-box links">
+        <div className="span3 accent-box links">
           <a href="http://www.vim.org" target="_blank" className="vim-link">
             <i className="vim-icon dark"></i>
             <i className="vim-icon light"></i>
@@ -421,10 +513,10 @@ var PluginPage = React.createClass({
       </div>
 
       <div className="row-fluid">
-        <div className="span8 install accent-box">
-          <h3 className="accent-box-label">Install</h3>
+        <div className="span9">
+          <Install github_url={this.state.github_url} />
         </div>
-        <div className="span4">
+        <div className="span3">
           <Tags tags={this.state.tags} onTagsChange={this.onTagsChange} />
         </div>
       </div>
@@ -502,8 +594,10 @@ if (Backbone.history && Backbone.history._hasPushState) {
     var href = $(this).attr("href");
     var protocol = this.protocol + "//";
 
-    // Only hijack URL to use Backbone router if it's relative (internal link).
-    if (href.substr(0, protocol.length) !== protocol) {
+    // Only hijack URL to use Backbone router if it's relative (internal link)
+    // and not a hash fragment.
+    if (href && href.substr(0, protocol.length) !== protocol &&
+        href[0] !== '#') {
       evt.preventDefault();
       Backbone.history.navigate(href, true);
 
