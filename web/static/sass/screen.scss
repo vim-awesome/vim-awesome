@@ -561,10 +561,8 @@ code {
 
     .content-column {
       height: 100%;
-    }
-
-    .tab-content {
       padding: $box-padding;
+      overflow: auto;
     }
   }
 

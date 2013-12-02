@@ -300,20 +300,10 @@ var Install = React.createClass({
       </div>
       <div className="content-column">
         {this.state.tabActive === "vundle" &&
-          <div className="tab-content">
-            <VundleInstructions github_url={this.props.github_url} />
-          </div>
-        }
+            <VundleInstructions github_url={this.props.github_url} />}
         {this.state.tabActive === "pathogen" &&
-          <div className="tab-content">
-            <PathogenInstructions github_url={this.props.github_url} />
-          </div>
-        }
-        {this.state.tabActive === "manual" &&
-          <div className="tab-content">
-            <ManualInstructions />
-          </div>
-        }
+            <PathogenInstructions github_url={this.props.github_url} />}
+        {this.state.tabActive === "manual" && <ManualInstructions />}
       </div>
     </div>;
   }
