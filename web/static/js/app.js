@@ -429,6 +429,7 @@ var Tags = React.createClass({
   }
 });
 
+// Permalink page with more details about a plugin.
 var PluginPage = React.createClass({
   getInitialState: function() {
     return {
@@ -467,6 +468,9 @@ var PluginPage = React.createClass({
   render: function() {
     // TODO(david): Should only run markdown on readme.md, not generic long_desc
     var readmeHtml = marked(this.state.long_desc || "");
+    // TODO(david): What to do for scripts that don't have a vim.org submission?
+    var vimOrgUrl = "http://www.vim.org/scripts/script.php?script_id=" +
+        encodeURIComponent(this.state.vim_script_id);
 
     return <div className="plugin-page">
       <Plugin plugin={this.state} />
@@ -489,7 +493,7 @@ var PluginPage = React.createClass({
           </div>
         </div>
         <div className="span3 accent-box links">
-          <a href="http://www.vim.org" target="_blank" className="vim-link">
+          <a href={vimOrgUrl} target="_blank" className="vim-link">
             <i className="vim-icon dark"></i>
             <i className="vim-icon light"></i>
             Vim.org
