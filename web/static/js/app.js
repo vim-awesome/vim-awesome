@@ -275,8 +275,17 @@ var Install = React.createClass({
     };
   },
 
+  componentDidMount: function() {
+    if (window.localStorage && window.localStorage["installTab"]) {
+      this.setState({tabActive: window.localStorage["installTab"]});
+    }
+  },
+
   onTabClick: function(installMethod) {
     this.setState({tabActive: installMethod});
+    if (window.localStorage) {
+      window.localStorage["installTab"] = installMethod;
+    }
   },
 
   render: function() {
