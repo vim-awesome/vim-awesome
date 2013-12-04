@@ -648,21 +648,17 @@ code {
         color: white;
       }
 
-      i {
-        margin-right: 3px;
-      }
-    }
-
-    &:hover .action-btn {
-      opacity: 0.7;
-
-      &.edit-btn {
-        background: rgba($bg-dark-1, 0.1);
-      }
-
       &:hover {
         @include transition(all 0.2s ease-out);
         opacity: 1.0;
+
+        &.edit-btn {
+          background: rgba($bg-dark-1, 0.1);
+        }
+      }
+
+      i {
+        margin-right: 3px;
       }
     }
 
