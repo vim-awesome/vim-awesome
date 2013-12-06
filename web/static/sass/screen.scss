@@ -186,6 +186,41 @@ code {
   margin-bottom: 40px;
 }
 
+.popover {
+  $bg-color: $content-4;
+
+  font-size: 14px;
+  border: none;
+  background: $bg-color;
+  color: mix($content-1, white);
+  line-height: 1.3;
+  box-shadow: none;
+  font-weight: normal;
+  cursor: default;
+
+  &.left {
+    .arrow {
+      border-left: 0;
+
+      &:after {
+        border-left-color: $bg-color;
+      }
+    }
+  }
+
+  .popover-content {
+    padding: 14px;
+  }
+
+  a {
+    color: white;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Homepage
 

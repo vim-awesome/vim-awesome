@@ -267,6 +267,33 @@ var ManualInstructions = React.createClass({
   }
 });
 
+// Help text explaining what Vundle is and linking to more details.
+var VundleTabPopover = React.createClass({
+  render: function() {
+    return <div>
+      Vundle is short for Vim Bundle and is a plugin manager for Vim.
+      <br/><br/>See
+      <a href="https://github.com/gmarik/vundle" target="_blank">
+        <i className="icon-github" /> gmarik/vundle
+      </a>
+    </div>;
+  }
+});
+
+// Help text explaining what Pathogen is and linking to more details.
+var PathogenTabPopover = React.createClass({
+  render: function() {
+    return <div>
+      Pathogen makes it super easy to install plugins and runtime files
+      in their own private directories.
+      <br/><br/>See
+      <a href="https://github.com/tpope/vim-pathogen" target="_blank">
+        <i className="icon-github" /> tpope/vim-pathogen
+      </a>
+    </div>;
+  }
+});
+
 // The installation instructions (via Vundle, etc.) widget on the details page.
 var Install = React.createClass({
   getInitialState: function() {
@@ -279,6 +306,27 @@ var Install = React.createClass({
     if (window.localStorage && window.localStorage["installTab"]) {
       this.setState({tabActive: window.localStorage["installTab"]});
     }
+
+    var popovers = {
+      vundleTab: <VundleTabPopover />,
+      pathogenTab: <PathogenTabPopover />
+    };
+
+    var self = this;
+    _.each(popovers, function(component, ref) {
+      React.renderComponentToString(component, function(markup) {
+        var $tabElem = $(self.refs[ref].getDOMNode());
+        $tabElem.popover({
+          html: true,
+          content: markup,
+          placement: "left",
+          animation: false,
+          trigger: "hover",
+          delay: 100,
+          container: $tabElem
+        });
+      });
+    });
   },
 
   onTabClick: function(installMethod) {
@@ -293,11 +341,11 @@ var Install = React.createClass({
       <div className="tabs-column">
         <h3 className="install-label">Install from</h3>
         <ul className="install-tabs">
-          <li onClick={this.onTabClick.bind(this, "vundle")}
+          <li onClick={this.onTabClick.bind(this, "vundle")} ref="vundleTab"
               className={this.state.tabActive === "vundle" ? "active" : ""}>
             Vundle
           </li>
-          <li onClick={this.onTabClick.bind(this, "pathogen")}
+          <li onClick={this.onTabClick.bind(this, "pathogen")} ref="pathogenTab"
               className={this.state.tabActive === "pathogen" ? "active" : ""}>
             Pathogen
           </li>
