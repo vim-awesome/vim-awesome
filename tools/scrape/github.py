@@ -1,31 +1,36 @@
-import requests
 import base64
 import re
-import getpass
+
+import requests
+from termcolor import cprint
 
 
-auth = None
+try:
+    import secrets
+    _GITHUB_API_TOKEN = getattr(secrets, 'GITHUB_PERSONAL_ACCESS_TOKEN', None)
+except ImportError:
+    _GITHUB_API_TOKEN = None
 
 
-def prompt_for_auth():
-    """Retrieve authentication information from the user"""
-    global auth
-    if not auth:
-        print "GitHub username:",
-        user = raw_input()
-        password = getpass.getpass()
-        auth = (user, password)
+_NO_GITHUB_API_TOKEN_MESSAGE = """
+*******************************************************************************
+* Warning: GitHub API token not found in secrets.py. Scraping will be severely
+* rate-limited. See secrets.py.example to obtain a GitHub personal access token
+*******************************************************************************
+"""
+if not _GITHUB_API_TOKEN:
+    cprint(_NO_GITHUB_API_TOKEN_MESSAGE, 'red')
 
 
-def get_api_page(url, page=1, per_page=100):
+def get_api_page(path, page=1, per_page=100):
     """Get a page from the github API"""
-    if not auth:
-        prompt_for_auth()
+    url = 'https://api.github.com/%s?page=%s&per_page=%s' % (path, page,
+            per_page)
 
-    res = requests.get(
-            'https://api.github.com/%s?page=%s&per_page=%s' % (url, page,
-                per_page),
-            auth=auth)
+    if _GITHUB_API_TOKEN:
+        url += '&access_token=%s' % _GITHUB_API_TOKEN
+
+    res = requests.get(url)
     return res.headers, res.json()
 
 
