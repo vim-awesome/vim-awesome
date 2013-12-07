@@ -497,8 +497,8 @@ var PluginPage = React.createClass({
   getInitialState: function() {
     return {
       // TODO(david): placeholders
-      created_date: 1286809444566,
-      updated_date: 1371265409091
+      created_at: 1286809444,
+      updated_at: 1371265409
     };
   },
 
@@ -576,13 +576,13 @@ var PluginPage = React.createClass({
             <div className="span6">
               <h3 className="date-label">Created</h3>
               <div className="date-value">
-                {moment(this.state.created_date).fromNow()}
+                {moment(this.state.created_at * 1000).fromNow()}
               </div>
             </div>
             <div className="span6">
               <h3 className="date-label">Updated</h3>
               <div className="date-value">
-                {moment(this.state.updated_date).fromNow()}
+                {moment(this.state.updated_at * 1000).fromNow()}
               </div>
             </div>
           </div>

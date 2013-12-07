@@ -1,7 +1,14 @@
+import calendar
+import datetime
+import re
+
 import requests
 import lxml.html
 import lxml.html.html5parser
-import re
+
+
+def _to_timestamp(dt):
+    return calendar.timegm(dt.timetuple())
 
 
 class HTMLParser(lxml.html.html5parser.HTMLParser):
@@ -109,10 +116,25 @@ def get_plugin_info(script_id):
                         (elem.attrib["href"], elem.text))
             elem.getparent().remove(elem)
 
+    download_trs = html.xpath(
+            '//table[tbody/tr/th[text()="release notes"]]/*/*')
+
+    # Parse created and updated dates
+    assert download_trs[0][2].text == "date"
+    updated_date_text = download_trs[1][2][0].text
+    created_date_text = download_trs[-1][2][0].text
+
+    date_format = "%Y-%m-%d"
+    updated_date = datetime.datetime.strptime(updated_date_text, date_format)
+    created_date = datetime.datetime.strptime(created_date_text, date_format)
+
     return {
         "rating_denom": rating_denom,
         "author": creator,
         "long_desc": _get_innerhtml(description_node),
+        # TODO(david): Upgrade rethink to >= 1.8 to get native datetime support
+        "updated_at": _to_timestamp(updated_date),
+        "created_at": _to_timestamp(created_date),
     }
 
 
