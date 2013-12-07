@@ -92,11 +92,7 @@ def get_vim_scripts_repos():
 
 def scrape_vim_scripts(num):
     """Retrieve all the vim-scripts repos as plugins"""
-    # TODO(david): It would be good not to have to fetch every plugin.
-    repos = list(get_vim_scripts_repos())
-
-    # sort by popularity
-    repos.sort(key=lambda r: -r['watchers'])
-
-    for repo in repos[:num]:
+    for i, repo in enumerate(get_vim_scripts_repos()):
+        if i == num:
+            break
         yield fetch_plugin('vim-scripts', repo['name'], repo)
