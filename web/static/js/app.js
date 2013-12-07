@@ -107,6 +107,10 @@ var SearchBox = React.createClass({
 });
 
 var Plugin = React.createClass({
+  goToDetailsPage: function() {
+    Backbone.history.navigate("plugin/" + this.props.plugin.name, true);
+  },
+
   render: function() {
     // TODO(david): Animations on initial render
     var plugin = this.props.plugin;
@@ -169,27 +173,31 @@ var PluginList = React.createClass({
 
   onWindowKeyDown: function(e) {
     // TODO(david): Duplicated code from SearchBox
-    // TODO(david): Enter key to go to plugin page
     var tag = e.target.tagName;
     var key = e.keyCode;
 
-    if (tag !== "INPUT" && tag !== "TEXTAREA" &&
-        (key === J_KEYCODE || key === K_KEYCODE)) {
-      // Go to next or previous plugin
-      var direction = (key === J_KEYCODE ? 1 : -1);
-      var maxIndex = this.state.plugins.length - 1;
-      var newIndex = clamp(this.state.selectedIndex + direction, 0, maxIndex);
+    if (tag !== "INPUT" && tag !== "TEXTAREA") {
+      if (key === J_KEYCODE || key === K_KEYCODE) {
+        // Go to next or previous plugin
+        var direction = (key === J_KEYCODE ? 1 : -1);
+        var maxIndex = this.state.plugins.length - 1;
+        var newIndex = clamp(this.state.selectedIndex + direction, 0, maxIndex);
 
-      // Disable hover when navigating plugins, because when the screen scrolls,
-      // a MouseEnter event will be fired if the mouse is over a plugin, causing
-      // the selection to jump back.
-      this.setState({selectedIndex: newIndex, hoverDisabled: true});
+        // Disable hover when navigating plugins, because when the screen scrolls,
+        // a MouseEnter event will be fired if the mouse is over a plugin, causing
+        // the selection to jump back.
+        this.setState({selectedIndex: newIndex, hoverDisabled: true});
 
-      // Re-enable hover after a delay
-      clearTimeout(this.reenableHoverTimeout);
-      this.reenableHoverTimeout = setTimeout(function() {
-        this.setState({hoverDisabled: false});
-      }.bind(this), 100);
+        // Re-enable hover after a delay
+        clearTimeout(this.reenableHoverTimeout);
+        this.reenableHoverTimeout = setTimeout(function() {
+          this.setState({hoverDisabled: false});
+        }.bind(this), 100);
+
+      } else if (key === ENTER_KEYCODE && this.refs.navFocus) {
+        e.preventDefault();
+        this.refs.navFocus.goToDetailsPage();
+      }
     }
   },
 
