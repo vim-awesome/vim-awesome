@@ -4,6 +4,13 @@
 
 // TODO(david): We might want to split up this file eventually.
 
+var D_KEYCODE = 'D'.charCodeAt(),
+    G_KEYCODE = 'G'.charCodeAt(),
+    J_KEYCODE = 'J'.charCodeAt(),
+    K_KEYCODE = 'K'.charCodeAt(),
+    U_KEYCODE = 'U'.charCodeAt(),
+    ENTER_KEYCODE = 13;
+
 // A cache of all tag IDs and their counts.
 var allTags = {};
 
@@ -165,7 +172,6 @@ var PluginList = React.createClass({
     // TODO(david): Enter key to go to plugin page
     var tag = e.target.tagName;
     var key = e.keyCode;
-    var J_KEYCODE = 74, K_KEYCODE = 75;
 
     if (tag !== "INPUT" && tag !== "TEXTAREA" &&
         (key === J_KEYCODE || key === K_KEYCODE)) {
@@ -498,12 +504,44 @@ var PluginPage = React.createClass({
 
   componentDidMount: function() {
     this.fetchPlugin();
+    window.addEventListener("keydown", this.onWindowKeyDown, false);
+  },
+
+  componentWillUnmount: function() {
+    window.removeEventListener("keydown", this.onWindowKeyDown, false);
   },
 
   fetchPlugin: function() {
     $.getJSON("/api/plugins/" + this.props.name, function(data) {
       this.setState(data);
     }.bind(this));
+  },
+
+  // TODO(david): Maybe use keypress?
+  onWindowKeyDown: function(e) {
+    var key = e.keyCode;
+    var direction;
+    var gPressed = (key === G_KEYCODE && !e.altKey && !e.ctrlKey &&
+        !e.shiftKey && !e.metaKey);
+
+    if (key === J_KEYCODE || key === K_KEYCODE) {
+      // Scroll page in small increments with j/k.
+      direction = (key === J_KEYCODE ? 1 : -1);
+      window.scrollBy(0, direction * 100);
+    } else if (key === U_KEYCODE || key === D_KEYCODE) {
+      // Scroll page in large increments with u/d.
+      direction = (key === D_KEYCODE ? 1 : -1);
+      window.scrollBy(0, direction * 400);
+    } else if (key === G_KEYCODE && e.shiftKey) {
+      // Scroll to bottom of page with shift+G.
+      window.scrollTo(0, $(document).height());
+    } else if (this.gLastPressed && gPressed) {
+      // Scroll to top of page with gg (or by holding down g (yes this is what
+      // Vim does as well -- TIL)).
+      window.scrollTo(0, 0);
+    }
+
+    this.gLastPressed = gPressed;
   },
 
   // TODO(david): Should we adopt the "handleTagsChange" naming convention?
