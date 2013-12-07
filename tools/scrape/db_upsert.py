@@ -47,5 +47,5 @@ def upsert_plugin(conn, plugin):
             "Attempting to insert a plugin with no identifying information")
 
     # Otherwise, insert the plugin
-    plugin['tags'] = plugin['tags'] or []
+    plugin.setdefault('tags', [])
     r.table('plugins').insert(plugin).run(conn)

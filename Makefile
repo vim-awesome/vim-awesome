@@ -17,7 +17,7 @@ seed_data:
 	python db/seed.py
 	@echo
 	@echo "Scraping some repos from the vim-scripts GitHub org"
-	python tools/scrape/scrape.py 40
+	PYTHONPATH=. python tools/scrape/scrape.py 40
 
 aggregate_tags:
 	PYTHONPATH=. python tools/aggregate.py

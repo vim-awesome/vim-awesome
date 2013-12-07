@@ -1,23 +1,46 @@
-import db_upsert
-import github
-import vimorg
-import rethinkdb as r
-import sys
+import argparse
+import logging
+
+from tools.scrape import vimorg, github, db_upsert
+import util
+
+r_conn = util.r_conn
+
+
+def scrape_github(num):
+    print "Scraping from github.com..."
+    for repo in github.scrape_vim_scripts(num):
+        print "    scraped %s" % repo['name']
+        db_upsert.upsert_plugin(r_conn(), repo)
+
+
+def scrape_vimorg(num):
+    print "Scraping from vim.org..."
+    for plugin in vimorg.get_plugin_list(num):
+        print "    scraped %s" % plugin['name']
+        db_upsert.upsert_plugin(r_conn(), plugin)
 
 
 if __name__ == "__main__":
-    conn = r.connect()
-    conn.use("vim_awesome")
+    parser = argparse.ArgumentParser()
 
-    if len(sys.argv) > 1:
-        num = int(sys.argv[1])
-    else:
-        num = None
+    scrape_fns = {
+        "vim.org": scrape_vimorg,
+        "github": scrape_github,
+    }
 
-    for repo in github.scrape_vim_scripts(num):
-        print "Scraped", repo['name']
-        db_upsert.upsert_plugin(conn, repo)
+    parser.add_argument("number", nargs="?", default=6000, type=int,
+            help="Maximum # of plugins to scrape from each source"
+            " (default: 6000)")
+    parser.add_argument("--source", "-s", choices=scrape_fns.keys(),
+            default="all", help="Source to scrape from (default: all)")
 
-    for plugin in vimorg.get_plugin_list(num):
-        print "Scraped", plugin['name']
-        db_upsert.upsert_plugin(conn, plugin)
+    args = parser.parse_args()
+
+    sources = scrape_fns.keys() if args.source == "all" else [args.source]
+    for source in sources:
+        scrape_fn = scrape_fns[source]
+        try:
+            scrape_fn(args.number)
+        except:
+            logging.exception("scrape.py: error in %s " % (scrape_fn))
