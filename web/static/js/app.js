@@ -154,7 +154,7 @@ var PluginList = React.createClass({
 
   componentDidUpdate: function(prevProps) {
     if (prevProps.searchQuery !== this.props.searchQuery) {
-      this.fetchPlugins(this.props.searchQuery);
+      this.fetchPluginsDebounced(this.props.searchQuery);
     }
 
     // Scroll to the navigated plugin if available
@@ -221,6 +221,10 @@ var PluginList = React.createClass({
       }.bind(this)
     });
   },
+
+  fetchPluginsDebounced: _.debounce(function() {
+    this.fetchPlugins.apply(this, arguments);
+  }, 300),
 
   render: function() {
     var query = this.props.searchQuery.toLowerCase();
