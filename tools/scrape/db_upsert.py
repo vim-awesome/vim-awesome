@@ -1,8 +1,7 @@
 import rethinkdb as r
 
-
-class DuplicatePluginError(Exception):
-    pass
+import db.util
+import db.plugins
 
 
 class InvalidPluginError(Exception):
@@ -12,23 +11,21 @@ class InvalidPluginError(Exception):
 def try_update(conn, plugin, attrib):
     """Try to update a plugin based on a given attribute.
 
-    This returns a boolean whether it updated the plugin or not, or raises an
-    error if there are already duplicate plugins with the same attribute.
+    Returns whether it updated an existing plugin.
     """
-    script_filter = (lambda p: p.contains(attrib) &
-            (p[attrib] == plugin[attrib]))
-    num_results = (r.table('plugins')
-                    .filter(script_filter)
-                    .count()
-                    .run(conn))
-    if num_results == 1:
-        (r.table('plugins')
-          .filter(script_filter)
-          .update(plugin)
-          .run(conn))
+    if attrib == 'vim_script_id':
+        query = r.table('plugins').get_all(plugin['vim_script_id'],
+                index='vim_script_id')
+    else:
+        query = r.table('plugins').filter(lambda p: p.contains(attrib) &
+                (p[attrib] == plugin[attrib]))
+
+    db_plugin = db.util.get_first(query)
+
+    if db_plugin:
+        updated_plugin = db.plugins.update_plugin(db_plugin, plugin)
+        query.update(updated_plugin).run(conn)
         return True
-    elif num_results > 1:
-        raise DuplicatePluginError("Duplicate plugin with attrib: " + attrib)
     else:
         return False
 

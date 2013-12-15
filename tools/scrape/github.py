@@ -1,8 +1,11 @@
 import base64
 import re
 
+import dateutil.parser
 import requests
 from termcolor import cprint
+
+import util
 
 
 try:
@@ -52,6 +55,25 @@ def fetch_plugin(owner, repo, repo_data=None, readme_data=None):
     else:
         homepage = repo_data['homepage']
 
+    # Fetch commits so we can get the update/create dates. Unfortunately
+    # repo_data['updated_at'] and repo_data['pushed_at'] are wildy
+    # misrepresentative of the last time someone made a commit to the repo.
+    _, commits_data = get_api_page('repos/%s/%s/commits' % (owner, repo),
+            per_page=100)
+    updated_date_text = commits_data[0]['commit']['author']['date']
+    updated_date = dateutil.parser.parse(updated_date_text)
+
+    # To get the creation date, we use the heuristic of min(repo creation date,
+    # 100th latest commit date). We do this because repo creation date can be
+    # later than the date of the first commit, which is particularly pervasive
+    # for vim-scripts repos. Fortunately, most vim-scripts repos don't have
+    # more than 100 commits, and also we get creation_date for vim-scripts
+    # repos when scraping vim.org.
+    early_commit_date_text = commits_data[-1]['commit']['author']['date']
+    early_commit_date = dateutil.parser.parse(early_commit_date_text)
+    repo_created_date = dateutil.parser.parse(repo_data['created_at'])
+    created_date = min(repo_created_date, early_commit_date)
+
     return {
         'name': repo,
         'github_url': repo_data['html_url'],
@@ -61,6 +83,8 @@ def fetch_plugin(owner, repo, repo_data=None, readme_data=None):
         'short_desc': repo_data['description'],
         'long_desc': unicode(base64.b64decode(readme_data['content']),
             'utf-8'),
+        'created_at': util.to_timestamp(created_date),
+        'updated_at': util.to_timestamp(updated_date),
         'github_data': repo_data,
     }
 

@@ -127,7 +127,7 @@ var Plugin = React.createClass({
         <h3 className={"plugin-name " + color}>{plugin.name}</h3>
         {plugin.author && <span className="by">by</span>}
         {plugin.author && <span className="author">{" " + plugin.author}</span>}
-        {plugin.github_stars && <div className="github-stars">
+        {plugin.github_stars > 0 && <div className="github-stars">
           {plugin.github_stars} <i className="icon-star"></i>
         </div>}
         <p className="short-desc">{plugin.short_desc}</p>

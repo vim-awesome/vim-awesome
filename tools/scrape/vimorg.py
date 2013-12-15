@@ -1,4 +1,3 @@
-import calendar
 import datetime
 import re
 
@@ -6,9 +5,7 @@ import requests
 import lxml.html
 import lxml.html.html5parser
 
-
-def _to_timestamp(dt):
-    return calendar.timegm(dt.timetuple())
+import util
 
 
 class HTMLParser(lxml.html.html5parser.HTMLParser):
@@ -133,8 +130,8 @@ def get_plugin_info(script_id):
         "author": creator,
         "long_desc": _get_innerhtml(description_node),
         # TODO(david): Upgrade rethink to >= 1.8 to get native datetime support
-        "updated_at": _to_timestamp(updated_date),
-        "created_at": _to_timestamp(created_date),
+        "updated_at": util.to_timestamp(updated_date),
+        "created_at": util.to_timestamp(created_date),
     }
 
 

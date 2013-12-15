@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 
-.PHONY: local deploy clean
+.PHONY: local deploy seed_data aggregate_tags test clean
 
 local:
 	tools/local_server.sh
@@ -20,6 +20,9 @@ seed_data:
 
 aggregate_tags:
 	PYTHONPATH=. python tools/aggregate.py
+
+test:
+	PYTHONPATH=. nosetests -v
 
 clean:
 	find . -name '*.pyc' -delete
