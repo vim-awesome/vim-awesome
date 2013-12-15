@@ -3,10 +3,13 @@ import re
 
 import dateutil.parser
 import requests
+import rethinkdb as r
 from termcolor import cprint
 
+import db.util
 import util
 
+r_conn = db.util.r_conn
 
 try:
     import secrets
@@ -96,26 +99,12 @@ def get_requests_left():
     return data['rate']['remaining']
 
 
-def get_vim_scripts_repos():
-    """Retrieve all of the repos in the vim-scripts group"""
-    _, user_data = get_api_page('users/vim-scripts')
-
-    print "Fetching repositories from https://github.com/vim-scripts ..."
-
-    # calculate how many pages of repositories there are
-    num_pages = (user_data['public_repos'] + 99) / 100
-
-    for page in range(num_pages):
-        _, repos_data = get_api_page('users/vim-scripts/repos',
-                page=(page + 1))
-
-        for repo in repos_data:
-            yield repo
-
-
 def scrape_vim_scripts(num):
-    """Retrieve all the vim-scripts repos as plugins"""
-    for i, repo in enumerate(get_vim_scripts_repos()):
-        if i == num:
-            break
-        yield fetch_plugin('vim-scripts', repo['name'], repo)
+    """Retrieve all the vim-scripts repos as plugins."""
+    query = r.table('github_repos').get_all('vim-scripts', index='owner')
+    query = query.order_by('last_scraped_at').limit(num)
+    repos = query.run(r_conn())
+
+    # TODO(david): Update repo's last_scraped_at, times_scraped, etc.
+    for repo in repos:
+        yield fetch_plugin('vim-scripts', repo['repo_name'], repo['repo_data'])

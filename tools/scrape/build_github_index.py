@@ -1,11 +1,14 @@
 """Build an index (DB table) of known GitHub repositories of Vim plugins."""
 
+import argparse
+import logging
 import re
 
 import rethinkdb as r
 
 import db.util
 import db.github_repos
+from tools.scrape.github import get_api_page
 
 r_conn = db.util.r_conn
 
@@ -69,8 +72,10 @@ def _extract_github_repo_urls(text):
     return filter(_is_github_url_allowed, normalized_matches)
 
 
-def extract_repos_from_vimorg_descriptions():
+def get_repos_from_vimorg_descriptions():
     """Extract URLs of GitHub repos from the long descriptions on vim.org."""
+    print "Discovering GitHub repos from vim.org long descriptions ..."
+
     repo_urls = set()
 
     all_plugins = r.table('plugins').filter({}).run(r_conn())
@@ -83,12 +88,57 @@ def extract_repos_from_vimorg_descriptions():
     db.github_repos.create_table()
     for repo_url in repo_urls:
         _, owner, repo_name = repo_url.split('/')
-        if db.github_repos.insert_with_owner_repo(owner, repo_name):
+        if db.github_repos.upsert_with_owner_repo(owner, repo_name):
             num_inserted += 1
 
     print "Found %s GitHub repos; inserted %s of which are new." % (
             len(repo_urls), num_inserted)
 
 
+def get_vim_scripts_repos():
+    """Retrieve all of the repos from the vim-scripts GitHub user."""
+    db.github_repos.create_table()
+
+    print "Discovering repositories from https://github.com/vim-scripts ..."
+    _, user_data = get_api_page('users/vim-scripts')
+
+    # Calculate how many pages of repositories there are.
+    num_repos = user_data['public_repos']
+    num_pages = (num_repos + 99) / 100  # ceil(num_repos / 100.0)
+
+    num_inserted = 0
+
+    for page in range(num_pages):
+        _, repos_data = get_api_page('users/vim-scripts/repos',
+                page=(page + 1))
+
+        for repo_data in repos_data:
+            if db.github_repos.upsert_with_owner_repo('vim-scripts',
+                    repo_data['name'], repo_data):
+                num_inserted += 1
+
+    print ("Found %s vim-scripts GitHub repos; "
+            "inserted %s of which are new." % (num_repos, num_inserted))
+
+
 if __name__ == '__main__':
-    extract_repos_from_vimorg_descriptions()
+    parser = argparse.ArgumentParser()
+
+    extract_fns = {
+        "vim.org": get_repos_from_vimorg_descriptions,
+        "vim-scripts": get_vim_scripts_repos,
+    }
+
+    parser.add_argument("--source", "-s", choices=extract_fns.keys(),
+            default="all", help="Source to extract from (default: all)")
+
+    args = parser.parse_args()
+
+    sources = extract_fns.keys() if args.source == "all" else [args.source]
+    for source in sources:
+        extract_fn = extract_fns[source]
+        try:
+            extract_fn()
+        except:
+            logging.exception("build_github_index.py: error in %s " % (
+                    extract_fn))

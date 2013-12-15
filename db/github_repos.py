@@ -9,13 +9,17 @@ r_conn = db.util.r_conn
 
 def create_table():
     db.util.create_table('github_repos')
+    db.util.create_index('github_repos', 'owner')
+    db.util.create_index('github_repos', 'last_scraped_at')
     db.util.create_index('github_repos', 'owner_repo',
             lambda repo: [repo['owner'], repo['repo_name']])
 
 
-def insert_with_owner_repo(owner, repo_name):
+def upsert_with_owner_repo(owner, repo_name, repo_data=None):
     """Insert a new row with the given owner and repo names if not already
     present.
+
+    Updates the specified repo with the given repo_data if found.
 
     Returns True if a new row was inserted, False if a repo with the given
     arguments already exists.
@@ -32,7 +36,12 @@ def insert_with_owner_repo(owner, repo_name):
             'times_scraped': 0,
             'is_blacklisted': False,
             'normalized_plugin_name': '',
+            'repo_data': repo_data or {},
         }).run(r_conn())
         return True
+    elif repo_data:
+        repo['repo_data'] = repo_data
+        query.update(repo).run(r_conn())
+        return False
     else:
         return False
