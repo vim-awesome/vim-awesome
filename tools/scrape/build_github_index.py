@@ -4,7 +4,8 @@ import re
 
 import rethinkdb as r
 
-import db
+import db.util
+import db.github_repos
 
 r_conn = db.util.r_conn
 
@@ -78,9 +79,15 @@ def extract_repos_from_vimorg_descriptions():
             if field in plugin:
                 repo_urls |= set(_extract_github_repo_urls(plugin[field]))
 
-    # TODO(david): This is still WIP. This just prints out a set of GitHub URLs
-    #     we find from vim.org long descriptions for now.
-    print '\n'.join(str(url) for url in repo_urls)
+    num_inserted = 0
+    db.github_repos.create_table()
+    for repo_url in repo_urls:
+        _, owner, repo_name = repo_url.split('/')
+        if db.github_repos.insert_with_owner_repo(owner, repo_name):
+            num_inserted += 1
+
+    print "Found %s GitHub repos; inserted %s of which are new." % (
+            len(repo_urls), num_inserted)
 
 
 if __name__ == '__main__':
