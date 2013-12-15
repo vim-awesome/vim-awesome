@@ -130,7 +130,9 @@ var Plugin = React.createClass({
         {plugin.github_stars > 0 && <div className="github-stars">
           {plugin.github_stars} <i className="icon-star"></i>
         </div>}
-        <p className="short-desc">{plugin.short_desc}</p>
+        <p className="short-desc">
+          {plugin.github_short_desc || plugin.vimorg_short_desc}
+        </p>
       </a>
     </li>;
   }
@@ -569,9 +571,19 @@ var PluginPage = React.createClass({
   },
 
   render: function() {
-    // TODO(david): Should only run markdown on readme.md, not generic long_desc
-    var readmeHtml = marked(this.state.long_desc || "");
-    // TODO(david): What to do for scripts that don't have a vim.org submission?
+    var longDesc;
+
+    // For rendering long description, prefer GitHub's README if it's not from
+    // the vim-scripts mirror.
+    if (this.state.github_readme &&
+        this.state.github_url.indexOf("github.com/vim-scripts") === -1) {
+      longDesc = this.state.github_readme;
+    } else {
+      longDesc = this.state.vimorg_long_desc || this.state.github_readme || "";
+    }
+
+    // TODO(david): What to do for scripts that don't have a vim.org
+    //     submission?
     var vimOrgUrl = "http://www.vim.org/scripts/script.php?script_id=" +
         encodeURIComponent(this.state.vim_script_id);
 
@@ -620,7 +632,7 @@ var PluginPage = React.createClass({
 
       <div className="row-fluid">
         <div className="span12 long-desc"
-            dangerouslySetInnerHTML={{__html: readmeHtml}}>
+            dangerouslySetInnerHTML={{__html: marked(longDesc)}}>
         </div>
       </div>
 

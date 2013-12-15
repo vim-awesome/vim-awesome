@@ -48,7 +48,7 @@ def get_plugin_list(num):
             "vimorg_type": tr[1].text,
             "vimorg_rating": int(tr[2].text),
             "vimorg_downloads": int(tr[3].text),
-            "short_desc": tr[4][0].text,
+            "vimorg_short_desc": tr[4][0].text,
         }, **get_plugin_info(script_id))
 
 
@@ -128,7 +128,7 @@ def get_plugin_info(script_id):
     return {
         "rating_denom": rating_denom,
         "author": creator,
-        "long_desc": _get_innerhtml(description_node),
+        "vimorg_long_desc": _get_innerhtml(description_node),
         # TODO(david): Upgrade rethink to >= 1.8 to get native datetime support
         "updated_at": util.to_timestamp(updated_date),
         "created_at": util.to_timestamp(created_date),
