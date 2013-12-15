@@ -1,4 +1,5 @@
 import datetime
+import logging
 import re
 
 import requests
@@ -37,8 +38,21 @@ def get_plugin_list(num):
     # the first two rows and the last row aren't scripts
     for tr in scripts[2:-1]:
         link = tr[0][0].attrib['href']
-        # Parse out the script id
+
         script_id = int(re.search("script_id=(\d+)", link).group(1))
+        name = tr[0][0].text
+
+        # TODO(david): Somehow also get a count of how many plugins failed to
+        #     be scraped in total. Maybe return a tuple with error status.
+        # TODO(david): Fix error scraping vimcat (id=4325) (something about
+        #     only unicode and ascii allowed, no null bytes or control chars)
+        try:
+            plugin_info = get_plugin_info(script_id)
+        except:
+            logging.exception('Error scraping %s (script_id=%s) from vim.org' %
+                    (name, script_id))
+            continue
+
         # Merge the data we get here with the extra data from get_plugin_info
         yield dict({
             "vimorg_url": "http://www.vim.org/scripts/%s" %
@@ -49,7 +63,7 @@ def get_plugin_list(num):
             "vimorg_rating": int(tr[2].text),
             "vimorg_downloads": int(tr[3].text),
             "vimorg_short_desc": tr[4][0].text,
-        }, **get_plugin_info(script_id))
+        }, **plugin_info)
 
 
 def _clean_text_node(node):
@@ -91,9 +105,11 @@ def _clean_text_node(node):
                     elem.getparent().text += elem.text
                     if elem.tail:
                         elem.getparent().text += elem.tail
+            elif 'vimtip' in elem.text:
+                pass  # Ignore the rare link to www.vim.org/tips/index.php
             else:
                 # Throw an error if it's not one of those types
-                raise ("Weird link to %s with text %s" %
+                raise Exception("Weird link to %s with text %s" %
                         (elem.attrib["href"], elem.text))
             elem.getparent().remove(elem)
 
