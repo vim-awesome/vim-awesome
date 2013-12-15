@@ -14,9 +14,8 @@ deploy:
 
 seed_data:
 	@echo "Creating tables with some example data"
-	python db/seed.py
+	PYTHONPATH=. python db/seed.py
 	@echo
-	@echo "Scraping some repos from the vim-scripts GitHub org"
 	PYTHONPATH=. python tools/scrape/scrape.py 40
 
 aggregate_tags:

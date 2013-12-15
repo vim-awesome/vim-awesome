@@ -13,7 +13,7 @@ app = flask.Flask(__name__)
 
 app.config.from_envvar('FLASK_CONFIG')
 
-r_conn = util.r_conn
+r_conn = db.util.r_conn
 
 # TODO(david): Add logging handler
 

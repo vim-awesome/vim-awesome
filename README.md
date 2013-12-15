@@ -29,7 +29,7 @@ $ make
 1. Seed the database with some test data:
 
 ```sh
-$ python db/seed.py
+$ make seed_data
 ```
 
 1. Open the website in your browser!

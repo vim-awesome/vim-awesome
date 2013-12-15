@@ -41,17 +41,16 @@ def fetch_plugin(owner, repo, repo_data=None, readme_data=None):
     if not readme_data:
         _, readme_data = get_api_page('repos/%s/%s/readme' % (owner, repo))
 
+    vim_script_id = None
+    homepage = None
+
     if repo_data['homepage'].startswith('http://www.vim.org/scripts/'):
         vim_script_url = repo_data['homepage']
         match = re.search('script_id=(\d+)', vim_script_url)
         if match:
             vim_script_id = int(match.group(1))
-        else:
-            vim_script_id = None
-        homepage = None
     else:
         homepage = repo_data['homepage']
-        vim_script_id = None
 
     return {
         'name': repo,
