@@ -52,38 +52,22 @@ def get_plugin_list(num):
         }, **get_plugin_info(script_id))
 
 
-def get_plugin_info(script_id):
-    """Gets some more detailed information about a vim.org script
+def _clean_text_node(node):
+    """Cleans a text description node on vim.org.
 
-    Scrapes a given vim.org script page, and returns some detailed information
-    about the plugin that is not available from the search page, like how many
-    people rated a plugin, the author's name, and a long description
+    More precisely, this removes <br>s (newlines will be kept) and replaces <a>
+    tags with the text of the link.
     """
-    res = requests.get(
-            'http://www.vim.org/scripts/script.php?script_id=%d' % script_id)
-
-    html = lxml.html.html5parser.document_fromstring(res.text, parser=PARSER)
-
-    rating = html.xpath('//td[contains(text(),"Rating")]/b')[0]
-    rating_denom = int(re.search("(\d+)/(\d+)", rating.text).group(2))
-
-    body_trs = html.xpath(
-            '//table[tbody/tr/td[contains(@class,"prompt")]]/*/*')
-
-    assert body_trs[0][0].text == "created by"
-    assert body_trs[6][0].text == "description"
-
-    creator = body_trs[1][0][0].text
-    description_node = body_trs[7][0]
+    # TODO(david): Check that all <br>s have been removed.
 
     # Sometimes there's an <a> at the beginning of the description, and that
     # breaks some code down below because there's no text in the body. This
     # fixes that.
-    if len(description_node) > 0 and not description_node[0].getparent().text:
-        description_node[0].getparent().text = ""
+    if len(node) > 0 and not node[0].getparent().text:
+        node[0].getparent().text = ""
 
     # Iterate through the tags of the description
-    for elem in description_node:
+    for elem in node:
         # Remove <br> tags completely
         if elem.tag == 'br':
             # lxml wizardry to remove the tag but keep the text
@@ -113,6 +97,36 @@ def get_plugin_info(script_id):
                         (elem.attrib["href"], elem.text))
             elem.getparent().remove(elem)
 
+
+def get_plugin_info(script_id):
+    """Gets some more detailed information about a vim.org script
+
+    Scrapes a given vim.org script page, and returns some detailed information
+    about the plugin that is not available from the search page, like how many
+    people rated a plugin, the author's name, and a long description.
+    """
+    res = requests.get(
+            'http://www.vim.org/scripts/script.php?script_id=%d' % script_id)
+
+    html = lxml.html.html5parser.document_fromstring(res.text, parser=PARSER)
+
+    rating = html.xpath('//td[contains(text(),"Rating")]/b')[0]
+    rating_denom = int(re.search("(\d+)/(\d+)", rating.text).group(2))
+
+    body_trs = html.xpath(
+            '//table[tbody/tr/td[contains(@class,"prompt")]]/*/*')
+
+    assert body_trs[0][0].text == "created by"
+    creator = body_trs[1][0][0].text
+
+    assert body_trs[6][0].text == "description"
+    description_node = body_trs[7][0]
+    _clean_text_node(description_node)
+
+    assert body_trs[9][0].text == "install details"
+    install_node = body_trs[10][0]
+    _clean_text_node(install_node)
+
     download_trs = html.xpath(
             '//table[tbody/tr/th[text()="release notes"]]/*/*')
 
@@ -129,6 +143,7 @@ def get_plugin_info(script_id):
         "rating_denom": rating_denom,
         "author": creator,
         "vimorg_long_desc": _get_innerhtml(description_node),
+        "vimorg_install_details": _get_innerhtml(install_node),
         # TODO(david): Upgrade rethink to >= 1.8 to get native datetime support
         "updated_at": util.to_timestamp(updated_date),
         "created_at": util.to_timestamp(created_date),

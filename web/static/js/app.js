@@ -502,6 +502,13 @@ var Tags = React.createClass({
   }
 });
 
+var Markdown = React.createClass({
+  render: function() {
+    return <div
+        dangerouslySetInnerHTML={{__html: marked(this.props.children)}} />;
+  }
+});
+
 // Permalink page with more details about a plugin.
 var PluginPage = React.createClass({
   getInitialState: function() {
@@ -582,6 +589,10 @@ var PluginPage = React.createClass({
       longDesc = this.state.vimorg_long_desc || this.state.github_readme || "";
     }
 
+    // TODO(david): Need to also scrape the link to the archive download (for
+    //     the manual install mode).
+    var installDetails = this.state.vimorg_install_details;
+
     // TODO(david): What to do for scripts that don't have a vim.org
     //     submission?
     var vimOrgUrl = "http://www.vim.org/scripts/script.php?script_id=" +
@@ -631,8 +642,14 @@ var PluginPage = React.createClass({
       </div>
 
       <div className="row-fluid">
-        <div className="span12 long-desc"
-            dangerouslySetInnerHTML={{__html: marked(longDesc)}}>
+        <div className="span12 long-desc">
+          <Markdown>{longDesc}</Markdown>
+          {!!installDetails &&
+            <div>
+              <h2>Installation</h2>
+              <Markdown>{installDetails}</Markdown>
+            </div>
+          }
         </div>
       </div>
 
