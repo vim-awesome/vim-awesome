@@ -1,5 +1,7 @@
 import base64
 import re
+import sys
+import time
 
 import dateutil.parser
 import requests
@@ -7,6 +9,7 @@ import rethinkdb as r
 from termcolor import cprint
 
 import db.util
+import tools.scrape.db_upsert as db_upsert
 import util
 
 r_conn = db.util.r_conn
@@ -37,26 +40,29 @@ def get_api_page(path, page=1, per_page=100):
         url += '&access_token=%s' % _GITHUB_API_TOKEN
 
     res = requests.get(url)
-    return res.headers, res.json()
+    return res, res.json()
 
 
 def fetch_plugin(owner, repo, repo_data=None, readme_data=None):
     """Fetch a plugin from a github repo"""
     if not repo_data:
-        _, repo_data = get_api_page('repos/%s/%s' % (owner, repo))
+        res, repo_data = get_api_page('repos/%s/%s' % (owner, repo))
+        if res.status_code == 404:
+            return None, repo_data
+
     if not readme_data:
         _, readme_data = get_api_page('repos/%s/%s/readme' % (owner, repo))
 
-    vim_script_id = None
-    homepage = None
+    readme = unicode(base64.b64decode(readme_data.get('content', '')), 'utf-8')
 
-    if repo_data['homepage'].startswith('http://www.vim.org/scripts/'):
-        vim_script_url = repo_data['homepage']
+    vim_script_id = None
+    homepage = repo_data['homepage']
+
+    if homepage and homepage.startswith('http://www.vim.org/scripts/'):
+        vim_script_url = homepage
         match = re.search('script_id=(\d+)', vim_script_url)
         if match:
             vim_script_id = int(match.group(1))
-    else:
-        homepage = repo_data['homepage']
 
     # Fetch commits so we can get the update/create dates. Unfortunately
     # repo_data['updated_at'] and repo_data['pushed_at'] are wildy
@@ -77,19 +83,17 @@ def fetch_plugin(owner, repo, repo_data=None, readme_data=None):
     repo_created_date = dateutil.parser.parse(repo_data['created_at'])
     created_date = min(repo_created_date, early_commit_date)
 
-    return {
+    return ({
         'name': repo,
         'github_url': repo_data['html_url'],
         'vim_script_id': vim_script_id,
         'homepage': homepage,
         'github_stars': repo_data['watchers'],
         'github_short_desc': repo_data['description'],
-        'github_readme': unicode(base64.b64decode(readme_data['content']),
-            'utf-8'),
+        'github_readme': readme,
         'created_at': util.to_timestamp(created_date),
         'updated_at': util.to_timestamp(updated_date),
-        'github_data': repo_data,
-    }
+    }, repo_data)
 
 
 def get_requests_left():
@@ -99,12 +103,38 @@ def get_requests_left():
     return data['rate']['remaining']
 
 
-def scrape_vim_scripts(num):
-    """Retrieve all the vim-scripts repos as plugins."""
-    query = r.table('github_repos').get_all('vim-scripts', index='owner')
+def scrape_repos(num):
+    """Scrapes the num repos that have been least recently scraped."""
+    query = r.table('github_repos').filter({'is_blacklisted': False})
     query = query.order_by('last_scraped_at').limit(num)
     repos = query.run(r_conn())
 
-    # TODO(david): Update repo's last_scraped_at, times_scraped, etc.
     for repo in repos:
-        yield fetch_plugin('vim-scripts', repo['repo_name'], repo['repo_data'])
+        repo_name = repo['repo_name']
+        repo_owner = repo['owner']
+
+        # Print w/o newline.
+        print "    scraping %s/%s ..." % (repo_owner, repo_name),
+        sys.stdout.flush()
+
+        # TODO(david): One optimization is to pass in repo['repo_data'] for
+        #     vim-scripts repos (since we already save that when discovering
+        #     vim-scripts repos in build_github_index.py). But the
+        #     implementation here should not be coupled with implemenation
+        #     details in build_github_index.py.
+        plugin, repo_data = fetch_plugin(repo_owner, repo_name)
+
+        repo['last_scraped_at'] = int(time.time())
+        repo['repo_data'] = repo_data
+        repo['times_scraped'] += 1
+        db.util.replace_document('github_repos', repo)
+
+        if plugin:
+            db_upsert.upsert_plugin(plugin)
+
+            print "done"
+        else:
+            # TODO(david): Insert some metadata in the github repo that this is
+            #     not found
+            print "not found."
+            continue

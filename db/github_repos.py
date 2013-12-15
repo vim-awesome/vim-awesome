@@ -35,7 +35,6 @@ def upsert_with_owner_repo(owner, repo_name, repo_data=None):
             'last_scraped_at': 0,
             'times_scraped': 0,
             'is_blacklisted': False,
-            'normalized_plugin_name': '',
             'repo_data': repo_data or {},
         }).run(r_conn())
         return True
