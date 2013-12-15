@@ -225,12 +225,6 @@ var PluginList = React.createClass({
   render: function() {
     var query = this.props.searchQuery.toLowerCase();
     var plugins = _.chain(this.state.plugins)
-      .sortBy(function(plugin) {
-        // TODO(david): We should always ensure properties when inserting a new
-        //     plugin and have default values.
-        return -((plugin.github_stars || 0) * 100000 +
-            (plugin.vimorg_rating || 0));
-      })
       .map(function(plugin, index) {
         var hasNavFocus = (index === this.state.selectedIndex);
         return <Plugin

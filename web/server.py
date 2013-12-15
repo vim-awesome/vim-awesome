@@ -41,6 +41,11 @@ def get_plugins():
     search = request.args.get('query', '')
     query = r.table('plugins')
 
+    # This will actually sort with github_stars taking precedence because it's
+    # an index: http://www.rethinkdb.com/api/python/order_by/
+    query = query.order_by(r.desc('vimorg_rating'),
+            index=r.desc('github_stars'))
+
     if search:
         needles = [t.lower() for t in re.findall(r'\w+', search)]
         needles.sort()
@@ -60,6 +65,8 @@ def get_plugins():
 
             return needles.length === 0;
         })""" % json.dumps(needles)))
+
+    query = query.limit(20)
 
     return json.dumps(list(query.run(r_conn())))
 

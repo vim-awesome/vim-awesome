@@ -14,6 +14,7 @@ def create_table():
     #     doesn't have an optimizer yet. Must use get_all().)
     db.util.create_index('plugins', 'vim_script_id')
     db.util.create_index('plugins', 'name')
+    db.util.create_index('plugins', 'github_stars')
 
 
 def get_for_name(name):
