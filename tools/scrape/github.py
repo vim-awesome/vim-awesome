@@ -139,7 +139,7 @@ def scrape_repos(num):
         repo['last_scraped_at'] = int(time.time())
         repo['repo_data'] = repo_data
         repo['times_scraped'] += 1
-        db.util.replace_document('github_repos', repo)
+        r.table('github_repos').insert(repo, upsert=True).run(r_conn())
 
         if plugin:
             # FIXME(david): This is temprorary. I intend to match GitHub repo

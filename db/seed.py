@@ -28,7 +28,7 @@ def main():
     ctrlp_readme = read_file('ctrlp.md')
     youcompleteme_readme = read_file('youcompleteme.md')
 
-    r.table('plugins').insert([
+    db.plugins.insert([
         {
             'id': 'ctrlp-example-plugin',
             'name': 'ctrlp.vim',
@@ -51,7 +51,7 @@ def main():
             'homepage': 'http://valloric.github.io/YouCompleteMe/',
             'tags': ['autocomplete', 'fuzzy', 'C'],
         },
-    ], upsert=True).run(conn)
+    ], upsert=True)
 
     # TODO(david): Add other fields like friendly name, description
     r.table('tags').insert([{

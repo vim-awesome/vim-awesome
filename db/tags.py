@@ -51,7 +51,10 @@ def aggregate_tags():
     # TODO(david): This can definitely be optimized if necessary, eg. by
     #     batching inserts/updates in Rethink or using Python's Counter class
     #     to aggregate counts in-memory first
-    all_plugins = r.table('plugins').filter({}).run(r_conn())
+    # TODO(david): Figure out why Rethink 1.11 is giving the following error if
+    #     we don't call list() on the result set:
+    #     RqlClientError: Token 14 not in stream cache.
+    all_plugins = list(r.table('plugins').run(r_conn()))
     for plugin in all_plugins:
         if 'tags' not in plugin:
             plugin['tags'] = []

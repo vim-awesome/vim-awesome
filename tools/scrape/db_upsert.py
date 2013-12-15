@@ -44,7 +44,7 @@ def _update_db_plugin(db_plugin, plugin):
     """
     if db_plugin:
         updated_plugin = db.plugins.update_plugin(db_plugin, plugin)
-        db.util.replace_document('plugins', updated_plugin)
+        db.plugins.insert(updated_plugin, upsert=True)
         return True
     else:
         return False
@@ -119,5 +119,4 @@ def upsert_plugin(plugin):
 
     # If we didn't update an existing plugin, insert a new row.
     if not updated:
-        plugin.setdefault('tags', [])
-        r.table('plugins').insert(plugin).run(r_conn())
+        db.plugins.insert(plugin)

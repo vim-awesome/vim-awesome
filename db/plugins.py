@@ -10,16 +10,46 @@ r_conn = db.util.r_conn
 def create_table():
     db.util.create_table('plugins')
 
-    # TODO(david): Actually use these secondary indices in our queries (Rethink
-    #     doesn't have an optimizer yet. Must use get_all().)
     db.util.create_index('plugins', 'vim_script_id')
     db.util.create_index('plugins', 'name')
     db.util.create_index('plugins', 'github_stars')
 
 
+# TODO(david): Yep, using an ODM enforcing a consistent schema would be great.
+def insert(plugins, *args, **kwargs):
+    """Insert or update a plugin or list of plugins.
+
+    Although this would be more accurately named "upsert", this is a wrapper
+    around http://www.rethinkdb.com/api/python/#insert that ensures
+    a consistent plugin schema before inserting into DB.
+    """
+    if not isinstance(plugins, list):
+        plugins = [plugins]
+
+    mapped_plugins = []
+    for plugin in plugins:
+        plugin_with_defaults = dict({
+            'tags': [],
+            'github_stars': 0,
+            'vimorg_rating': 0,
+            'github_url': '',
+            'vim_script_id': None,
+            'github_short_desc': '',
+            'github_readme': '',
+            'homepage': '',
+        }, **plugin)
+
+        assert plugin_with_defaults['name']
+
+        mapped_plugins.append(plugin_with_defaults)
+
+    return r.table('plugins').insert(mapped_plugins, *args, **kwargs).run(
+            r_conn())
+
+
 def get_for_name(name):
     """Get the plugin model of the given name."""
-    return db.util.get_first(r.table('plugins').filter({'name': name}))
+    return db.util.get_first(r.table('plugins').get_all(name, index='name'))
 
 
 def update_tags(plugin, tags):

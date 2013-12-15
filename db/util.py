@@ -28,11 +28,3 @@ def create_index(table_name, index_name, *args, **kwargs):
     if index_name not in indices:
         r.table(table_name).index_create(index_name, *args, **kwargs).run(
                 r_conn())
-
-
-def replace_document(table_name, document):
-    """Updates an existing document in the DB (like calling document.save()).
-
-    Document must have the primary key field 'id'.
-    """
-    r.table(table_name).get(document['id']).replace(document).run(r_conn())
