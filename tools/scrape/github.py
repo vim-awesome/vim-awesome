@@ -53,7 +53,8 @@ def fetch_plugin(owner, repo, repo_data=None, readme_data=None):
     if not readme_data:
         _, readme_data = get_api_page('repos/%s/%s/readme' % (owner, repo))
 
-    readme = unicode(base64.b64decode(readme_data.get('content', '')), 'utf-8')
+    readme_base64_decoded = base64.b64decode(readme_data.get('content', ''))
+    readme = unicode(readme_base64_decoded, 'utf-8', errors='ignore')
 
     vim_script_id = None
     homepage = repo_data['homepage']
@@ -64,24 +65,33 @@ def fetch_plugin(owner, repo, repo_data=None, readme_data=None):
         if match:
             vim_script_id = int(match.group(1))
 
-    # Fetch commits so we can get the update/create dates. Unfortunately
-    # repo_data['updated_at'] and repo_data['pushed_at'] are wildy
-    # misrepresentative of the last time someone made a commit to the repo.
+    repo_created_date = dateutil.parser.parse(repo_data['created_at'])
+
+    # Fetch commits so we can get the update/create dates.
     _, commits_data = get_api_page('repos/%s/%s/commits' % (owner, repo),
             per_page=100)
-    updated_date_text = commits_data[0]['commit']['author']['date']
-    updated_date = dateutil.parser.parse(updated_date_text)
 
-    # To get the creation date, we use the heuristic of min(repo creation date,
-    # 100th latest commit date). We do this because repo creation date can be
-    # later than the date of the first commit, which is particularly pervasive
-    # for vim-scripts repos. Fortunately, most vim-scripts repos don't have
-    # more than 100 commits, and also we get creation_date for vim-scripts
-    # repos when scraping vim.org.
-    early_commit_date_text = commits_data[-1]['commit']['author']['date']
-    early_commit_date = dateutil.parser.parse(early_commit_date_text)
-    repo_created_date = dateutil.parser.parse(repo_data['created_at'])
-    created_date = min(repo_created_date, early_commit_date)
+    if commits_data and isinstance(commits_data, list) and len(commits_data):
+
+        # Unfortunately repo_data['updated_at'] and repo_data['pushed_at'] are
+        # wildy misrepresentative of the last time someone made a commit to the
+        # repo.
+        updated_date_text = commits_data[0]['commit']['author']['date']
+        updated_date = dateutil.parser.parse(updated_date_text)
+
+        # To get the creation date, we use the heuristic of min(repo creation
+        # date, 100th latest commit date). We do this because repo creation
+        # date can be later than the date of the first commit, which is
+        # particularly pervasive for vim-scripts repos. Fortunately, most
+        # vim-scripts repos don't have more than 100 commits, and also we get
+        # creation_date for vim-scripts repos when scraping vim.org.
+        early_commit_date_text = commits_data[-1]['commit']['author']['date']
+        early_commit_date = dateutil.parser.parse(early_commit_date_text)
+        created_date = min(repo_created_date, early_commit_date)
+
+    else:
+        updated_date = dateutil.parser.parse(repo_data['updated_at'])
+        created_date = repo_created_date
 
     return ({
         'name': repo,
@@ -109,6 +119,8 @@ def scrape_repos(num):
     query = query.order_by('last_scraped_at').limit(num)
     repos = query.run(r_conn())
 
+    # TODO(david): Print stats at the end: # successfully scraped, # not found,
+    #     # redirects, etc.
     for repo in repos:
         repo_name = repo['repo_name']
         repo_owner = repo['owner']
@@ -130,7 +142,14 @@ def scrape_repos(num):
         db.util.replace_document('github_repos', repo)
 
         if plugin:
-            db_upsert.upsert_plugin(plugin)
+            # FIXME(david): This is temprorary. I intend to match GitHub repo
+            #     with the description it was scraped from as a backup in the
+            #     actually common case of normalized name collisions.
+            try:
+                db_upsert.upsert_plugin(plugin)
+            except db_upsert.MultiplePluginsWithSameNormalizedNameError:
+                import logging
+                logging.exception('uh oh multiple matches')
 
             print "done"
         else:
