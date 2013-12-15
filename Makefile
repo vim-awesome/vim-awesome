@@ -21,6 +21,9 @@ seed_data:
 aggregate_tags:
 	PYTHONPATH=. python tools/aggregate.py
 
+build_github_index:
+	PYTHONPATH=. python tools/scrape/build_github_index.py
+
 test:
 	PYTHONPATH=. nosetests -v
 
