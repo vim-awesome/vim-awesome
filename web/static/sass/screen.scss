@@ -319,6 +319,7 @@ code {
     margin-left: -$bar-horizontal-padding - $left-offset;
     padding: 5px 10px 5px ($bar-horizontal-padding + $left-offset);
     color: white;
+    white-space: nowrap;
 
     // Pre-animation setup
     @include transition(all 0.1s ease-out);
