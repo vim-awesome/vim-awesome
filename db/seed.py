@@ -3,6 +3,7 @@ import os
 
 import rethinkdb as r
 
+import db.init_db
 import db.plugins
 import db.util
 import tags
@@ -17,7 +18,7 @@ def main():
         pass  # Ignore db already created
     conn.use('vim_awesome')
 
-    db.plugins.create_table()
+    db.init_db.ensure_tables_and_indices()
 
     def read_file(filename):
         full_path = os.path.join(os.path.dirname(__file__), filename)
@@ -52,7 +53,6 @@ def main():
         },
     ], upsert=True).run(conn)
 
-    db.util.create_table('tags')
     # TODO(david): Add other fields like friendly name, description
     r.table('tags').insert([{
         'id': 'buffer',

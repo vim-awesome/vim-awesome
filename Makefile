@@ -12,6 +12,9 @@ deploy:
 		cat tools/deploy.sh | ssh vim@vimawesome.com sh; \
 	fi
 
+ensure_tables_and_indices:
+	PYTHONPATH=. python db/init_db.py
+
 seed_data:
 	@echo "Creating tables with some example data"
 	PYTHONPATH=. python db/seed.py

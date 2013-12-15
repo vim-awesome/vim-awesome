@@ -28,6 +28,9 @@ then
     kill $(cat .gunicorn.pid)
 fi
 
+# Create any new tables and indices.
+make ensure_tables_and_indices
+
 echo "Restarting gunicorn"
 PYTHONPATH="/home/vim/vim-awesome" \
   FLASK_CONFIG="$HOME/vim-awesome/conf/flask_prod.py" \

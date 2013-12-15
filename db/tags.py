@@ -7,6 +7,10 @@ import db
 r_conn = db.util.r_conn
 
 
+def create_table():
+    db.util.create_table('tags')
+
+
 def add_tag(tag_id):
     """Increment count of given tag_id. Create row if does not exist."""
     tag = r.table('tags').get(tag_id).run(r_conn())

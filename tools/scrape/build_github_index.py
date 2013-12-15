@@ -85,7 +85,6 @@ def get_repos_from_vimorg_descriptions():
                 repo_urls |= set(_extract_github_repo_urls(plugin[field]))
 
     num_inserted = 0
-    db.github_repos.create_table()
     for repo_url in repo_urls:
         _, owner, repo_name = repo_url.split('/')
         if db.github_repos.upsert_with_owner_repo(owner, repo_name):
@@ -97,8 +96,6 @@ def get_repos_from_vimorg_descriptions():
 
 def get_vim_scripts_repos():
     """Retrieve all of the repos from the vim-scripts GitHub user."""
-    db.github_repos.create_table()
-
     print "Discovering repositories from https://github.com/vim-scripts ..."
     _, user_data = get_api_page('users/vim-scripts')
 
