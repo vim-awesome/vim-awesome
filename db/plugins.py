@@ -30,13 +30,23 @@ def insert(plugins, *args, **kwargs):
     for plugin in plugins:
         plugin_with_defaults = dict({
             'tags': [],
-            'github_stars': 0,
-            'vimorg_rating': 0,
+            'homepage': '',
+            'author': '',
+            'created_at': 0,  # Timestamp in seconds
+            'updated_at': 0,  # Timestamp in seconds
+            'vim_script_id': None,  # Integer >= 1
+            'vimorg_url': '',
+            'vimorg_type': '',
+            'vimorg_rating': 0,  # Integer
+            'vimorg_num_raters': 0,  # Integer >= 0
+            'vimorg_downloads': 0,  # Integer >= 0
+            'vimorg_short_desc': '',
+            'vimorg_long_desc': '',
+            'vimorg_install_details': '',
+            'github_stars': 0,  # Integer >= 0
             'github_url': '',
-            'vim_script_id': None,
             'github_short_desc': '',
             'github_readme': '',
-            'homepage': '',
         }, **plugin)
 
         assert plugin_with_defaults['name']

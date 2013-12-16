@@ -156,7 +156,7 @@ def get_plugin_info(script_id):
     created_date = datetime.datetime.strptime(created_date_text, date_format)
 
     return {
-        "rating_denom": rating_denom,
+        "vimorg_num_raters": rating_denom,
         "author": creator,
         "vimorg_long_desc": _get_innerhtml(description_node),
         "vimorg_install_details": _get_innerhtml(install_node),
