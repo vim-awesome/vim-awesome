@@ -21,11 +21,17 @@ _GITHUB_REPO_URL_PATTERN = re.compile(
 # TODO(david): This could alternatively be a dynamic blacklist by having an
 #     is_blacklisted property in the GitHub repos index table instead of
 #     hardcoded here.
+# TODO(david): We should probably have some heuristic to test if a repo is
+#     actually a vim plugin... there's a bunch of repos referenced from vim.org
+#     descrptions that are not vim plugins.
 _BLACKLISTED_GITHUB_URLS = set([
     'github.com/github/gitignore',
     'github.com/kablamo/dotfiles',
     'github.com/aemoncannon/ensime',
     'github.com/experiment/vim',
+    'github.com/ggreer/the_silver_searcher',
+    'github.com/pry/pry',
+    'github.com/sitaramc/gitolite',
 ])
 
 
