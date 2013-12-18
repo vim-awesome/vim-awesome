@@ -1,4 +1,4 @@
-pythonpath = "vim-awesome/web"
+pythonpath = "vim-awesome"
 
 pidfile = ".gunicorn.pid"
 
