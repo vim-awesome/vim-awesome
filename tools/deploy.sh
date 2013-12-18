@@ -34,7 +34,10 @@ fi
 echo "Restarting gunicorn"
 PYTHONPATH="/home/vim/vim-awesome" \
   FLASK_CONFIG="$HOME/vim-awesome/conf/flask_prod.py" \
-  gunicorn --config vim-awesome/conf/gunicorn.py server:app
+  gunicorn \
+  --config vim-awesome/conf/gunicorn.py web.server:app \
+  --access-logfile logs/gunicorn/access-log \
+  --error-logfile logs/gunicorn/error-log
 
 echo "Removing old vim-awesome clones"
 for old in $(ls repos/ | head -n -2)
