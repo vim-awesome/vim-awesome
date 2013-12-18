@@ -11,7 +11,7 @@ git clone git@github.com:divad12/vim-awesome.git $NEW_CLONE > /dev/null
 
 # TODO(david): Use virtualenv so we don't have to sudo pip install
 echo "Installing Python requirements"
-sudo pip install -r requirements.txt
+sudo pip install -r vim-awesome/requirements.txt
 
 echo "Compass compile sass files"
 ( cd $NEW_CLONE && \
@@ -29,7 +29,7 @@ then
 fi
 
 # Create any new tables and indices.
-make ensure_tables_and_indices
+( cd $NEW_CLONE && make ensure_tables_and_indices )
 
 echo "Restarting gunicorn"
 PYTHONPATH="/home/vim/vim-awesome" \
