@@ -46,25 +46,37 @@ def get_plugins():
     query = query.order_by(r.desc('vimorg_rating'),
             index=r.desc('github_stars'))
 
+    # Specify a projection to limit fields returned to reduce network and
+    # serialize/deserialize costs.
+    query = query.pluck(['id', 'name', 'created_at', 'updated_at', 'tags',
+        'homepage', 'author', 'vim_script_id', 'vimorg_rating',
+        'vimorg_short_desc', 'github_stars', 'github_url',
+        'github_short_desc'])
+
     if search:
-        needles = [t.lower() for t in re.findall(r'\w+', search)]
-        needles.sort()
-        query = query.filter(r.js(r"""(function(row) {
-            var needles = %s;
+        # TODO(david): Also search through tags. Figure out how to prioritize
+        #     that in results ordering.
+        # TODO(david): More optimization ideas:
+        #     - add a field that's the space-delimited sort-uniqued tokens from
+        #       the other fields that we want to search through (eg.
+        #       descriptions, name, tags), and only search through that.
+        #     - in-memory cache of plugins (~5000 plugins will fit). Could use
+        #       a trie or prefix tree.
+        #     - look into elasticsearch or similar
+        #     - unfortunately, indexing a field does not make regex matching
+        #       any faster
 
-            var name = row.name || "";
-            var desc = row.short_desc || "";
-            var tokens = (name + " " + desc).toLowerCase().match(/\w+/g) || [];
-            tokens.sort();
-            tokens.forEach(function(token) {
-                // if needles and token.startswith(needles[0]):
-                if (needles.length && token.lastIndexOf(needles[0], 0) === 0) {
-                    needles.shift();
-                }
-            });
+        # Wrap each token in the search string in a beginning-of-word regex.
+        tokens_regex = (r'\b%s' % re.escape(t) for t in search.split())
 
-            return needles.length === 0;
-        })""" % json.dumps(needles)))
+        # (?i) means case-insensitive. See rethinkdb.com/api/python/match
+        search_regex =  r'(?i)%s' % '.*'.join(tokens_regex)
+
+        query = query.filter(lambda plugin:
+                plugin['name'].match(search_regex) |
+                plugin['github_short_desc'].match(search_regex) |
+                plugin['vimorg_short_desc'].match(search_regex)
+        )
 
     query = query.limit(20)
 
