@@ -31,11 +31,12 @@ fi
 # Create any new tables and indices.
 ( cd $NEW_CLONE && make ensure_tables_and_indices )
 
+# TODO(david): Log files locations should be consolidated in the Python config
 echo "Restarting gunicorn"
 PYTHONPATH="/home/vim/vim-awesome" \
   FLASK_CONFIG="$HOME/vim-awesome/conf/flask_prod.py" \
   gunicorn \
-  --config vim-awesome/conf/gunicorn.py web.server:app \
+  --config vim-awesome/conf/gunicorn.py server:app \
   --access-logfile logs/gunicorn/access-log \
   --error-logfile logs/gunicorn/error-log
 
