@@ -14,7 +14,7 @@ def get_first(query):
     return results[0] if results else None
 
 
-def create_table(table_name):
+def ensure_table(table_name):
     """Creates a table if it doesn't exist."""
     try:
         r.table_create(table_name).run(r_conn())
@@ -22,7 +22,7 @@ def create_table(table_name):
         pass  # Ignore db already created
 
 
-def create_index(table_name, index_name, *args, **kwargs):
+def ensure_index(table_name, index_name, *args, **kwargs):
     """Creates an index if it doesn't exist."""
     indices = r.table(table_name).index_list().run(r_conn())
     if index_name not in indices:

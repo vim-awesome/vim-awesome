@@ -7,11 +7,11 @@ import db.util
 r_conn = db.util.r_conn
 
 
-def create_table():
-    db.util.create_table('github_repos')
-    db.util.create_index('github_repos', 'owner')
-    db.util.create_index('github_repos', 'last_scraped_at')
-    db.util.create_index('github_repos', 'owner_repo',
+def ensure_table():
+    db.util.ensure_table('github_repos')
+    db.util.ensure_index('github_repos', 'owner')
+    db.util.ensure_index('github_repos', 'last_scraped_at')
+    db.util.ensure_index('github_repos', 'owner_repo',
             lambda repo: [repo['owner'], repo['repo_name']])
 
 

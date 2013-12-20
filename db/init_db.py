@@ -4,9 +4,9 @@ import db.tags
 
 
 def ensure_tables_and_indices():
-    db.plugins.create_table()
-    db.tags.create_table()
-    db.github_repos.create_table()
+    db.plugins.ensure_table()
+    db.tags.ensure_table()
+    db.github_repos.ensure_table()
 
 
 if __name__ == '__main__':

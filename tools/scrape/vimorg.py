@@ -55,8 +55,7 @@ def get_plugin_list(num):
 
         # Merge the data we get here with the extra data from get_plugin_info
         yield dict({
-            "vimorg_url": "http://www.vim.org/scripts/%s" %
-                   tr[0][0].attrib['href'],
+            "vimorg_url": "http://www.vim.org/scripts/%s" % link,
             "vim_script_id": script_id,
             "name": tr[0][0].text,
             "vimorg_type": tr[1].text,

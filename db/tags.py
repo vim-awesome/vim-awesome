@@ -7,8 +7,8 @@ import db
 r_conn = db.util.r_conn
 
 
-def create_table():
-    db.util.create_table('tags')
+def ensure_table():
+    db.util.ensure_table('tags')
 
 
 def add_tag(tag_id):
@@ -40,8 +40,6 @@ def aggregate_tags():
     This is intended to be run daily in a cron job to mitigate the effects of
     race conditions and to clear out 0-count tags.
     """
-    db.util.create_table('tags')
-
     # Clear out all 0-count tags.
     r.table('tags').filter({'count': 0}).delete().run(r_conn())
 

@@ -7,12 +7,12 @@ import db.util
 r_conn = db.util.r_conn
 
 
-def create_table():
-    db.util.create_table('plugins')
+def ensure_table():
+    db.util.ensure_table('plugins')
 
-    db.util.create_index('plugins', 'vim_script_id')
-    db.util.create_index('plugins', 'name')
-    db.util.create_index('plugins', 'github_stars')
+    db.util.ensure_index('plugins', 'vim_script_id')
+    db.util.ensure_index('plugins', 'name')
+    db.util.ensure_index('plugins', 'github_stars')
 
 
 # TODO(david): Yep, using an ODM enforcing a consistent schema would be great.
