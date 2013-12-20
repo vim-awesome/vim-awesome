@@ -18,8 +18,12 @@ ensure_tables_and_indices:
 seed_data:
 	@echo "Creating tables with some example data"
 	PYTHONPATH=. python db/seed.py
-	@echo
-	PYTHONPATH=. python tools/scrape/scrape.py 40
+	@echo "Scraping 100 plugins from vim.org."
+	PYTHONPATH=. python tools/scrape/scrape.py -s vim.org 100
+	@echo "Extracting GitHub repo URLs from descriptions."
+	PYTHONPATH=. python tools/scrape/build_github_index.py -s vim.org
+	@echo "Scraping discovered GitHub repos."
+	PYTHONPATH=. python tools/scrape/scrape.py -s github 30
 
 aggregate_tags:
 	PYTHONPATH=. python tools/aggregate.py
