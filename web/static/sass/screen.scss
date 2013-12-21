@@ -278,6 +278,101 @@ code {
   }
 }
 
+.pagination {
+  margin-top: 40px;
+
+  ul {
+    box-shadow: none;
+  }
+
+  .pagination-block {
+    padding: 20px;
+    line-height: 1;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 0;
+    color: $content-2;
+  }
+
+  // Grr bootstrap y u be so specific
+  ul > li > a.pager-button {
+    @extend .pagination-block;
+    background: $bg-light-2;
+    @include transition(all 0.1s ease-out);
+
+    &:hover {
+      @include transition(all 0.1s ease-out);
+      background: $content-4;
+      color: white;
+
+      code {
+        @include transition(all 0.1s ease-out);
+        opacity: 1;
+      }
+    }
+
+    code {
+      @include transition(all 0.1s ease-out);
+      opacity: 0;
+      margin-left: 10px;
+      margin-right: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      color: white;
+    }
+  }
+
+  ul > li > a.prev-page-button {
+    padding-left: 47px;
+    padding-right: 10px;
+    margin-right: 30px;
+  }
+
+  ul > li > a.next-page-button {
+    padding-left: 50px;
+    padding-right: 90px;
+    margin-left: 30px;
+    position: relative;
+
+    .right-arrow {
+      margin-left: 10px;
+    }
+
+    &:after {
+      $arrow-width: 20px;
+      $arrow-height: 54px;  // TODO(david): Don't hardcode arrow height.
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 0;
+      height: 0;
+      right: 0;
+      margin-right: -$arrow-width;
+      border-left: $arrow-width solid $bg-light-2;
+      border-top: ($arrow-height / 2) solid transparent;
+      border-bottom: ($arrow-height / 2) solid transparent;
+      @include transition(all 0.1s ease-out);
+    }
+
+    &:hover:after {
+      @include transition(all 0.1s ease-out);
+      border-left-color: $content-4;
+    }
+  }
+
+  .page-number {
+    @extend .pagination-block;
+    padding-left: 0;
+    padding-right: 0;
+    background: none;
+
+    &:hover {
+      background: none;
+    }
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Plugins
 

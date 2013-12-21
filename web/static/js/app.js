@@ -22,6 +22,8 @@ var capitalizeFirstLetter = function(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+// TODO(david): Make this show at least 100px above/below the node (ie. Vim's
+//     'scrolloff').
 var scrollToNode = function(domNode) {
   var windowTop = $(window).scrollTop();
   var windowBottom = $(window).height() + windowTop;
@@ -102,6 +104,43 @@ var SearchBox = React.createClass({
       <i className="icon-search"></i>
       <input type="text" className="search" placeholder="Search" ref="input"
         onKeyUp={this.handleKeyUp} />
+    </div>;
+  }
+});
+
+var Pager = React.createClass({
+  render: function() {
+    // TODO(david): Have buttons for page numbers, including first page, last
+    //     page, and current page.
+
+    var currentPage = this.props.currentPage;
+    var totalPages = this.props.totalPages;
+
+    if (totalPages <= 1) {
+      return <div />;
+    }
+
+    return <div className="pagination">
+      <ul>
+        {currentPage > 1 &&
+          <li>
+            <a className="pager-button prev-page-button" href="#">
+              {"\u2190"} <code>H</code>
+            </a>
+          </li>
+        }
+        <li>
+          <a className="page-number">Page {currentPage} of {totalPages}</a>
+        </li>
+        {currentPage < totalPages &&
+          <li>
+            <a className="pager-button next-page-button" href="#">
+              <code>L</code> Next page
+              <span className="right-arrow">{"\u2192"}</span>
+            </a>
+          </li>
+        }
+      </ul>
     </div>;
   }
 });
@@ -672,9 +711,11 @@ var PluginListPage = React.createClass({
       <SearchBox onInput={this.onSearchInput} />
       <div className="keyboard-tips">
         Tip: use <code>/</code> to search and
-        <code>ESC</code>, <code>j</code>, <code>k</code> to navigate
+        <code>ESC</code>, <code>J</code>/<code>K</code>,
+        <code>H</code>/<code>L</code> to navigate
       </div>
       <PluginList ref="pluginList" searchQuery={this.state.searchQuery} />
+      <Pager currentPage={2} totalPages={10} />
     </div>;
   }
 });
