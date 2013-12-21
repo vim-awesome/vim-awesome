@@ -15,6 +15,7 @@ app.config.from_envvar('FLASK_CONFIG')
 
 r_conn = db.util.r_conn
 
+
 # TODO(david): Add logging handler
 
 # Catch-all route for single-page app
@@ -38,6 +39,9 @@ def crash():
 # TODO(david): API functions should return content-type header JSON
 @app.route('/api/plugins', methods=['GET'])
 def get_plugins():
+    RESULTS_PER_PAGE = 20
+
+    page = int(request.args.get('page', 1))
     search = request.args.get('query', '')
     query = r.table('plugins')
 
@@ -78,9 +82,18 @@ def get_plugins():
                 plugin['vimorg_short_desc'].match(search_regex)
         )
 
-    query = query.limit(20)
+    # TODO(david): Seriously need to optimize searches. This count query
+    #     doubles the time. Or, don't show total pages and just tell the client
+    #     whether there's a next page or not.
+    count = query.count().run(r_conn())
+    total_pages = (count + RESULTS_PER_PAGE - 1) / RESULTS_PER_PAGE  # ceil
 
-    return json.dumps(list(query.run(r_conn())))
+    query = query.skip((page - 1) * RESULTS_PER_PAGE).limit(RESULTS_PER_PAGE)
+
+    return json.dumps({
+        'plugins': list(query.run(r_conn())),
+        'total_pages': total_pages,
+    })
 
 
 @app.route('/api/plugins/<name>', methods=['GET'])

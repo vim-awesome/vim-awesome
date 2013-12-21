@@ -4,11 +4,13 @@
 
 // TODO(david): We might want to split up this file eventually.
 
-var D_KEYCODE = 'D'.charCodeAt(),
-    G_KEYCODE = 'G'.charCodeAt(),
-    J_KEYCODE = 'J'.charCodeAt(),
-    K_KEYCODE = 'K'.charCodeAt(),
-    U_KEYCODE = 'U'.charCodeAt(),
+var D_KEYCODE = 'D'.charCodeAt(0),
+    G_KEYCODE = 'G'.charCodeAt(0),
+    H_KEYCODE = 'H'.charCodeAt(0),
+    J_KEYCODE = 'J'.charCodeAt(0),
+    K_KEYCODE = 'K'.charCodeAt(0),
+    L_KEYCODE = 'L'.charCodeAt(0),
+    U_KEYCODE = 'U'.charCodeAt(0),
     ENTER_KEYCODE = 13;
 
 // A cache of all tag IDs and their counts.
@@ -20,6 +22,22 @@ var clamp = function(num, min, max) {
 
 var capitalizeFirstLetter = function(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+// Adapted from http://stackoverflow.com/a/2880929/392426
+var getQueryParams = function() {
+  var match,
+      pl     = /\+/g,  // Regex for replacing addition symbol with a space
+      search = /([^&=]+)=?([^&]*)/g,
+      decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+      query  = window.location.search.substring(1),
+      urlParams = {};
+
+  while ((match = search.exec(query))) {
+    urlParams[decode(match[1])] = decode(match[2]);
+  }
+
+  return urlParams;
 };
 
 // TODO(david): Make this show at least 100px above/below the node (ie. Vim's
@@ -86,6 +104,7 @@ var SearchBox = React.createClass({
     if (tag !== "INPUT" && tag !== "TEXTAREA" &&
         key === 191 /* forward slash */) {
       this.refs.input.getDOMNode().focus();
+      this.props.onFocus();
     }
   },
 
@@ -103,16 +122,62 @@ var SearchBox = React.createClass({
     return <div className="search-container">
       <i className="icon-search"></i>
       <input type="text" className="search" placeholder="Search" ref="input"
-        onKeyUp={this.handleKeyUp} />
+          defaultValue={this.props.searchQuery} onKeyUp={this.handleKeyUp} />
     </div>;
   }
 });
 
 var Pager = React.createClass({
-  render: function() {
-    // TODO(david): Have buttons for page numbers, including first page, last
-    //     page, and current page.
+  propTypes: {
+    currentPage: React.PropTypes.number.isRequired,
+    totalPages: React.PropTypes.number.isRequired
+  },
 
+  componentDidMount: function() {
+    window.addEventListener("keyup", this.onWindowKeyDown, false);
+  },
+
+  componentWillUnmount: function() {
+    window.removeEventListener("keyup", this.onWindowKeyDown, false);
+  },
+
+  onWindowKeyDown: function(e) {
+    var tag = e.target.tagName;
+    var key = e.keyCode;
+
+    if (tag !== "INPUT" && tag !== "TEXTAREA") {
+      if (key === H_KEYCODE) {
+        this.goToPrevPage();
+      } else if (key === L_KEYCODE) {
+        this.goToNextPage();
+      }
+    }
+  },
+
+  goToPage: function(page) {
+    var newPage = clamp(page, 1, this.props.totalPages);
+    this.props.onPageChange(newPage);
+  },
+
+  goToPrevPage: function() {
+    this.goToPage(this.props.currentPage - 1);
+  },
+
+  goToNextPage: function() {
+    this.goToPage(this.props.currentPage + 1);
+  },
+
+  onPrevClick: function(e) {
+    e.preventDefault();
+    this.goToPrevPage();
+  },
+
+  onNextClick: function(e) {
+    e.preventDefault();
+    this.goToNextPage();
+  },
+
+  render: function() {
     var currentPage = this.props.currentPage;
     var totalPages = this.props.totalPages;
 
@@ -120,11 +185,14 @@ var Pager = React.createClass({
       return <div />;
     }
 
+    // TODO(david): Have buttons for page numbers, including first page, last
+    //     page, and current page.
     return <div className="pagination">
       <ul>
         {currentPage > 1 &&
           <li>
-            <a className="pager-button prev-page-button" href="#">
+            <a className="pager-button prev-page-button" href="#"
+                onClick={this.onPrevClick}>
               {"\u2190"} <code>H</code>
             </a>
           </li>
@@ -134,7 +202,8 @@ var Pager = React.createClass({
         </li>
         {currentPage < totalPages &&
           <li>
-            <a className="pager-button next-page-button" href="#">
+            <a className="pager-button next-page-button" href="#"
+                onClick={this.onNextClick}>
               <code>L</code> Next page
               <span className="right-arrow">{"\u2192"}</span>
             </a>
@@ -187,17 +256,28 @@ var PluginList = React.createClass({
   },
 
   componentDidMount: function() {
-    this.fetchPlugins(this.props.searchQuery);
+    this.fetchPlugins(this.props);
     window.addEventListener("keydown", this.onWindowKeyDown, false);
   },
 
-  componentDidUpdate: function(prevProps) {
-    if (prevProps.searchQuery !== this.props.searchQuery) {
-      this.fetchPluginsDebounced(this.props.searchQuery);
+  componentWillReceiveProps: function(nextProps) {
+    if (nextProps.searchQuery !== this.props.searchQuery) {
+      this.fetchPluginsDebounced(nextProps);
+    } else if (nextProps.currentPage !== this.props.currentPage) {
+      this.fetchPluginsThrottled(nextProps);
     }
+  },
 
+  shouldComponentUpdate: function(nextProps, nextState) {
+    // Only re-render when new plugins have been fetched.
+    // TODO(david): But we still want to grey-out and show a loading spinner
+    //     when fetching.
+    return !_.isEqual(nextState, this.state);
+  },
+
+  componentDidUpdate: function(prevProps) {
     // Scroll to the navigated plugin if available
-    if (this.refs.navFocus) {
+    if (this.refs && this.refs.navFocus) {
       scrollToNode(this.refs.navFocus.getDOMNode());
     }
   },
@@ -235,7 +315,7 @@ var PluginList = React.createClass({
           this.setState({hoverDisabled: false});
         }.bind(this), 100);
 
-      } else if (key === ENTER_KEYCODE && this.refs.navFocus) {
+      } else if (key === ENTER_KEYCODE && this.refs && this.refs.navFocus) {
         e.preventDefault();
         this.refs.navFocus.goToDetailsPage();
       }
@@ -248,22 +328,44 @@ var PluginList = React.createClass({
     this.setState({selectedIndex: index});
   },
 
-  fetchPlugins: function(query) {
-    $.ajax({
+  fetchPlugins: function(params) {
+    // Abort any pending XHRs so that we don't update from a stale query.
+    if (this.fetchPluginsXhr) {
+      this.fetchPluginsXhr.abort();
+    }
+
+    this.fetchPluginsXhr = $.ajax({
       url: "/api/plugins",
       dataType: "json",
-      data: {query: query},
-      success: function(data) {
-        if (query === this.props.searchQuery) {
-          this.setState({plugins: data});
-        }
-      }.bind(this)
+      data: {
+        query: params.searchQuery,
+        page: params.currentPage
+      },
+      success: this.onPluginsFetched
     });
+  },
+
+  onPluginsFetched: function(data) {
+    this.setState({
+      plugins: data.plugins,
+      totalPages: data.total_pages
+    });
+
+    // TODO(david): Give this prop a default value.
+    this.props.onPluginsFetched();
+
+    if (this.state.selectedIndex !== -1) {
+      this.setState({selectedIndex: 0});
+    }
   },
 
   fetchPluginsDebounced: _.debounce(function() {
     this.fetchPlugins.apply(this, arguments);
   }, 300),
+
+  fetchPluginsThrottled: _.throttle(function() {
+    this.fetchPlugins.apply(this, arguments);
+  }, 500),
 
   render: function() {
     var query = this.props.searchQuery.toLowerCase();
@@ -278,8 +380,15 @@ var PluginList = React.createClass({
             onMouseEnter={this.onPluginMouseEnter.bind(this, index)} />;
       }, this)
       .value();
+    var totalPages = this.state.totalPages || 0;
 
-    return <ul className="plugins">{plugins}</ul>;
+    // TODO(david): Figure out a way to not update the page number until the
+    //     request has returned.
+    return <div>
+      <ul className="plugins">{plugins}</ul>
+      <Pager currentPage={this.props.currentPage}
+          totalPages={totalPages} onPageChange={this.props.onPageChange} />
+    </div>;
   }
 });
 
@@ -697,25 +806,89 @@ var PluginPage = React.createClass({
 });
 
 var PluginListPage = React.createClass({
+  // TODO(david): What happens if user goes to non-existent page?
+  // TODO(david): Update title so that user has meaningful history entries.
+
   getInitialState: function() {
-    return {searchQuery: ""};
+    var queryParams = getQueryParams();
+    var currentPage = +(queryParams.p || 1);
+
+    return {
+      currentPage: currentPage,
+      searchQuery: queryParams.q || ""
+    };
+  },
+
+  componentDidMount: function() {
+    window.addEventListener("popstate", this.onWindowPopstate, false);
+  },
+
+  componentWillUnmount: function() {
+    window.removeEventListener("popstate", this.onWindowPopstate, false);
+  },
+
+  onWindowPopstate: function() {
+    // TODO(david): pushState previous results so we don't re-fetch. Or, set up
+    //     a jQuery AJAX hook to cache all GET requests!!!! That will help with
+    //     so many things!!! (But make sure not to exceed a memory threshold.)
+    // FIXME(david): It seems like Chrome is popping a history entry for every
+    //      two back button presses. Really weird.
+    this.setState(this.getInitialState());
+  },
+
+  onSearchFocus: function() {
+    this.refs.pluginList.resetSelection();
   },
 
   onSearchInput: function(query) {
-    this.setState({searchQuery: query});
+    this.setState({
+      searchQuery: query,
+      currentPage: 1
+    });
     this.refs.pluginList.resetSelection();
+  },
+
+  updateUrlFromState: function() {
+    var queryObject = {};
+
+    if (this.state.currentPage !== 1) {
+      queryObject.p = this.state.currentPage;
+    }
+
+    if (this.state.searchQuery) {
+      queryObject.q = this.state.searchQuery;
+    }
+
+    var queryParams = $.param(queryObject);
+    var path = queryParams ? '?' + queryParams : '';
+    Backbone.history.navigate(path);
+  },
+
+  onPluginsFetched: function() {
+    // Update the URL when the page content has been updated.
+    this.updateUrlFromState();
+
+    // Scroll to top
+    window.scrollTo(0, 0);
+  },
+
+  onPageChange: function(page) {
+    this.setState({currentPage: page});
   },
 
   render: function() {
     return <div>
-      <SearchBox onInput={this.onSearchInput} />
+      <SearchBox searchQuery={this.state.searchQuery}
+          onInput={this.onSearchInput} onFocus={this.onSearchFocus} />
       <div className="keyboard-tips">
         Tip: use <code>/</code> to search and
         <code>ESC</code>, <code>J</code>/<code>K</code>,
         <code>H</code>/<code>L</code> to navigate
       </div>
-      <PluginList ref="pluginList" searchQuery={this.state.searchQuery} />
-      <Pager currentPage={2} totalPages={10} />
+      <PluginList ref="pluginList" searchQuery={this.state.searchQuery}
+          currentPage={this.state.currentPage}
+          onPluginsFetched={this.onPluginsFetched}
+          onPageChange={this.onPageChange} />
     </div>;
   }
 });
