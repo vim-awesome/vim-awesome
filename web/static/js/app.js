@@ -40,18 +40,24 @@ var getQueryParams = function() {
   return urlParams;
 };
 
-// TODO(david): Make this show at least 100px above/below the node (ie. Vim's
-//     'scrolloff').
-var scrollToNode = function(domNode) {
+/**
+ * Scrolls the window so that the entirety of `domNode` is visible.
+ * @param {Element} domNode The DOM node to scroll into view.
+ * @param {number=} context An optional amount of context (minimum distance from
+ *     top or bottom of screen) to keep in pixels. Defaults to 0.
+ */
+var scrollToNode = function(domNode, context) {
+  context = context || 0;
   var windowTop = $(window).scrollTop();
-  var windowBottom = $(window).height() + windowTop;
+  var windowHeight = $(window).height();
+  var windowBottom = windowHeight + windowTop;
   var elementTop = $(domNode).offset().top;
   var elementBottom = elementTop + $(domNode).height();
 
-  if (elementBottom > windowBottom) {
-    domNode.scrollIntoView(false /* alignWithTop */);
-  } else if (elementTop < windowTop) {
-    domNode.scrollIntoView(true /* alignWithTop */);
+  if (elementBottom + context > windowBottom) {
+    window.scrollTo(0, elementBottom + 100 - windowHeight);
+  } else if (elementTop - context < windowTop) {
+    window.scrollTo(0, Math.max(0, elementTop - context));
   }
 };
 
@@ -275,13 +281,6 @@ var PluginList = React.createClass({
     return !_.isEqual(nextState, this.state);
   },
 
-  componentDidUpdate: function(prevProps) {
-    // Scroll to the navigated plugin if available
-    if (this.refs && this.refs.navFocus) {
-      scrollToNode(this.refs.navFocus.getDOMNode());
-    }
-  },
-
   componentWillUnmount: function() {
     window.removeEventListener("keydown", this.onWindowKeyDown, false);
   },
@@ -313,8 +312,12 @@ var PluginList = React.createClass({
         clearTimeout(this.reenableHoverTimeout);
         this.reenableHoverTimeout = setTimeout(function() {
           this.setState({hoverDisabled: false});
-        }.bind(this), 100);
+        }.bind(this), 400);
 
+        // Scroll to the navigated plugin if available.
+        if (this.refs && this.refs.navFocus) {
+          scrollToNode(this.refs.navFocus.getDOMNode(), 105 /* context */);
+        }
       } else if (key === ENTER_KEYCODE && this.refs && this.refs.navFocus) {
         e.preventDefault();
         this.refs.navFocus.goToDetailsPage();
