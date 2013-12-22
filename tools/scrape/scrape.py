@@ -1,8 +1,7 @@
 import argparse
 import logging
-import sys
 
-from tools.scrape import vimorg, github, db_upsert
+from tools.scrape import vimorg, github
 
 
 def scrape_github(num):
@@ -12,11 +11,7 @@ def scrape_github(num):
 
 def scrape_vimorg(num):
     print "\nScraping from vim.org..."
-    for plugin in vimorg.get_plugin_list(num):
-        print "    scraping %s ..." % plugin['name'],  # Print w/o newline
-        sys.stdout.flush()
-        db_upsert.upsert_plugin(plugin)
-        print "done"
+    vimorg.scrape_scripts(num)
 
 
 if __name__ == "__main__":
@@ -40,5 +35,5 @@ if __name__ == "__main__":
         scrape_fn = scrape_fns[source]
         try:
             scrape_fn(args.number)
-        except:
+        except Exception:
             logging.exception("scrape.py: error in %s " % (scrape_fn))

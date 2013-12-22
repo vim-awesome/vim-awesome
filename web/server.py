@@ -90,6 +90,10 @@ def get_plugins():
 
     query = query.skip((page - 1) * RESULTS_PER_PAGE).limit(RESULTS_PER_PAGE)
 
+    # TODO(david): Figure out why Rethink returns less results than count (eg.
+    #     Rethink will report 7 pages of "python" plugins but show 2 plugins on
+    #     page 3 and 2 plugins on page 4.). Or just throw out Rethink and do
+    #     the search in-memory. :)
     return json.dumps({
         'plugins': list(query.run(r_conn())),
         'total_pages': total_pages,

@@ -1,11 +1,13 @@
 import datetime
 import logging
 import re
+import sys
 
 import requests
 import lxml.html
 import lxml.html.html5parser
 
+import tools.scrape.db_upsert as db_upsert
 import util
 
 
@@ -19,12 +21,8 @@ class HTMLParser(lxml.html.html5parser.HTMLParser):
 PARSER = HTMLParser()
 
 
-def get_plugin_list(num):
-    """Get plugin information from vim.org
-
-    This scrapes a given number of scripts (reverse ordered by vim.org id) and
-    returns a dict of the important data about the plugin.
-    """
+def scrape_scripts(num):
+    """Scrapes and upserts the num most recently created scripts on vim.org."""
     res = requests.get(
             'http://www.vim.org/scripts/script_search_results.php?show_me=%d' %
                 num)
@@ -42,27 +40,35 @@ def get_plugin_list(num):
         script_id = int(re.search("script_id=(\d+)", link).group(1))
         name = tr[0][0].text
 
+        # Print w/o newline.
+        print "    scraping %s (id=%s) ..." % (name, script_id),
+        sys.stdout.flush()
+
         # TODO(david): Somehow also get a count of how many plugins failed to
         #     be scraped in total. Maybe return a tuple with error status.
         # TODO(david): Fix error scraping vimcat (id=4325) (something about
         #     only unicode and ascii allowed, no null bytes or control chars)
+        # TODO(david): Fix error scraping
+        #     http://www.vim.org/scripts/script.php?script_id=4099 (unicode
+        #     chars in plugin name) due to invalid escape sequence \\xe0 in the
+        #     Rql regex match in db_upsert._find_by_similar_name.
         try:
-            plugin_info = get_plugin_info(script_id)
-        except:
-            logging.exception('Error scraping %s (script_id=%s) from vim.org' %
+            # Merge the data we get here with extra data from the details page.
+            plugin = dict({
+                "vimorg_url": "http://www.vim.org/scripts/%s" % link,
+                "vim_script_id": script_id,
+                "name": tr[0][0].text,
+                "vimorg_type": tr[1].text,
+                "vimorg_rating": int(tr[2].text),
+                "vimorg_downloads": int(tr[3].text),
+                "vimorg_short_desc": tr[4][0].text,
+            }, **get_plugin_info(script_id))
+            db_upsert.upsert_plugin(plugin)
+            print "done"
+        except Exception:
+            logging.exception(
+                    '\nError scraping %s (script_id=%s) from vim.org' %
                     (name, script_id))
-            continue
-
-        # Merge the data we get here with the extra data from get_plugin_info
-        yield dict({
-            "vimorg_url": "http://www.vim.org/scripts/%s" % link,
-            "vim_script_id": script_id,
-            "name": tr[0][0].text,
-            "vimorg_type": tr[1].text,
-            "vimorg_rating": int(tr[2].text),
-            "vimorg_downloads": int(tr[3].text),
-            "vimorg_short_desc": tr[4][0].text,
-        }, **plugin_info)
 
 
 def _clean_text_node(node):

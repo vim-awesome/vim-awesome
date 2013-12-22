@@ -142,16 +142,21 @@ def scrape_repos(num):
         r.table('github_repos').insert(repo, upsert=True).run(r_conn())
 
         if plugin:
-            # FIXME(david): This is temprorary. I intend to match GitHub repo
-            #     with the description it was scraped from as a backup in the
-            #     actually common case of normalized name collisions.
-            try:
-                db_upsert.upsert_plugin(plugin)
-            except db_upsert.MultiplePluginsWithSameNormalizedNameError:
-                import logging
-                logging.exception('uh oh multiple matches')
+
+            # If this plugin's repo was mentioned in vim.org script
+            # descriptions, try to see if this plugin matches any of those
+            # scripts before a global search.
+            query_filter = None
+            if repo.get('from_vim_scripts'):
+                vim_script_ids = repo['from_vim_scripts']
+                query_filter = (lambda plugin:
+                        plugin['vim_script_id'] in vim_script_ids)
+
+            # TODO(david): We should probably still wrap this in a try block.
+            db_upsert.upsert_plugin(plugin, query_filter)
 
             print "done"
+
         else:
             # TODO(david): Insert some metadata in the github repo that this is
             #     not found

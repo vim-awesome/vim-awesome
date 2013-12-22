@@ -7,6 +7,24 @@ import db.util
 r_conn = db.util.r_conn
 
 
+_ROW_SCHEMA = {
+    # Last time this repo was scraped (Unix timestamp in seconds)
+    'last_scraped_at': 0,
+
+    # Number of times scraped
+    'times_scraped': 0,
+
+    # Whether this repo should not be used for fetching plugin data
+    'is_blacklisted': False,
+
+    # Raw repo data from GitHub API
+    'repo_data': {},
+
+    # IDs of vim.org scripts where this repo was mentioned
+    'from_vim_scripts': [],
+}
+
+
 def ensure_table():
     db.util.ensure_table('github_repos')
     db.util.ensure_index('github_repos', 'owner')
@@ -15,32 +33,25 @@ def ensure_table():
             lambda repo: [repo['owner'], repo['repo_name']])
 
 
-def upsert_with_owner_repo(owner, repo_name, repo_data=None):
-    """Insert a new row with the given owner and repo names if not already
-    present.
+def upsert_with_owner_repo(repo):
+    """Insert or update a row using (owner, repo_name) as the key.
 
-    Updates the specified repo with the given repo_data if found.
-
-    Returns True if a new row was inserted, False if a repo with the given
-    arguments already exists.
+    Returns True if a new row was inserted.
     """
+    owner = repo['owner']
+    repo_name = repo['repo_name']
+
+    assert owner
+    assert repo_name
+
     query = r.table('github_repos').get_all([owner, repo_name],
             index='owner_repo')
-    repo = db.util.get_first(query)
+    db_repo = db.util.get_first(query)
 
-    if repo is None:
-        r.table('github_repos').insert({
-            'owner': owner,
-            'repo_name': repo_name,
-            'last_scraped_at': 0,
-            'times_scraped': 0,
-            'is_blacklisted': False,
-            'repo_data': repo_data or {},
-        }).run(r_conn())
+    if db_repo is None:
+        repo_to_insert = dict(_ROW_SCHEMA, **repo)
+        r.table('github_repos').insert(repo_to_insert).run(r_conn())
         return True
-    elif repo_data:
-        repo['repo_data'] = repo_data
-        query.update(repo).run(r_conn())
-        return False
     else:
+        query.update(repo).run(r_conn())
         return False

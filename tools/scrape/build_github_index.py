@@ -1,6 +1,7 @@
 """Build an index (DB table) of known GitHub repositories of Vim plugins."""
 
 import argparse
+import collections
 import logging
 import re
 
@@ -14,6 +15,8 @@ r_conn = db.util.r_conn
 
 
 # Matches eg. "github.com/scrooloose/syntastic", "github.com/kien/ctrlp.vim"
+# TODO(david): Debug why this overmatches "1155063 ... [extra cruft]" and
+#     "steveno) ..." and "3278077 ..."
 _GITHUB_REPO_URL_PATTERN = re.compile(
         r'github\.com/[^/]+/[\d\w\.\%\+\-\=\:\|\~]+\b', re.IGNORECASE)
 
@@ -24,6 +27,7 @@ _GITHUB_REPO_URL_PATTERN = re.compile(
 # TODO(david): We should probably have some heuristic to test if a repo is
 #     actually a vim plugin... there's a bunch of repos referenced from vim.org
 #     descrptions that are not vim plugins.
+# TODO(david): This should actually be in github_repos.py.
 _BLACKLISTED_GITHUB_URLS = set([
     'github.com/github/gitignore',
     'github.com/kablamo/dotfiles',
@@ -82,22 +86,31 @@ def get_repos_from_vimorg_descriptions():
     """Extract URLs of GitHub repos from the long descriptions on vim.org."""
     print "Discovering GitHub repos from vim.org long descriptions ..."
 
-    repo_urls = set()
+    # A map of repo URL to the vim_script_ids they were found in.
+    repo_urls_dict = collections.defaultdict(list)
 
-    all_plugins = r.table('plugins').filter({}).run(r_conn())
+    all_plugins = r.table('plugins').run(r_conn())
     for plugin in all_plugins:
         for field in ['vimorg_long_desc', 'vimorg_install_details']:
             if field in plugin:
-                repo_urls |= set(_extract_github_repo_urls(plugin[field]))
+                repo_urls = set(_extract_github_repo_urls(plugin[field]))
+                vim_script_id = plugin['vim_script_id']
+                assert vim_script_id
+                for repo_url in repo_urls:
+                    repo_urls_dict[repo_url].append(vim_script_id)
 
     num_inserted = 0
-    for repo_url in repo_urls:
+    for repo_url, vim_script_ids in repo_urls_dict.iteritems():
         _, owner, repo_name = repo_url.split('/')
-        if db.github_repos.upsert_with_owner_repo(owner, repo_name):
-            num_inserted += 1
+        inserted = db.github_repos.upsert_with_owner_repo({
+            'owner': owner,
+            'repo_name': repo_name,
+            'vim_script_ids': vim_script_ids,
+        })
+        num_inserted += int(inserted)
 
-    print "Found %s GitHub repos; inserted %s of which are new." % (
-            len(repo_urls), num_inserted)
+    print "Found %s GitHub repos; inserted %s new ones." % (
+            len(repo_urls_dict), num_inserted)
 
 
 def get_vim_scripts_repos():
@@ -116,12 +129,15 @@ def get_vim_scripts_repos():
                 page=(page + 1))
 
         for repo_data in repos_data:
-            if db.github_repos.upsert_with_owner_repo('vim-scripts',
-                    repo_data['name'], repo_data):
-                num_inserted += 1
+            inserted = db.github_repos.upsert_with_owner_repo({
+                'owner': 'vim-scripts',
+                'repo_name': repo_data['name'],
+                'repo_data': repo_data,
+            })
+            num_inserted += int(inserted)
 
-    print ("Found %s vim-scripts GitHub repos; "
-            "inserted %s of which are new." % (num_repos, num_inserted))
+    print "Found %s vim-scripts GitHub repos; inserted %s new ones." % (
+            num_repos, num_inserted)
 
 
 if __name__ == '__main__':
@@ -142,6 +158,6 @@ if __name__ == '__main__':
         extract_fn = extract_fns[source]
         try:
             extract_fn()
-        except:
+        except Exception:
             logging.exception("build_github_index.py: error in %s " % (
                     extract_fn))
