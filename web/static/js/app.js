@@ -222,6 +222,16 @@ var Pager = React.createClass({
 });
 
 var Plugin = React.createClass({
+  getInitialState: function() {
+    var pluginId = this.props.plugin.id;
+    var pluginStore = pluginId && store.enabled &&
+        store.get("plugin-" + pluginId);
+
+    return {
+      hasVisited: pluginStore && pluginStore.hasVisited
+    };
+  },
+
   goToDetailsPage: function() {
     Backbone.history.navigate("plugin/" + this.props.plugin.name, true);
   },
@@ -235,7 +245,8 @@ var Plugin = React.createClass({
     // TODO(david): Map color from tag/category or just hash of name
     var color = "accent-" + (plugin.name.charCodeAt(0) % 9);
     return <li
-        className={"plugin" + (hasNavFocus ? " nav-focus" : "")}
+        className={"plugin" + (hasNavFocus ? " nav-focus" : "") +
+            (this.state.hasVisited ? " visited" : "")}
         onMouseEnter={this.props.onMouseEnter}>
       <a href={"plugin/" + plugin.name}>
         <h3 className={"plugin-name " + color}>{plugin.name}</h3>
@@ -282,6 +293,7 @@ var PluginList = React.createClass({
   },
 
   componentWillUnmount: function() {
+    clearTimeout(this.reenableHoverTimeout);
     window.removeEventListener("keydown", this.onWindowKeyDown, false);
   },
 
@@ -465,16 +477,13 @@ var PathogenTabPopover = React.createClass({
 // The installation instructions (via Vundle, etc.) widget on the details page.
 var Install = React.createClass({
   getInitialState: function() {
+    var tabActive = (store.enabled && store.get("installTab")) || "vundle";
     return {
-      tabActive: "vundle"
+      tabActive: tabActive
     };
   },
 
   componentDidMount: function() {
-    if (window.localStorage && window.localStorage["installTab"]) {
-      this.setState({tabActive: window.localStorage["installTab"]});
-    }
-
     var popovers = {
       vundleTab: <VundleTabPopover />,
       pathogenTab: <PathogenTabPopover />
@@ -498,8 +507,8 @@ var Install = React.createClass({
 
   onTabClick: function(installMethod) {
     this.setState({tabActive: installMethod});
-    if (window.localStorage) {
-      window.localStorage["installTab"] = installMethod;
+    if (store.enabled) {
+      store.set("installTab", installMethod);
     }
   },
 
@@ -682,6 +691,13 @@ var PluginPage = React.createClass({
   fetchPlugin: function() {
     $.getJSON("/api/plugins/" + this.props.name, function(data) {
       this.setState(data);
+
+      // Save in localStorage that this plugin has been visited.
+      if (store.enabled) {
+        var pluginStore = store.get("plugin-" + data.id) || {};
+        pluginStore.hasVisited = true;
+        store.set("plugin-" + data.id, pluginStore);
+      }
     }.bind(this));
   },
 

@@ -388,6 +388,10 @@ code {
   background-color: $bg-light-2;
   margin-bottom: 10px;
 
+  &.visited {
+    opacity: 0.6;
+  }
+
   > a {
     padding: $bar-vertical-padding $bar-horizontal-padding;
     display: block;
@@ -515,6 +519,7 @@ code {
 
   .plugin {
     margin: $box-margin 0;
+    opacity: 1.0;
   }
 
   .accent-box {
