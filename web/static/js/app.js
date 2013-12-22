@@ -109,20 +109,21 @@ var SearchBox = React.createClass({
   },
 
   handleKeyUp: function(e) {
-    var input = this.refs.input.getDOMNode();
-
     if (e.nativeEvent.keyCode === 27 /* escape */) {
-      input.blur();
-    } else {
-      this.props.onInput(input.value);
+      this.refs.input.getDOMNode().blur();
     }
+  },
+
+  onChange: function(e) {
+    this.props.onChange(this.refs.input.getDOMNode().value);
   },
 
   render: function() {
     return <div className="search-container">
       <i className="icon-search"></i>
       <input type="text" className="search" placeholder="Search" ref="input"
-          defaultValue={this.props.searchQuery} onKeyUp={this.handleKeyUp} />
+          value={this.props.searchQuery} onChange={this.onChange}
+          onKeyUp={this.handleKeyUp} />
     </div>;
   }
 });
@@ -810,13 +811,7 @@ var PluginListPage = React.createClass({
   // TODO(david): Update title so that user has meaningful history entries.
 
   getInitialState: function() {
-    var queryParams = getQueryParams();
-    var currentPage = +(queryParams.p || 1);
-
-    return {
-      currentPage: currentPage,
-      searchQuery: queryParams.q || ""
-    };
+    return this.getStateFromUrl();
   },
 
   componentDidMount: function() {
@@ -831,21 +826,29 @@ var PluginListPage = React.createClass({
     // TODO(david): pushState previous results so we don't re-fetch. Or, set up
     //     a jQuery AJAX hook to cache all GET requests!!!! That will help with
     //     so many things!!! (But make sure not to exceed a memory threshold.)
-    // FIXME(david): It seems like Chrome is popping a history entry for every
-    //      two back button presses. Really weird.
-    this.setState(this.getInitialState());
+    this.setState(this.getStateFromUrl());
   },
 
   onSearchFocus: function() {
     this.refs.pluginList.resetSelection();
   },
 
-  onSearchInput: function(query) {
+  onSearchChange: function(query) {
     this.setState({
       searchQuery: query,
       currentPage: 1
     });
     this.refs.pluginList.resetSelection();
+  },
+
+  getStateFromUrl: function() {
+    var queryParams = getQueryParams();
+    var currentPage = +(queryParams.p || 1);
+
+    return {
+      currentPage: currentPage,
+      searchQuery: queryParams.q || ""
+    };
   },
 
   updateUrlFromState: function() {
@@ -865,8 +868,10 @@ var PluginListPage = React.createClass({
   },
 
   onPluginsFetched: function() {
-    // Update the URL when the page content has been updated.
-    this.updateUrlFromState();
+    // Update the URL when the page content has been updated if necessary.
+    if (!_.isEqual(this.getStateFromUrl(), this.state)) {
+      this.updateUrlFromState();
+    }
 
     // Scroll to top
     window.scrollTo(0, 0);
@@ -879,7 +884,7 @@ var PluginListPage = React.createClass({
   render: function() {
     return <div>
       <SearchBox searchQuery={this.state.searchQuery}
-          onInput={this.onSearchInput} onFocus={this.onSearchFocus} />
+          onChange={this.onSearchChange} onFocus={this.onSearchFocus} />
       <div className="keyboard-tips">
         Tip: use <code>/</code> to search and
         <code>ESC</code>, <code>J</code>/<code>K</code>,
