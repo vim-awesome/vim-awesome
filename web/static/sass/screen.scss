@@ -393,15 +393,6 @@ code {
     display: block;
   }
 
-  .hover-bg {
-    position: absolute;
-    width: 100%;
-    left: 0;
-    z-index: -1;
-    margin-top: -$bar-vertical-padding;
-    height: 85px;  // TODO(david): Don't hardcode this
-  }
-
   .plugin-name {
     $left-offset: 5px;
     position: relative;
@@ -455,9 +446,7 @@ code {
   }
 
   &.nav-focus {
-    .hover-bg {
-      background: rgba($bg-light-2, 1.0);
-    }
+    background: mix($bg-light-2, $bg-dark-1, 95%);
 
     .plugin-name {
       @include transition(all 0.1s ease-out);
@@ -468,10 +457,10 @@ code {
         opacity: 1.0;
         left: 7px;
       }
+    }
 
-      &:after {
-        display: none;
-      }
+    .short-desc {
+      color: $content-4;
     }
   }
 

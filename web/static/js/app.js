@@ -232,7 +232,6 @@ var Plugin = React.createClass({
         className={"plugin" + (hasNavFocus ? " nav-focus" : "")}
         onMouseEnter={this.props.onMouseEnter}>
       <a href={"plugin/" + plugin.name}>
-        <div className="hover-bg"></div>
         <h3 className={"plugin-name " + color}>{plugin.name}</h3>
         {plugin.author && <span className="by">by</span>}
         {plugin.author && <span className="author">{" " + plugin.author}</span>}
