@@ -8,10 +8,6 @@ import db.plugins
 r_conn = db.util.r_conn
 
 
-class InvalidPluginError(Exception):
-    pass
-
-
 class MultiplePluginsWithSameNormalizedNameError(Exception):
     pass
 
@@ -109,13 +105,12 @@ def upsert_plugin(plugin):
     """Update or insert the given plugin into the DB."""
     # Try to update an existing plugin in the DB first.
     updated = False
+
     if plugin['vim_script_id']:
         updated = _update_by_vim_script_id(plugin)
-    elif plugin['name']:
+
+    if not updated and plugin['name']:
         updated = _update_by_name(plugin)
-    else:
-        raise InvalidPluginError(
-            "Attempting to insert a plugin with no identifying information")
 
     # If we didn't update an existing plugin, insert a new row.
     if not updated:
