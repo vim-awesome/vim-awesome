@@ -19,7 +19,7 @@ cache = Cache(app)
 
 
 # Add logging handlers on the production server.
-if app.config['ENV'] == 'PROD':
+if app.config['ENV'] == 'prod':
     from logging.handlers import TimedRotatingFileHandler
     logging.basicConfig(level=logging.INFO)
 
