@@ -18,7 +18,21 @@ app.config.from_envvar('FLASK_CONFIG')
 cache = Cache(app)
 
 
-# TODO(david): Add logging handler
+# Add logging handlers on the production server.
+if app.config['ENV'] == 'PROD':
+    from logging.handlers import TimedRotatingFileHandler
+    logging.basicConfig(level=logging.INFO)
+
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s in'
+            ' %(module)s:%(lineno)d %(message)s')
+
+    # Log everything at the INFO level or higher to file.
+    file_handler = TimedRotatingFileHandler(filename=app.config['LOG_PATH'],
+            when='D')
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
+    app.logger.addHandler(file_handler)
+    logging.getLogger('').addHandler(file_handler)  # Root handler
 
 
 @cache.cached(timeout=60 * 60 * 4)
