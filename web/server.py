@@ -4,16 +4,18 @@ import re
 
 import flask
 from flask import request
+from flask.ext.cache import Cache
 import rethinkdb as r
 
 import db
 import util
 
-app = flask.Flask(__name__)
-
-app.config.from_envvar('FLASK_CONFIG')
-
 r_conn = db.util.r_conn
+
+
+app = flask.Flask(__name__)
+app.config.from_envvar('FLASK_CONFIG')
+cache = Cache(app)
 
 
 # TODO(david): Add logging handler
@@ -43,59 +45,29 @@ def get_plugins():
 
     page = int(request.args.get('page', 1))
     search = request.args.get('query', '')
-    query = r.table('plugins')
 
-    # This will actually sort with github_stars taking precedence because it's
-    # an index: http://www.rethinkdb.com/api/python/order_by/
-    query = query.order_by(r.desc('vimorg_rating'),
-            index=r.desc('github_stars'))
-
-    # Specify a projection to limit fields returned to reduce network and
-    # serialize/deserialize costs.
-    query = query.pluck(['id', 'name', 'created_at', 'updated_at', 'tags',
-        'homepage', 'author', 'vim_script_id', 'vimorg_rating',
-        'vimorg_short_desc', 'github_stars', 'github_url',
-        'github_short_desc'])
+    results = db.plugins.get_search_index()
 
     if search:
-        # TODO(david): Also search through tags. Figure out how to prioritize
-        #     that in results ordering.
-        # TODO(david): More optimization ideas:
-        #     - add a field that's the space-delimited sort-uniqued tokens from
-        #       the other fields that we want to search through (eg.
-        #       descriptions, name, tags), and only search through that.
-        #     - in-memory cache of plugins (~5000 plugins will fit). Could use
-        #       a trie or prefix tree.
-        #     - look into elasticsearch or similar
-        #     - unfortunately, indexing a field does not make regex matching
-        #       any faster
+        # Create a regex that matches a string S iff for each keyword K in
+        # `search` there is a corresponding word in S that begins with K.
+        tokens = (t.lower() for t in sorted(search.split()))
+        tokens_regex = (r'\b%s' % re.escape(t) for t in tokens)
+        search_regex =  re.compile('.*'.join(tokens_regex))
 
-        # Wrap each token in the search string in a beginning-of-word regex.
-        tokens_regex = (r'\b%s' % re.escape(t) for t in search.split())
+        # Surprisingly, regex matching like this is slightly faster than
+        # prefix-matching two sorted lists of tokens.
+        results = filter(lambda plugin:
+                search_regex.search(plugin['keywords']), results)
 
-        # (?i) means case-insensitive. See rethinkdb.com/api/python/match
-        search_regex =  r'(?i)%s' % '.*'.join(tokens_regex)
-
-        query = query.filter(lambda plugin:
-                plugin['name'].match(search_regex) |
-                plugin['github_short_desc'].match(search_regex) |
-                plugin['vimorg_short_desc'].match(search_regex)
-        )
-
-    # TODO(david): Seriously need to optimize searches. This count query
-    #     doubles the time. Or, don't show total pages and just tell the client
-    #     whether there's a next page or not.
-    count = query.count().run(r_conn())
+    count = len(results)
     total_pages = (count + RESULTS_PER_PAGE - 1) / RESULTS_PER_PAGE  # ceil
 
-    query = query.skip((page - 1) * RESULTS_PER_PAGE).limit(RESULTS_PER_PAGE)
+    results = results[((page - 1) * RESULTS_PER_PAGE):
+            (page * RESULTS_PER_PAGE)]
 
-    # TODO(david): Figure out why Rethink returns less results than count (eg.
-    #     Rethink will report 7 pages of "python" plugins but show 2 plugins on
-    #     page 3 and 2 plugins on page 4.). Or just throw out Rethink and do
-    #     the search in-memory. :)
     return json.dumps({
-        'plugins': list(query.run(r_conn())),
+        'plugins': results,
         'total_pages': total_pages,
     })
 

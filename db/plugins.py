@@ -3,6 +3,7 @@
 import rethinkdb as r
 
 import db.util
+from web.server import cache
 
 r_conn = db.util.r_conn
 
@@ -129,3 +130,66 @@ def update_plugin(old_plugin, new_plugin):
                 new_plugin['created_at'])
 
     return updated_plugin
+
+
+@cache.cached(timeout=60 * 60 * 4)
+def get_search_index():
+    """Returns a view of the plugins table that can be used for search.
+
+    More precisely, we return a sorted list of all plugins, with fields limited
+    to the set that need to be displayed in search results or needed for
+    filtering and sorting. A keywords field is added that can be matched on
+    user-given search keywords.
+
+    We perform a search on plugins loaded in-memory because this is a lot more
+    performant (20x-30x faster on my MBPr) than ReQL queries, and the ~5000
+    plugins fit comfortably into memory.
+    """
+    query = r.table('plugins')
+
+    # TODO(david): Pass sort ordering as an argument somehow.
+    # TODO(david): We can't use the secondary index on github_stars until this
+    #     RethinkDB bug is fixed: https://github.com/rethinkdb/docs/issues/160
+    query = query.order_by(r.desc('github_stars'), r.desc('vimorg_rating'))
+
+    query = query.pluck(['id', 'name', 'created_at', 'updated_at', 'tags',
+        'homepage', 'author', 'vim_script_id', 'vimorg_rating',
+        'vimorg_short_desc', 'github_stars', 'github_url',
+        'github_short_desc'])
+
+    plugins = list(query.run(r_conn()))
+
+    for plugin in plugins:
+        tokens = _get_search_tokens_for_plugin(plugin)
+        plugin['keywords'] = ' '.join(tokens)
+
+    return plugins
+
+
+def _get_search_tokens_for_plugin(plugin):
+    """Returns a set of lowercased keywords generated from various fields on
+    the plugin that can be used for searching.
+    """
+    search_fields = ['name', 'tags', 'author', 'vimorg_short_desc',
+            'github_short_desc']
+    tokens = set()
+
+    for field in search_fields:
+
+        if field not in plugin:
+            continue
+
+        value = plugin[field]
+        if isinstance(value, basestring):
+            tokens_list = value.split()
+        elif isinstance(value, list):
+            tokens_list = value
+        elif value is None:
+            tokens_list = []
+        else:
+            raise Exception('Field %s has untokenizable type %s' % (
+                field, type(value)))
+
+        tokens |= set(t.lower() for t in tokens_list)
+
+    return tokens
