@@ -101,3 +101,25 @@ class PluginsTest(unittest.TestCase):
         assert_update({'github_url': 'old', 'updated_at': 5},
                 {'github_url': 'new', 'updated_at': 1},
                 {'github_url': 'old', 'updated_at': 5})
+
+    def test_merge_dict_except_none(self):
+        merge = db.plugins._merge_dict_except_none
+
+        # Basic merge works
+        self.assertEquals(merge({'a': 1}, {}), {'a': 1})
+        self.assertEquals(merge({'a': 1}, {'b': 2}), {'a': 1, 'b': 2})
+        self.assertEquals(merge({'a': 1}, {'a': 2}), {'a': 2})
+        self.assertEquals(merge({'a': 1, 'b': 2}, {'a': 3}), {'a': 3, 'b': 2})
+
+        # Does not merge in any None values
+        self.assertEquals(merge({'a': 1}, {'a': None}), {'a': 1})
+        self.assertEquals(merge({'a': 1}, {'b': None}), {'a': 1})
+        self.assertEquals(merge({'a': 1}, {'a': None, 'b': 2}),
+                {'a': 1, 'b': 2})
+
+        # Make sure we don't mutate arguments
+        a = {'a': 1, 'b': 2}
+        b = {'a': 3, 'c': 4}
+        self.assertEquals(merge(a, b), {'a': 3, 'b': 2, 'c': 4})
+        self.assertEquals(a, {'a': 1, 'b': 2})
+        self.assertEquals(b, {'a': 3, 'c': 4})

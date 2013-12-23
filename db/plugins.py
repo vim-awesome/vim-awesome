@@ -115,9 +115,9 @@ def update_plugin(old_plugin, new_plugin):
     # authoritative GitHub repo (eg. the author's) than new_plugin, then we
     # want to use old_plugin's data where possible.
     if is_more_authoritative(old_plugin, new_plugin):
-        updated_plugin = dict(new_plugin, **old_plugin)
+        updated_plugin = _merge_dict_except_none(new_plugin, old_plugin)
     else:
-        updated_plugin = dict(old_plugin, **new_plugin)
+        updated_plugin = _merge_dict_except_none(old_plugin, new_plugin)
 
     # Keep the latest updated date.
     if old_plugin.get('updated_at') and new_plugin.get('updated_at'):
@@ -130,6 +130,16 @@ def update_plugin(old_plugin, new_plugin):
                 new_plugin['created_at'])
 
     return updated_plugin
+
+
+def _merge_dict_except_none(dict_a, dict_b):
+    """Returns dict_a updated with any key/value pairs from dict_b where the
+    value is not None.
+
+    Does not mutate arguments. Also, please don't drink and drive.
+    """
+    dict_b_filtered = {k:v for k, v in dict_b.iteritems() if v is not None}
+    return dict(dict_a, **dict_b_filtered)
 
 
 @cache.cached(timeout=60 * 60 * 4)
