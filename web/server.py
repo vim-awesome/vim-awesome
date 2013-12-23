@@ -37,7 +37,7 @@ if app.config['ENV'] == 'prod':
 
 @cache.cached(timeout=60 * 60 * 4)
 def get_search_index_cached():
-    db.plugins.get_search_index()
+    return db.plugins.get_search_index()
 
 
 # Catch-all route for single-page app
