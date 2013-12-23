@@ -20,6 +20,12 @@ cache = Cache(app)
 
 # TODO(david): Add logging handler
 
+
+@cache.cached(timeout=60 * 60 * 4)
+def get_search_index_cached():
+    db.plugins.get_search_index()
+
+
 # Catch-all route for single-page app
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -46,7 +52,7 @@ def get_plugins():
     page = int(request.args.get('page', 1))
     search = request.args.get('query', '')
 
-    results = db.plugins.get_search_index()
+    results = get_search_index_cached()
 
     if search:
         # Create a regex that matches a string S iff for each keyword K in

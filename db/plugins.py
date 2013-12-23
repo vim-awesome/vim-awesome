@@ -3,7 +3,6 @@
 import rethinkdb as r
 
 import db.util
-from web.server import cache
 
 r_conn = db.util.r_conn
 
@@ -142,7 +141,6 @@ def _merge_dict_except_none(dict_a, dict_b):
     return dict(dict_a, **dict_b_filtered)
 
 
-@cache.cached(timeout=60 * 60 * 4)
 def get_search_index():
     """Returns a view of the plugins table that can be used for search.
 
@@ -154,6 +152,8 @@ def get_search_index():
     We perform a search on plugins loaded in-memory because this is a lot more
     performant (20x-30x faster on my MBPr) than ReQL queries, and the ~5000
     plugins fit comfortably into memory.
+
+    The return value of this function should be cached for these gains.
     """
     query = r.table('plugins')
 
