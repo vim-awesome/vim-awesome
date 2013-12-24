@@ -833,14 +833,16 @@ var PluginListPage = React.createClass({
   },
 
   componentDidMount: function() {
-    window.addEventListener("popstate", this.onWindowPopstate, false);
+    window.addEventListener("popstate", this.onUrlChange, false);
+    Backbone.history.on("route", this.onUrlChange);
   },
 
   componentWillUnmount: function() {
-    window.removeEventListener("popstate", this.onWindowPopstate, false);
+    Backbone.history.off("route", this.onUrlChange);
+    window.removeEventListener("popstate", this.onUrlChange, false);
   },
 
-  onWindowPopstate: function() {
+  onUrlChange: function() {
     // TODO(david): pushState previous results so we don't re-fetch. Or, set up
     //     a jQuery AJAX hook to cache all GET requests!!!! That will help with
     //     so many things!!! (But make sure not to exceed a memory threshold.)
