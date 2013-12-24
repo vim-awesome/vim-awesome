@@ -129,7 +129,7 @@ def get_requests_left():
 
 def scrape_repos(num):
     """Scrapes the num repos that have been least recently scraped."""
-    query = r.table('github_repos').filter({'is_blacklisted': False})
+    query = r.table('plugin_github_repos').filter({'is_blacklisted': False})
     query = query.order_by('last_scraped_at').limit(num)
     repos = query.run(r_conn())
 
@@ -153,7 +153,7 @@ def scrape_repos(num):
         repo['last_scraped_at'] = int(time.time())
         repo['repo_data'] = repo_data
         repo['times_scraped'] += 1
-        r.table('github_repos').insert(repo, upsert=True).run(r_conn())
+        r.table('plugin_github_repos').insert(repo, upsert=True).run(r_conn())
 
         if plugin:
 

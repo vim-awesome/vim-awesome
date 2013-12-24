@@ -8,7 +8,7 @@ import re
 import rethinkdb as r
 
 import db.util
-import db.github_repos
+from db.github_repos import PluginGithubRepos
 from tools.scrape.github import get_api_page
 
 r_conn = db.util.r_conn
@@ -71,7 +71,7 @@ def get_repos_from_vimorg_descriptions():
     all_plugins = r.table('plugins').run(r_conn())
     for plugin in all_plugins:
         for field in ['vimorg_long_desc', 'vimorg_install_details']:
-            if field in plugin:
+            if field in plugin and plugin[field]:
                 repo_urls = set(_extract_github_repo_urls(plugin[field]))
                 vim_script_id = plugin['vim_script_id']
                 assert vim_script_id
@@ -81,10 +81,10 @@ def get_repos_from_vimorg_descriptions():
     num_inserted = 0
     for repo_url, vim_script_ids in repo_urls_dict.iteritems():
         _, owner, repo_name = repo_url.split('/')
-        inserted = db.github_repos.upsert_with_owner_repo({
+        inserted = PluginGithubRepos.upsert_with_owner_repo({
             'owner': owner,
             'repo_name': repo_name,
-            'vim_script_ids': vim_script_ids,
+            'from_vim_scripts': vim_script_ids,
         })
         num_inserted += int(inserted)
 
@@ -108,7 +108,7 @@ def get_vim_scripts_repos():
                 page=(page + 1))
 
         for repo_data in repos_data:
-            inserted = db.github_repos.upsert_with_owner_repo({
+            inserted = PluginGithubRepos.upsert_with_owner_repo({
                 'owner': 'vim-scripts',
                 'repo_name': repo_data['name'],
                 'repo_data': repo_data,
