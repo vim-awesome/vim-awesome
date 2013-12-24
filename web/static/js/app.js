@@ -266,12 +266,25 @@ var Plugin = React.createClass({
   }
 });
 
+var Spinner = React.createClass({
+  render: function() {
+    return <div className="spinner">
+      <div className="rect1" />
+      <div className="rect2" />
+      <div className="rect3" />
+      <div className="rect4" />
+      <div className="rect5" />
+    </div>;
+  }
+});
+
 var PluginList = React.createClass({
   getInitialState: function() {
     return {
       plugins: [],
       selectedIndex: -1,
-      hoverDisabled: false
+      hoverDisabled: false,
+      isLoading: false
     };
   },
 
@@ -282,16 +295,16 @@ var PluginList = React.createClass({
 
   componentWillReceiveProps: function(nextProps) {
     if (nextProps.searchQuery !== this.props.searchQuery) {
+      this.setState({isLoading: true});
       this.fetchPluginsDebounced(nextProps);
     } else if (nextProps.currentPage !== this.props.currentPage) {
+      this.setState({isLoading: true});
       this.fetchPluginsThrottled(nextProps);
     }
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
     // Only re-render when new plugins have been fetched.
-    // TODO(david): But we still want to grey-out and show a loading spinner
-    //     when fetching.
     return !_.isEqual(nextState, this.state);
   },
 
@@ -353,6 +366,8 @@ var PluginList = React.createClass({
   },
 
   fetchPlugins: function(params) {
+    this.setState({isLoading: true});
+
     // Abort any pending XHRs so that we don't update from a stale query.
     if (this.fetchPluginsXhr) {
       this.fetchPluginsXhr.abort();
@@ -372,7 +387,8 @@ var PluginList = React.createClass({
   onPluginsFetched: function(data) {
     this.setState({
       plugins: data.plugins,
-      totalPages: data.total_pages
+      totalPages: data.total_pages,
+      isLoading: false
     });
 
     // TODO(david): Give this prop a default value.
@@ -392,7 +408,9 @@ var PluginList = React.createClass({
   }, 500),
 
   render: function() {
-    var query = this.props.searchQuery.toLowerCase();
+    // TODO(david): We should not update the page number and other search-params
+    //     UI until new data has arrived to keep things consistent.
+
     var plugins = _.chain(this.state.plugins)
       .map(function(plugin, index) {
         var hasNavFocus = (index === this.state.selectedIndex);
@@ -406,9 +424,9 @@ var PluginList = React.createClass({
       .value();
     var totalPages = this.state.totalPages || 0;
 
-    // TODO(david): Figure out a way to not update the page number until the
-    //     request has returned.
-    return <div>
+    return <div className={"plugins-container" + (
+        this.state.isLoading ? " loading" : "")}>
+      {this.state.isLoading && <Spinner />}
       <ul className="plugins">{plugins}</ul>
       <Pager currentPage={this.props.currentPage}
           totalPages={totalPages} onPageChange={this.props.onPageChange} />
