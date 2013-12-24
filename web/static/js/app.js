@@ -988,6 +988,9 @@ Backbone.history.start({pushState: true});
 // Adapted from https://gist.github.com/tbranyen/1142129
 if (Backbone.history && Backbone.history._hasPushState) {
   $(document).on("click", "a", function(evt) {
+    if (evt.altKey || evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+      return;
+    }
     var href = $(this).attr("href");
     var protocol = this.protocol + "//";
 
