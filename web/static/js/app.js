@@ -11,7 +11,8 @@ var D_KEYCODE = 'D'.charCodeAt(0),
     K_KEYCODE = 'K'.charCodeAt(0),
     L_KEYCODE = 'L'.charCodeAt(0),
     U_KEYCODE = 'U'.charCodeAt(0),
-    ENTER_KEYCODE = 13;
+    ENTER_KEYCODE = 13,
+    ESCAPE_KEYCODE = 27;
 
 // A cache of all tag IDs and their counts.
 var allTags = {};
@@ -115,8 +116,10 @@ var SearchBox = React.createClass({
   },
 
   handleKeyUp: function(e) {
-    if (e.nativeEvent.keyCode === 27 /* escape */) {
+    var key = e.nativeEvent.keyCode;
+    if (key === ESCAPE_KEYCODE || key === ENTER_KEYCODE) {
       this.refs.input.getDOMNode().blur();
+      this.props.onBlur();
     }
   },
 
@@ -297,7 +300,13 @@ var PluginList = React.createClass({
     window.removeEventListener("keydown", this.onWindowKeyDown, false);
   },
 
-  resetSelection: function() {
+  select: function() {
+    if (this.state.selectedIndex === -1) {
+      this.setState({selectedIndex: 0});
+    }
+  },
+
+  unselect: function() {
     if (this.state.selectedIndex !== -1) {
       this.setState({selectedIndex: -1});
     }
@@ -850,7 +859,11 @@ var PluginListPage = React.createClass({
   },
 
   onSearchFocus: function() {
-    this.refs.pluginList.resetSelection();
+    this.refs.pluginList.unselect();
+  },
+
+  onSearchBlur: function() {
+    this.refs.pluginList.select();
   },
 
   onSearchChange: function(query) {
@@ -858,7 +871,7 @@ var PluginListPage = React.createClass({
       searchQuery: query,
       currentPage: 1
     });
-    this.refs.pluginList.resetSelection();
+    this.refs.pluginList.unselect();
   },
 
   getStateFromUrl: function() {
@@ -904,7 +917,8 @@ var PluginListPage = React.createClass({
   render: function() {
     return <div>
       <SearchBox searchQuery={this.state.searchQuery}
-          onChange={this.onSearchChange} onFocus={this.onSearchFocus} />
+          onChange={this.onSearchChange} onFocus={this.onSearchFocus}
+          onBlur={this.onSearchBlur} />
       <div className="keyboard-tips">
         Tip: use <code>/</code> to search and
         <code>ESC</code>, <code>J</code>/<code>K</code>,
