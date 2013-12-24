@@ -43,15 +43,16 @@ def get_api_page(path, page=1, per_page=100):
     return res, res.json()
 
 
-def fetch_plugin(owner, repo, repo_data=None, readme_data=None):
+def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None):
     """Fetch a plugin from a github repo"""
     if not repo_data:
-        res, repo_data = get_api_page('repos/%s/%s' % (owner, repo))
+        res, repo_data = get_api_page('repos/%s/%s' % (owner, repo_name))
         if res.status_code == 404:
             return None, repo_data
 
     if not readme_data:
-        _, readme_data = get_api_page('repos/%s/%s/readme' % (owner, repo))
+        _, readme_data = get_api_page('repos/%s/%s/readme' % (
+            owner, repo_name))
 
     readme_base64_decoded = base64.b64decode(readme_data.get('content', ''))
     readme = unicode(readme_base64_decoded, 'utf-8', errors='ignore')
@@ -68,7 +69,7 @@ def fetch_plugin(owner, repo, repo_data=None, readme_data=None):
     repo_created_date = dateutil.parser.parse(repo_data['created_at'])
 
     # Fetch commits so we can get the update/create dates.
-    _, commits_data = get_api_page('repos/%s/%s/commits' % (owner, repo),
+    _, commits_data = get_api_page('repos/%s/%s/commits' % (owner, repo_name),
             per_page=100)
 
     if commits_data and isinstance(commits_data, list) and len(commits_data):
@@ -93,8 +94,16 @@ def fetch_plugin(owner, repo, repo_data=None, readme_data=None):
         updated_date = dateutil.parser.parse(repo_data['updated_at'])
         created_date = repo_created_date
 
-    return ({
-        'name': repo,
+    # Fetch owner info to get author name.
+    owner_login = repo_data['owner']['login']
+    if owner_login == 'vim-scripts':
+        author = None
+    else:
+        _, owner_data = get_api_page('users/%s' % owner_login)
+        author = owner_data.get('name') or owner_data.get('login')
+
+    repo = {
+        'name': repo_name,
         'github_url': repo_data['html_url'],
         'vim_script_id': vim_script_id,
         'homepage': homepage,
@@ -103,7 +112,12 @@ def fetch_plugin(owner, repo, repo_data=None, readme_data=None):
         'github_readme': readme,
         'created_at': util.to_timestamp(created_date),
         'updated_at': util.to_timestamp(updated_date),
-    }, repo_data)
+    }
+
+    if author:
+        repo['author'] = author
+
+    return (repo, repo_data)
 
 
 def get_requests_left():
