@@ -20,24 +20,6 @@ r_conn = db.util.r_conn
 _GITHUB_REPO_URL_PATTERN = re.compile(
         r'github\.com/[^/]+/[\d\w\.\%\+\-\=\:\|\~]+\b', re.IGNORECASE)
 
-# GitHub URLs that are not repos of Vim plugins that we've manually found.
-# TODO(david): This could alternatively be a dynamic blacklist by having an
-#     is_blacklisted property in the GitHub repos index table instead of
-#     hardcoded here.
-# TODO(david): We should probably have some heuristic to test if a repo is
-#     actually a vim plugin... there's a bunch of repos referenced from vim.org
-#     descrptions that are not vim plugins.
-# TODO(david): This should actually be in github_repos.py.
-_BLACKLISTED_GITHUB_URLS = set([
-    'github.com/github/gitignore',
-    'github.com/kablamo/dotfiles',
-    'github.com/aemoncannon/ensime',
-    'github.com/experiment/vim',
-    'github.com/ggreer/the_silver_searcher',
-    'github.com/pry/pry',
-    'github.com/sitaramc/gitolite',
-])
-
 
 def _normalize_github_url(url):
     """Normalize a GitHub url so that there is one unique URL representation
@@ -67,9 +49,6 @@ def _is_github_url_allowed(url):
 
     # GitHub static assets are not GitHub repos.
     if parts[1] == 'assets':
-        return False
-
-    if url in _BLACKLISTED_GITHUB_URLS:
         return False
 
     return True

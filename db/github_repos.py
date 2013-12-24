@@ -25,12 +25,46 @@ _ROW_SCHEMA = {
 }
 
 
+# GitHub repos that are not Vim plugins that we've manually found.
+# TODO(david): We should probably have some heuristic to test if a repo is
+#     actually a vim plugin... there's a bunch of repos referenced from vim.org
+#     descrptions that are not vim plugins.
+# TODO(david): Make it easy to post-blacklist a plugin that we discover on the
+#     live site.
+_BLACKLISTED_GITHUB_REPOS = set([
+    'github/gitignore',
+    'kablamo/dotfiles',
+    'aemoncannon/ensime',
+    'experiment/vim',
+    'ggreer/the_silver_searcher',
+    'pry/pry',
+    'sitaramc/gitolite',
+    'sstephenson/bats',
+])
+
+
 def ensure_table():
     db.util.ensure_table('github_repos')
+
     db.util.ensure_index('github_repos', 'owner')
     db.util.ensure_index('github_repos', 'last_scraped_at')
     db.util.ensure_index('github_repos', 'owner_repo',
             lambda repo: [repo['owner'], repo['repo_name']])
+
+    _ensure_blacklisted_repos()
+
+
+def _ensure_blacklisted_repos():
+    """Make sure all blacklisted GitHub repos have an entry in the DB marking
+    them as such.
+    """
+    for owner_repo in _BLACKLISTED_GITHUB_REPOS:
+        owner, repo_name = owner_repo.split('/')
+        upsert_with_owner_repo({
+            'owner': owner,
+            'repo_name': repo_name,
+            'is_blacklisted': True,
+        })
 
 
 def upsert_with_owner_repo(repo):
