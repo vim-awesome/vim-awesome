@@ -389,7 +389,8 @@ code {
   margin-bottom: 10px;
 
   &.visited {
-    opacity: 0.6;
+    // TODO(david): Figure out a styling that is not ugly.
+    //opacity: 0.6;
   }
 
   > a {
