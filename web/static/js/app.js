@@ -10,6 +10,8 @@ var D_KEYCODE = 'D'.charCodeAt(0),
     J_KEYCODE = 'J'.charCodeAt(0),
     K_KEYCODE = 'K'.charCodeAt(0),
     L_KEYCODE = 'L'.charCodeAt(0),
+    N_KEYCODE = 'N'.charCodeAt(0),
+    P_KEYCODE = 'P'.charCodeAt(0),
     U_KEYCODE = 'U'.charCodeAt(0),
     ENTER_KEYCODE = 13,
     ESCAPE_KEYCODE = 27;
@@ -156,9 +158,9 @@ var Pager = React.createClass({
     var key = e.keyCode;
 
     if (tag !== "INPUT" && tag !== "TEXTAREA") {
-      if (key === H_KEYCODE) {
+      if (key === P_KEYCODE) {
         this.goToPrevPage();
-      } else if (key === L_KEYCODE) {
+      } else if (key === N_KEYCODE) {
         this.goToNextPage();
       }
     }
@@ -203,7 +205,7 @@ var Pager = React.createClass({
           <li>
             <a className="pager-button prev-page-button" href="#"
                 onClick={this.onPrevClick}>
-              {"\u2190"} <code>H</code>
+              {"\u2190"} <code>P</code>
             </a>
           </li>
         }
@@ -214,7 +216,7 @@ var Pager = React.createClass({
           <li>
             <a className="pager-button next-page-button" href="#"
                 onClick={this.onNextClick}>
-              <code>L</code> Next page
+              <code>N</code> Next page
               <span className="right-arrow">{"\u2192"}</span>
             </a>
           </li>
@@ -938,9 +940,9 @@ var PluginListPage = React.createClass({
           onChange={this.onSearchChange} onFocus={this.onSearchFocus}
           onBlur={this.onSearchBlur} />
       <div className="keyboard-tips">
-        Tip: use <code>/</code> to search and
-        <code>ESC</code>, <code>J</code>/<code>K</code>,
-        <code>H</code>/<code>L</code> to navigate
+        Tip: use <code>/</code> to search,
+        <code>ESC</code>/<code>J</code>/<code>K</code>, to navigate,
+        <code>N</code>/<code>P</code> to flip pages
       </div>
       <PluginList ref="pluginList" searchQuery={this.state.searchQuery}
           currentPage={this.state.currentPage}
