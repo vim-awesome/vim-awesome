@@ -81,3 +81,18 @@ class GithubTest(unittest.TestCase):
 
         test('git@github.com:Valloric/YouCompleteMe.git',
                 ('Valloric', 'YouCompleteMe'))
+        test('https://github.com/vim-scripts/The-NERD-tree.git',
+                ('vim-scripts', 'The-NERD-tree'))
+
+    def test_submodule_is_bundle_regex(self):
+        s = github._SUBMODULE_IS_BUNDLE_REGEX.search
+
+        self.assertIsNotNone(s('submodule "bundle/ropevim"'))
+        self.assertIsNotNone(s('submodule "vim/bundle/handlebars"'))
+        self.assertIsNotNone(s('submodule "available-bundles/unimpaired"'))
+        self.assertIsNotNone(s(
+            'submodule "vim/vim.symlink/bundle/vim-pathogen"'))
+
+        self.assertIsNone(s('submodule ".emacs.d/packages/groovy"'))
+        self.assertIsNone(s('submodule "theme/sundown"'))
+        self.assertIsNone(s('submodule "jedi"'))

@@ -1,16 +1,18 @@
 import base64
 import collections
 import datetime
+import logging
 import re
 import sys
 import time
 from urllib import urlencode
 import urlparse
 
+import configparser
 import dateutil.parser
 import requests
 import rethinkdb as r
-from termcolor import cprint
+from termcolor import colored
 
 from db.github_repos import PluginGithubRepos, DotfilesGithubRepos
 import db.util
@@ -33,7 +35,7 @@ _NO_GITHUB_API_TOKEN_MESSAGE = """
 *******************************************************************************
 """
 if not _GITHUB_API_TOKEN:
-    cprint(_NO_GITHUB_API_TOKEN_MESSAGE, 'red')
+    logging.warn(colored(_NO_GITHUB_API_TOKEN_MESSAGE, 'red'))
 
 
 # The following are names of repos and locations where we search for
@@ -52,8 +54,8 @@ _VIMRC_FILENAMES = ['vimrc', 'bundle', 'vundle.vim', 'vundles.vim',
 _VIM_DIRECTORIES = ['vim', 'config', 'home']
 
 
-# Regexes for extracting Vundle plugin references from dotfile repos. See
-# github_test.py for examples of what they match and don't match.
+# Regexes for extracting plugin references from dotfile repos. See
+# github_test.py for examples of what they match and don't.
 
 # Matches eg. "Bundle 'gmarik/vundle'" or "Bundle 'taglist'"
 # [^\S\n] means whitespace except newline: stackoverflow.com/a/3469155/392426
@@ -63,9 +65,15 @@ _VUNDLE_PLUGIN_REGEX = re.compile(_BUNDLE_PLUGIN_REGEX_TEMPLATE % 'Bundle',
 _NEOBUNDLE_PLUGIN_REGEX = re.compile( _BUNDLE_PLUGIN_REGEX_TEMPLATE %
         '(?:NeoBundle|NeoBundleFetch|NeoBundleLazy)', re.MULTILINE)
 
-# Extracts ('gmarik', 'vundle') or (None, 'taglist') from the above examples.
+# Extracts owner and repo name from a bundle spec -- a git repo URI, implicity
+# github.com if host not given.
+# eg. ('gmarik', 'vundle') or (None, 'taglist')
 _BUNDLE_OWNER_REPO_REGEX = re.compile(
         r'(?:([^:\'"/]+)/)?([^\'"\n\r/]+?)(?:\.git)?$')
+
+# Matches a .gitmodules section heading that's likely of a Pathogen bundle.
+_SUBMODULE_IS_BUNDLE_REGEX = re.compile(r'submodule.+bundles?/.+',
+        re.IGNORECASE)
 
 
 def get_api_page(url_or_path, query_params=None, page=1, per_page=100):
@@ -271,7 +279,8 @@ def _extract_bundles_with_regex(file_contents, bundle_plugin_regex):
             owner = 'vim-scripts' if owner is None else owner
             plugin_repos.append((owner, repo))
         else:
-            cprint('Failed to extract owner/repo from "%s"' % bundle, 'red')
+            logging.error(colored(
+                'Failed to extract owner/repo from "%s"' % bundle, 'red'))
 
     return plugin_repos
 
@@ -310,9 +319,6 @@ def _extract_bundle_repos_from_dir(dir_data, depth=0):
         A tuple (Vundle repos, NeoBundle repos). Each element is a list of
         tuples of the form (owner, repo_name) referencing a GitHub repo.
     """
-    if depth >= 3:
-        return
-
     # First, look for top-level files that are likely to contain references to
     # vim plugins.
     files = filter(lambda f: f['type'] == 'file', dir_data)
@@ -333,6 +339,9 @@ def _extract_bundle_repos_from_dir(dir_data, depth=0):
         if any(bundles_tuple):
             return bundles_tuple
 
+    if depth >= 3:
+        return [], []
+
     # No plugins were found, so look in subdirectories that could potentially
     # have vim config files.
     dirs = filter(lambda f: f['type'] == 'dir', dir_data)
@@ -352,7 +361,58 @@ def _extract_bundle_repos_from_dir(dir_data, depth=0):
 
 
 def _extract_pathogen_repos(repo_contents):
-    return []  # TODO(david)
+    """Extracts Pathogen plugin repos from a GitHub dotfiles repository.
+
+    This currently just extracts plugins if they are checked in as submodules,
+    because it's easy to extract repo URLs from the .gitmodules file but
+    difficult to determine the repo URL of a plugin that's just cloned in.
+
+    Arguments:
+        repo_contents: API response from GitHub of a directory or repo's
+            contents.
+
+    Returns:
+        A list of tuples (owner, repo_name) referencing GitHub repos.
+    """
+    gitmodules = filter(lambda f: f['type'] == 'file' and
+            f['name'].lower() == '.gitmodules', repo_contents)
+
+    if not gitmodules:
+        return []
+
+    _, file_contents = get_api_page(gitmodules[0]['url'])
+    contents_decoded = base64.b64decode(file_contents.get('content', ''))
+    contents_unicode = unicode(contents_decoded, 'utf-8', errors='ignore')
+
+    parser = configparser.ConfigParser(interpolation=None)
+
+    try:
+        parser.read_string(unicode(contents_unicode))
+    except configparser.Error:
+        logging.exception(colored(
+                'Could not parse the .gitmodules file of %s.' %
+                file_contents['url'], 'red'))
+        return []
+
+    plugin_repos = []
+    for section, config in parser.items():
+        if not _SUBMODULE_IS_BUNDLE_REGEX.search(section):
+            continue
+
+        if not config.get('url'):
+            continue
+
+        # The parser sometimes over-parses the value
+        url = config['url'].split('\n')[0]
+        match = _BUNDLE_OWNER_REPO_REGEX.search(url)
+        if match and len(match.groups()) == 2 and match.group(1):
+            owner, repo = match.groups()
+            plugin_repos.append((owner, repo))
+        else:
+            logging.error(colored(
+                    'Failed to extract owner/repo from "%s"' % url, 'red'))
+
+    return plugin_repos
 
 
 def _get_plugin_repos_from_dotfiles(repo_data, search_keyword):

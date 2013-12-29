@@ -126,6 +126,7 @@ class PluginGithubRepos(GithubRepos):
         'pry/pry',
         'sitaramc/gitolite',
         'sstephenson/bats',
+        'git.wincent.com/command-t',
     ])
 
 
