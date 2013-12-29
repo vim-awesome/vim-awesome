@@ -820,10 +820,9 @@ var PluginPage = React.createClass({
     //     the manual install mode).
     var installDetails = this.state.vimorg_install_details;
 
-    // TODO(david): What to do for scripts that don't have a vim.org
-    //     submission?
-    var vimOrgUrl = "http://www.vim.org/scripts/script.php?script_id=" +
-        encodeURIComponent(this.state.vim_script_id);
+    var vimOrgUrl = this.state.vim_script_id &&
+        ("http://www.vim.org/scripts/script.php?script_id=" +
+        encodeURIComponent(this.state.vim_script_id));
 
     return <div className="plugin-page">
       <Plugin plugin={this.state} />
@@ -846,12 +845,14 @@ var PluginPage = React.createClass({
           </div>
         </div>
         <div className="span3 accent-box links">
-          <a href={vimOrgUrl} target="_blank" className="vim-link">
+          <a href={vimOrgUrl || "#"} target="_blank" className={"vim-link" +
+              (vimOrgUrl ? "" : " disabled")}>
             <i className="vim-icon dark"></i>
             <i className="vim-icon light"></i>
             Vim.org
           </a>
-          <a href={this.state.github_url} target="_blank" className="github-link">
+          <a href={this.state.github_url || "#"} target="_blank" className={
+              "github-link" + (this.state.github_url ? "" : " disabled")}>
             <i className="github-icon dark"></i>
             <i className="github-icon light"></i>
             GitHub

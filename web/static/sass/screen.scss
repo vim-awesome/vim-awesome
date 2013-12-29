@@ -688,10 +688,15 @@ code {
       @include transition(all 0.2s ease-out);
       opacity: 0.8;
 
+      &.disabled {
+        opacity: 0.3;
+        pointer-events: none;
+      }
+
       i {
         background-position: center 18px;
         background-repeat: no-repeat;
-        background-size: 44px 44px;
+        background-size: 45px 45px;
         position: absolute;
         width: 100%;
         height: 100%;
