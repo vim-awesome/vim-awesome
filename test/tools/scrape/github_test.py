@@ -45,6 +45,22 @@ class GithubTest(unittest.TestCase):
         rx = github._VUNDLE_PLUGIN_REGEX
         self.assertEquals(rx.findall(vimrc), expected_matches)
 
+    def test_neobundle_plugin_regex(self):
+        vimrc = """
+        NeoBundle 'scrooloose/nerdtree'
+        NeoBundleFetch 'Shougo/neobundle.vim'
+        NeoBundleLazy 'Shougo/unite.vim'
+        """
+
+        expected_matches = [
+            'scrooloose/nerdtree',
+            'Shougo/neobundle.vim',
+            'Shougo/unite.vim',
+        ]
+
+        rx = github._NEOBUNDLE_PLUGIN_REGEX
+        self.assertEquals(rx.findall(vimrc), expected_matches)
+
     def test_bundle_owner_repo_regex(self):
         rx = github._BUNDLE_OWNER_REPO_REGEX
 
