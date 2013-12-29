@@ -76,6 +76,15 @@ _SUBMODULE_IS_BUNDLE_REGEX = re.compile(r'submodule.+bundles?/.+',
         re.IGNORECASE)
 
 
+class ApiRateLimitExceededError(Exception):
+
+    def __init__(self, headers):
+        self.headers = headers
+
+    def __str__(self):
+        return repr(self.headers)
+
+
 def get_api_page(url_or_path, query_params=None, page=1, per_page=100):
     """Get a page from GitHub's v3 API.
 
@@ -87,6 +96,8 @@ def get_api_page(url_or_path, query_params=None, page=1, per_page=100):
 
     Returns:
         A tuple: (Response object, JSON-decoded dict of the response)
+
+    Raises: ApiRateLimitExceededError
     """
     split_url = urlparse.urlsplit(url_or_path)
 
@@ -106,6 +117,10 @@ def get_api_page(url_or_path, query_params=None, page=1, per_page=100):
             fragment=split_url.fragment).geturl()
 
     res = requests.get(url)
+
+    if res.status_code == 403 and res.headers['X-RateLimit-Remaining'] == '0':
+        raise ApiRateLimitExceededError(res.headers)
+
     return res, res.json()
 
 
@@ -558,7 +573,16 @@ def scrape_dotfiles_repos(num):
 
             items = search_data.get('items', [])
             for item in items:
-                stats = _get_plugin_repos_from_dotfiles(item, repo_name)
+                try:
+                    stats = _get_plugin_repos_from_dotfiles(item, repo_name)
+                except ApiRateLimitExceededError:
+                    logging.exception('API rate limit exceeded.')
+                    return repos_scraped, scraped_counter
+                except Exception:
+                    logging.exception('Error scraping dotfiles repo %s' %
+                            item['full_name'])
+                    stats = {}
+
                 scraped_counter.update(stats)
 
                 # If we've scraped the number repos desired, we can quit.
