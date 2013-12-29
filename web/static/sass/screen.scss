@@ -186,6 +186,24 @@ code {
   margin-bottom: 40px;
 }
 
+.tooltip, .tooltip.in {
+  $bg-color: $content-4;
+  opacity: 1.0;
+
+  .tooltip-arrow {
+    border-top-color: $bg-color;
+  }
+
+  .tooltip-inner {
+    max-width: 400px;
+    background: $bg-color;
+    color: mix($content-1, white, 20%);
+    font-weight: 300;
+    font-size: 12px;
+    padding: 10px;
+  }
+}
+
 .popover {
   $bg-color: $content-4;
 
@@ -455,7 +473,9 @@ code {
 .plugin {
   $bar-vertical-padding: 10px;
   $bar-horizontal-padding: 20px;
+  $metric-width: 84px;
 
+  position: relative;
   list-style-type: none;
   background-color: $bg-light-2;
   margin-bottom: 10px;
@@ -571,16 +591,28 @@ code {
     white-space: nowrap;
   }
 
-  .github-stars {
-    float: right;
+  .metric {
+    position: absolute;
+    top: 0;
     background-color: mix($content-1, $bg-light-2, 20%);
-    margin-top: -$bar-vertical-padding;
-    padding: 8px 14px;
+    padding: 8px 0;
+    width: $metric-width;
     color: mix($content-2, $bg-light-2, 80%);
+    text-align: center;
 
     i {
       margin-left: 7px;
     }
+  }
+
+  .github-stars {
+    @extend .metric;
+    right: $bar-horizontal-padding;
+  }
+
+  .plugin-users {
+    @extend .metric;
+    right: $bar-horizontal-padding * 2 + $metric-width;
   }
 }
 

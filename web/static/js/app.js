@@ -237,6 +237,27 @@ var Plugin = React.createClass({
     };
   },
 
+  componentDidMount: function() {
+    this.addBootstrapTooltips();
+  },
+
+  componentWillUnmount: function() {
+    $(this.getDOMNode()).find('[title]').tooltip('destroy');
+  },
+
+  componentDidUpdate: function() {
+    this.addBootstrapTooltips();
+  },
+
+  addBootstrapTooltips: function() {
+    // TODO(david): Do something about tooltips being cut off on details page
+    //     (eg. add a sentence about keyboard tips on the top of the page).
+    $(this.getDOMNode()).find('[title]').tooltip({
+      animation: false,
+      container: 'body'
+    });
+  },
+
   goToDetailsPage: function() {
     Backbone.history.navigate("plugin/" + this.props.plugin.name, true);
   },
@@ -257,9 +278,19 @@ var Plugin = React.createClass({
         <h3 className={"plugin-name " + color}>{plugin.name}</h3>
         {plugin.author && <span className="by">by</span>}
         {plugin.author && <span className="author">{" " + plugin.author}</span>}
-        {plugin.github_stars > 0 && <div className="github-stars">
-          {plugin.github_stars} <i className="icon-star"></i>
-        </div>}
+        {plugin.github_stars > 0 &&
+          <div className="github-stars"
+              title={plugin.github_stars + " stars on GitHub"}>
+            {plugin.github_stars} <i className="icon-star"></i>
+          </div>
+        }
+        {!!plugin.plugin_manager_users &&
+          <div className="plugin-users"
+              title={plugin.plugin_manager_users +
+              " Vundle/Pathogen/NeoBundle users on GitHub"}>
+            {plugin.plugin_manager_users} <i className="icon-user"></i>
+          </div>
+        }
         <p className="short-desc">
           {plugin.github_short_desc || plugin.vimorg_short_desc}
         </p>
