@@ -127,6 +127,8 @@ class PluginGithubRepos(GithubRepos):
         'sitaramc/gitolite',
         'sstephenson/bats',
         'git.wincent.com/command-t',
+        'contrib/mpvim',
+        'svn/trunk',
     ])
 
 
