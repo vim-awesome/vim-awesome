@@ -69,7 +69,8 @@ _NEOBUNDLE_PLUGIN_REGEX = re.compile( _BUNDLE_PLUGIN_REGEX_TEMPLATE %
 # github.com if host not given.
 # eg. ('gmarik', 'vundle') or (None, 'taglist')
 _BUNDLE_OWNER_REPO_REGEX = re.compile(
-        r'(?:([^:\'"/]+)/)?([^\'"\n\r/]+?)(?:\.git)?$')
+        r'(?:([^:\'"/]+)/)?([^\'"\n\r/]+?)(?:\.git|/)?$')
+
 
 # Matches a .gitmodules section heading that's likely of a Pathogen bundle.
 _SUBMODULE_IS_BUNDLE_REGEX = re.compile(r'submodule.+bundles?/.+',

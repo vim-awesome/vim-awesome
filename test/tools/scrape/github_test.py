@@ -20,6 +20,7 @@ class GithubTest(unittest.TestCase):
         Bundle 'git://git.wincent.com/command-t.git'
         Bundle 'git@github.com:Valloric/YouCompleteMe.git'
         Bundle 'rstacruz/sparkup', {'rtp': 'vim/'}
+        Bundle 'https://github.com/Raimondi/delimitMate/'
 
         Bundle 'uh/oh
         "Bundle 'commented/out'
@@ -40,6 +41,7 @@ class GithubTest(unittest.TestCase):
             'git://git.wincent.com/command-t.git',
             'git@github.com:Valloric/YouCompleteMe.git',
             'rstacruz/sparkup',
+            'https://github.com/Raimondi/delimitMate/'
         ]
 
         rx = github._VUNDLE_PLUGIN_REGEX
@@ -68,6 +70,7 @@ class GithubTest(unittest.TestCase):
             self.assertEquals(rx.search(bundle).groups(), expected)
 
         test('gmarik/vundle', ('gmarik', 'vundle'))
+        test('gmarik/vundle/', ('gmarik', 'vundle'))
         test('taglist', (None, 'taglist'))
         test('ervandew/supertab.git', ('ervandew', 'supertab'))
         test('git://github.com/scrooloose/nerdtree',
@@ -83,6 +86,8 @@ class GithubTest(unittest.TestCase):
                 ('Valloric', 'YouCompleteMe'))
         test('https://github.com/vim-scripts/The-NERD-tree.git',
                 ('vim-scripts', 'The-NERD-tree'))
+        test('https://github.com/Raimondi/delimitMate/',
+                ('Raimondi', 'delimitMate'))
 
     def test_submodule_is_bundle_regex(self):
         s = github._SUBMODULE_IS_BUNDLE_REGEX.search
