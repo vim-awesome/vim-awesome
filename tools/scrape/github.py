@@ -122,12 +122,29 @@ def maybe_wait_until_api_limit_resets(response_headers):
         time.sleep(seconds_to_wait)
 
 
-def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None):
-    """Fetch a plugin from a github repo"""
+def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
+        scrape_fork=False):
+    """Fetch info relevant to a plugin from a GitHub repo.
+
+    Arguments:
+        owner: The repo's owner's login, eg. "gmarik"
+        repo_name: The repo name, eg. "vundle"
+        repo_data: (optional) GitHub API /repos response for this repo
+        readme_data: (optional) GitHub API /readme response for this repo
+        scrape_fork: Whether to bother scraping this repo if it's a fork
+
+    Returns:
+        A tuple (plugin_info, repo_data) where plugin_info is a dict of
+        properties that can be inserted as a row in the plugins table, and
+        repo_data is the API /repos response for this repo.
+    """
     if not repo_data:
         res, repo_data = get_api_page('repos/%s/%s' % (owner, repo_name))
         if res.status_code == 404:
             return None, repo_data
+
+    if repo_data.get('fork') and not scrape_fork:
+        return None, repo_data
 
     if not readme_data:
         _, readme_data = get_api_page('repos/%s/%s/readme' % (
@@ -209,6 +226,7 @@ def get_requests_left():
 def scrape_plugin_repos(num):
     """Scrapes the num plugin repos that have been least recently scraped."""
     query = r.table('plugin_github_repos').filter({'is_blacklisted': False})
+    query = query.filter({'is_fork': False}, default=True)
     query = query.order_by('last_scraped_at').limit(num)
     repos = query.run(r_conn())
 
@@ -231,7 +249,24 @@ def scrape_plugin_repos(num):
 
         repo['repo_data'] = repo_data
         PluginGithubRepos.log_scrape(repo)
+
+        # If this is a fork, note it and ensure we know about original repo.
+        if repo_data.get('fork'):
+            repo['is_fork'] = True
+            PluginGithubRepos.upsert_with_owner_repo({
+                'owner': repo_data['parent']['owner']['login'],
+                'repo_name': repo_data['parent']['name'],
+            })
+
         r.table('plugin_github_repos').insert(repo, upsert=True).run(r_conn())
+
+        # For most cases we don't care about info from forked repos and just
+        # want to scrape the original repo. We can whitelist important forked
+        # repos if the need arises, or perhaps we can allow forks w/ a minimum
+        # number of stars.
+        if repo_data.get('fork'):
+            print 'skipping fork of %s' % repo_data['parent']['full_name']
+            continue
 
         if plugin:
 
@@ -256,12 +291,12 @@ def scrape_plugin_repos(num):
                 logging.exception('Aw crap, I really need to think through how'
                         ' we\'re going to deal with name collisions.')
 
-            print "done"
+            print 'done'
 
         else:
             # TODO(david): Insert some metadata in the github repo that this is
             #     not found
-            print "not found."
+            print 'not found.'
             continue
 
 

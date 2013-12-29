@@ -116,6 +116,9 @@ class PluginGithubRepos(GithubRepos):
 
     _ROW_SCHEMA = dict(GithubRepos._ROW_SCHEMA, **{
 
+        # We don't generally care about scraping from forks.
+        'is_fork': False,
+
         # IDs of vim.org scripts where this repo was mentioned
         'from_vim_scripts': [],
 
