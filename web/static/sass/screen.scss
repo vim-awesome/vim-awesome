@@ -508,6 +508,10 @@ code {
     @include transition(all 0.1s ease-out);
     opacity: 0.8;
 
+    // Fixes an issue where hovering over a non 1.0-opacity element causes
+    // Chrome to wobble by a pixel: http://stackoverflow.com/a/16833496/392426
+    -webkit-backface-visibility: hidden;
+
     &:before {
       color: white;
       content: '»';
@@ -687,6 +691,10 @@ code {
 
       @include transition(all 0.2s ease-out);
       opacity: 0.8;
+
+      // Fixes an issue where hovering over a non 1.0-opacity element causes
+      // Chrome to wobble by a pixel: http://stackoverflow.com/a/16833496/392426
+      -webkit-backface-visibility: hidden;
 
       &.disabled {
         opacity: 0.3;
