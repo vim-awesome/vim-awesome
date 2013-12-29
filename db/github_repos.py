@@ -9,6 +9,8 @@ import db.util
 r_conn = db.util.r_conn
 
 
+# TODO(david): Using a proper ODM to do inheritance, enforce constraints, and
+#     ensure a schema would be really nice.
 class GithubRepos(object):
     """Abstract base class of class methods to handle a table of GitHub
     repositories.
@@ -32,6 +34,9 @@ class GithubRepos(object):
 
         # Raw repo data from GitHub API
         'repo_data': {},
+
+        # Number of Vundle, Pathogen, NeoBundle, etc. users
+        'plugin_manager_users': 0,
 
     }
 
@@ -78,6 +83,9 @@ class GithubRepos(object):
 
         Returns True if a new row was inserted.
         """
+        assert repo['owner']
+        assert repo['repo_name']
+
         if repo.get('id'):
             db_repo = r.table(cls._TABLE_NAME).get(repo['id']).run(r_conn())
         else:
@@ -89,6 +97,8 @@ class GithubRepos(object):
             return True
         else:
             db_repo.update(repo)
+            # TODO(david): Figure out if there's any difference between doing
+            #     table().replace(db_repo), and if so, which is preferred.
             r.table(cls._TABLE_NAME).insert(db_repo, upsert=True).run(r_conn())
             return False
 
@@ -129,6 +139,15 @@ class PluginGithubRepos(GithubRepos):
         'git.wincent.com/command-t',
         'contrib/mpvim',
         'svn/trunk',
+
+        # TODO(david): This repo actually contains a Vim plugin nested in
+        #     https://github.com/mozilla/rust/tree/master/src/etc/vim, but
+        #     showing the top-level repo and description ("a safe, concurrent,
+        #     practical language") appears out of place, especially since it
+        #     has about 3K stars. Figure out what to do with it. If we default
+        #     sort by # of users instead of GitHub stars, we can probably
+        #     un-blacklist this.
+        'mozilla/rust',
     ])
 
 

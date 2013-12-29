@@ -244,8 +244,13 @@ def scrape_plugin_repos(num):
                 query_filter = (lambda plugin:
                         plugin['vim_script_id'] in vim_script_ids)
 
-            # TODO(david): We should probably still wrap this in a try block.
-            db_upsert.upsert_plugin(plugin, query_filter)
+            try:
+                db_upsert.upsert_plugin(plugin, query_filter)
+            except db_upsert.MultiplePluginsWithSameNormalizedNameError:
+                # TODO(david): Yeah. Figure this out. We need to clearly define
+                #     the schema for the plugins table and the keys to use.
+                logging.exception('Aw crap, I really need to think through how'
+                        ' we\'re going to deal with name collisions.')
 
             print "done"
 

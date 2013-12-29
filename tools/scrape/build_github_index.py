@@ -119,12 +119,71 @@ def get_vim_scripts_repos():
             num_repos, num_inserted)
 
 
+def aggregate_repos_from_dotfiles():
+    """Aggregate plugin references scraped from dotfiles repos on GitHub.
+
+    Adds newly-discovered GitHub repos of plugins and also updates each GitHub
+    plugin repo with the number of plugin manager users. Prints out some stats
+    at the end.
+    """
+    # Counter of how many users for each of Pathogen/Vundle/NeoBundle.
+    users_counter = collections.Counter()
+
+    # Counter of how many times a repo occurs.
+    repos_counter = collections.Counter()
+
+    # Counter of total bundles for each of Pathogen/Vundle/NeoBundle.
+    manager_counter = collections.Counter()
+
+    # Map of plugin manager name to column name in dotfiles_github_repos table.
+    managers = {
+        'vundle': 'vundle_repos',
+        'pathogen': 'pathogen_repos',
+        'neobundle': 'neobundle_repos',
+    }
+
+    query = r.table('dotfiles_github_repos').pluck(managers.values())
+    all_dotfiles = query.run(r_conn())
+
+    for dotfiles_repo in all_dotfiles:
+        for manager, field in managers.iteritems():
+            plugin_repos = dotfiles_repo[field]
+            users_counter[manager] += 1 if plugin_repos else 0
+            manager_counter[manager] += len(plugin_repos)
+
+            for owner_repo in plugin_repos:
+                repos_counter[owner_repo] += 1
+
+    num_inserted = 0
+
+    for owner_repo, num_users in repos_counter.iteritems():
+        owner, repo_name = owner_repo.split('/')
+        repo = {
+            'owner': owner,
+            'repo_name': repo_name,
+            'plugin_manager_users': num_users,
+        }
+
+        newly_inserted = PluginGithubRepos.upsert_with_owner_repo(repo)
+        num_inserted += int(newly_inserted)
+
+    most_used_repos = '\n'.join(map(str, repos_counter.most_common(10)))
+    print 'Most used plugins:', most_used_repos
+    print 'Users per manager:', users_counter
+    print 'Plugins per manager:', manager_counter
+    print 'Dotfile repos scraped:', query.count().run(r_conn())
+    print 'New plugin repos inserted:', num_inserted
+    print 'Unique plugin bundles found:', len(repos_counter)
+    print 'Total plugin bundles found:', sum(manager_counter.values())
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     extract_fns = {
         "vim.org": get_repos_from_vimorg_descriptions,
         "vim-scripts": get_vim_scripts_repos,
+        "dotfiles": aggregate_repos_from_dotfiles,
     }
 
     parser.add_argument("--source", "-s", choices=extract_fns.keys(),
