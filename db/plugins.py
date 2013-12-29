@@ -13,6 +13,7 @@ def ensure_table():
     db.util.ensure_index('plugins', 'vim_script_id')
     db.util.ensure_index('plugins', 'name')
     db.util.ensure_index('plugins', 'github_stars')
+    db.util.ensure_index('plugins', 'plugin_manager_users')
 
 
 # TODO(david): Yep, using an ODM enforcing a consistent schema on write AND
@@ -161,17 +162,20 @@ def get_search_index():
     """
     query = r.table('plugins')
 
-    # TODO(david): Pass sort ordering as an argument somehow.
-    # TODO(david): We can't use the secondary index on github_stars until this
-    #     RethinkDB bug is fixed: https://github.com/rethinkdb/docs/issues/160
-    query = query.order_by(r.desc('github_stars'), r.desc('vimorg_rating'))
-
     query = query.pluck(['id', 'name', 'created_at', 'updated_at', 'tags',
         'homepage', 'author', 'vim_script_id', 'vimorg_rating',
-        'vimorg_short_desc', 'github_stars', 'github_url',
-        'github_short_desc'])
+        'vimorg_short_desc', 'github_stars', 'github_url', 'github_short_desc',
+        'plugin_manager_users'])
 
     plugins = list(query.run(r_conn()))
+
+    # We can't order_by on multiple fields with secondary indexes due to the
+    # following RethinkDB bug: https://github.com/rethinkdb/docs/issues/160
+    # Thus, we sort in-memory for now because it's way faster than using
+    # Rethink's order_by w/o indices (~7 secs vs. ~0.012 secs on my MBPr).
+    # TODO(david): Pass sort ordering as an argument somehow.
+    plugins.sort(key=lambda p: (-p.get('plugin_manager_users', 0),
+            -p.get('github_stars', 0), -p.get('vimorg_rating', 0)))
 
     for plugin in plugins:
         tokens = _get_search_tokens_for_plugin(plugin)
