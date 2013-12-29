@@ -15,7 +15,8 @@ def ensure_table():
     db.util.ensure_index('plugins', 'github_stars')
 
 
-# TODO(david): Yep, using an ODM enforcing a consistent schema would be great.
+# TODO(david): Yep, using an ODM enforcing a consistent schema on write AND
+#     read would be great.
 def insert(plugins, *args, **kwargs):
     """Insert or update a plugin or list of plugins.
 
@@ -47,6 +48,9 @@ def insert(plugins, *args, **kwargs):
             'github_url': '',
             'github_short_desc': '',
             'github_readme': '',
+
+            # Number of Vundle/Pathogen/NeoBundle etc. users. Integer >= 0
+            'plugin_manager_users': 0,
         }, **plugin)
 
         assert plugin_with_defaults['name']

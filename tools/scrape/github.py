@@ -235,6 +235,10 @@ def scrape_plugin_repos(num):
 
         if plugin:
 
+            # Insert the number of plugin manager users if present.
+            if repo.get('plugin_manager_users'):
+                plugin['plugin_manager_users'] = repo['plugin_manager_users']
+
             # If this plugin's repo was mentioned in vim.org script
             # descriptions, try to see if this plugin matches any of those
             # scripts before a global search.
