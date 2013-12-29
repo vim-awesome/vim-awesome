@@ -1,5 +1,7 @@
 """A table of all known GitHub repos of vim plugins that we want to scrape."""
 
+import time
+
 import rethinkdb as r
 
 import db.util
@@ -61,28 +63,40 @@ class GithubRepos(object):
             })
 
     @classmethod
-    def upsert_with_owner_repo(cls, repo):
-        """Insert or update a row using (owner, repo_name) as the key.
-
-        Returns True if a new row was inserted.
-        """
-        owner = repo['owner']
-        repo_name = repo['repo_name']
-
+    def get_with_owner_repo(cls, owner, repo_name):
+        """Returns the repository with the given owner and repo_name."""
         assert owner
         assert repo_name
 
         query = r.table(cls._TABLE_NAME).get_all([owner, repo_name],
                 index='owner_repo')
-        db_repo = db.util.get_first(query)
+        return db.util.get_first(query)
+
+    @classmethod
+    def upsert_with_owner_repo(cls, repo):
+        """Insert or update a row using (owner, repo_name) as the key.
+
+        Returns True if a new row was inserted.
+        """
+        if repo.get('id'):
+            db_repo = r.table(cls._TABLE_NAME).get(repo['id']).run(r_conn())
+        else:
+            db_repo = cls.get_with_owner_repo(repo['owner'], repo['repo_name'])
 
         if db_repo is None:
             repo_to_insert = dict(cls._ROW_SCHEMA, **repo)
             r.table(cls._TABLE_NAME).insert(repo_to_insert).run(r_conn())
             return True
         else:
-            query.update(repo).run(r_conn())
+            db_repo.update(repo)
+            r.table(cls._TABLE_NAME).insert(db_repo, upsert=True).run(r_conn())
             return False
+
+    @classmethod
+    def log_scrape(cls, repo):
+        """Update a repo's fields to note that it has just been scraped."""
+        repo['last_scraped_at'] = int(time.time())
+        repo['times_scraped'] = repo.get('times_scraped', 0) + 1
 
 
 class PluginGithubRepos(GithubRepos):
@@ -113,3 +127,39 @@ class PluginGithubRepos(GithubRepos):
         'sitaramc/gitolite',
         'sstephenson/bats',
     ])
+
+
+class DotfilesGithubRepos(GithubRepos):
+    """GitHub repositories of dotfiles (*nix config) repos."""
+
+    _TABLE_NAME = 'dotfiles_github_repos'
+
+    _ROW_SCHEMA = dict(GithubRepos._ROW_SCHEMA, **{
+
+        # Last time this repo was pushed (Unix timestamp in seconds).
+        'pushed_at': 0,
+
+        # The keyword that was used to find this repo.
+        'search_keyword': '',
+
+        # References to GitHub plugin repos as strings. eg. "kien/ctrlp.vim"
+        'vundle_repos': [],
+        'neobundle_repos': [],
+        'pathogen_repos': [],
+
+    })
+
+    @classmethod
+    def ensure_table(cls):
+        super(DotfilesGithubRepos, cls).ensure_table()
+        db.util.ensure_index(cls._TABLE_NAME, 'search_keyword')
+        db.util.ensure_index(cls._TABLE_NAME, 'pushed_at')
+
+    @classmethod
+    def get_latest_with_keyword(cls, search_keyword):
+        # Looks like we can't chain a get_all with an order_by, so we can't use
+        # the search_keyword index.
+        query = (r.table(cls._TABLE_NAME)
+                .order_by(index=r.desc('pushed_at'))
+                .filter({'search_keyword': search_keyword}))
+        return db.util.get_first(query)

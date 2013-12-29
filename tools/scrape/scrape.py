@@ -4,13 +4,22 @@ import logging
 from tools.scrape import vimorg, github
 
 
-def scrape_github(num):
-    print "\nScraping from github.com..."
-    github.scrape_repos(num)
+def scrape_github_plugins(num):
+    print "\nScraping plugins from github.com..."
+    github.scrape_plugin_repos(num)
+    print "%s GitHub API requests remaining." % github.get_requests_left()
+
+
+def scrape_github_dotfiles(num):
+    print "\nScraping dotfiles from github.com..."
+    num_scraped, scraped_counter = github.scrape_dotfiles_repos(num)
+    print "\nScraped %s dotfiles repos." % num_scraped
+    print "Found: %s" % scraped_counter
+    print "%s GitHub API requests remaining." % github.get_requests_left()
 
 
 def scrape_vimorg(num):
-    print "\nScraping from vim.org..."
+    print "\nScraping plugins from vim.org..."
     vimorg.scrape_scripts(num)
 
 
@@ -19,11 +28,12 @@ if __name__ == "__main__":
 
     scrape_fns = {
         "vim.org": scrape_vimorg,
-        "github": scrape_github,
+        "github-plugins": scrape_github_plugins,
+        "github-dotfiles": scrape_github_dotfiles,
     }
 
     parser.add_argument("number", nargs="?", default=6000, type=int,
-            help="Maximum # of plugins to scrape from each source"
+            help="Maximum # of objects to scrape from each source"
             " (default: 6000)")
     parser.add_argument("--source", "-s", choices=scrape_fns.keys(),
             default="all", help="Source to scrape from (default: all)")

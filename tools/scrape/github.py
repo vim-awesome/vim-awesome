@@ -1,13 +1,18 @@
 import base64
+import collections
+import datetime
 import re
 import sys
 import time
+from urllib import urlencode
+import urlparse
 
 import dateutil.parser
 import requests
 import rethinkdb as r
 from termcolor import cprint
 
+from db.github_repos import PluginGithubRepos, DotfilesGithubRepos
 import db.util
 import tools.scrape.db_upsert as db_upsert
 import util
@@ -31,16 +36,79 @@ if not _GITHUB_API_TOKEN:
     cprint(_NO_GITHUB_API_TOKEN_MESSAGE, 'red')
 
 
-def get_api_page(path, page=1, per_page=100):
-    """Get a page from the github API"""
-    url = 'https://api.github.com/%s?page=%s&per_page=%s' % (path, page,
-            per_page)
+# The following are names of repos and locations where we search for
+# Vundle/Pathogen plugin references. They were found by manually going through
+# search results of
+# github.com/search?q=scrooloose%2Fsyntastic&ref=searchresults&type=Code
+
+# TODO(david): It would be good to add "vim", "settings", and "config", but
+#     there are too many false positives that need to be filtered out.
+_DOTFILE_REPO_NAMES = ['dotfile', 'vimrc', 'vimfile', 'vim-file', 'vimconf',
+        'vim-conf', 'dotvim', 'config-files', 'vim-setting', 'myvim']
+
+_VIMRC_FILENAMES = ['vimrc', 'bundle', 'vundle.vim', 'vundles.vim',
+        'vim.config', 'plugins.vim']
+
+_VIM_DIRECTORIES = ['vim', 'config', 'home']
+
+
+# Regexes for extracting Vundle plugin references from dotfile repos. See
+# github_test.py for examples of what they match and don't match.
+
+# Matches eg. "Bundle 'gmarik/vundle'" or "Bundle 'taglist'"
+# [^\S\n] means whitespace except newline: stackoverflow.com/a/3469155/392426
+_VUNDLE_PLUGIN_REGEX = re.compile(
+        r'^[^\S\n]*Bundle[^\S\n]*[\'"]([^\'"\n\r]+)[\'"]', re.MULTILINE)
+
+# Extracts ('gmarik', 'vundle') or (None, 'taglist') from the above examples.
+_BUNDLE_OWNER_REPO_REGEX = re.compile(
+        r'(?:([^:\'"/]+)/)?([^\'"\n\r/]+?)(?:\.git)?$')
+
+
+def get_api_page(url_or_path, query_params=None, page=1, per_page=100):
+    """Get a page from GitHub's v3 API.
+
+    Arguments:
+        url_or_path: The API method to call or the full URL.
+        query_params: A dict of additional query parameters
+        page: Page number
+        per_page: How many results to return per page. Max is 100.
+
+    Returns:
+        A tuple: (Response object, JSON-decoded dict of the response)
+    """
+    split_url = urlparse.urlsplit(url_or_path)
+
+    query = {
+        'page': page,
+        'per_page': per_page,
+    }
 
     if _GITHUB_API_TOKEN:
-        url += '&access_token=%s' % _GITHUB_API_TOKEN
+        query['access_token'] = _GITHUB_API_TOKEN
+
+    query.update(dict(urlparse.parse_qsl(split_url.query)))
+    query.update(query_params or {})
+
+    url = urlparse.SplitResult(scheme='https', netloc='api.github.com',
+            path=split_url.path, query=urlencode(query),
+            fragment=split_url.fragment).geturl()
 
     res = requests.get(url)
     return res, res.json()
+
+
+def maybe_wait_until_api_limit_resets(response_headers):
+    """If we're about to exceed our API limit, sleeps until our API limit is
+    reset.
+    """
+    if response_headers['X-RateLimit-Remaining'] == '0':
+        reset_timestamp = response_headers['X-RateLimit-Reset']
+        reset_date = datetime.datetime.fromtimestamp(int(reset_timestamp))
+        now = datetime.datetime.now()
+        seconds_to_wait = (reset_date - now).seconds + 1
+        print "Sleeping %s seconds for API limit to reset." % seconds_to_wait
+        time.sleep(seconds_to_wait)
 
 
 def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None):
@@ -127,8 +195,8 @@ def get_requests_left():
     return data['rate']['remaining']
 
 
-def scrape_repos(num):
-    """Scrapes the num repos that have been least recently scraped."""
+def scrape_plugin_repos(num):
+    """Scrapes the num plugin repos that have been least recently scraped."""
     query = r.table('plugin_github_repos').filter({'is_blacklisted': False})
     query = query.order_by('last_scraped_at').limit(num)
     repos = query.run(r_conn())
@@ -150,9 +218,8 @@ def scrape_repos(num):
         #     details in build_github_index.py.
         plugin, repo_data = fetch_plugin(repo_owner, repo_name)
 
-        repo['last_scraped_at'] = int(time.time())
         repo['repo_data'] = repo_data
-        repo['times_scraped'] += 1
+        PluginGithubRepos.log_scrape(repo)
         r.table('plugin_github_repos').insert(repo, upsert=True).run(r_conn())
 
         if plugin:
@@ -176,3 +243,206 @@ def scrape_repos(num):
             #     not found
             print "not found."
             continue
+
+
+# TODO(david): NeoBundle, NeoBundleFetch
+def _extract_vundle_repos_from_file(file_contents):
+    """Extracts references to Vundle plugin repositories from contents of
+    a vimrc-like file.
+
+    Arguments:
+        file_contents: A string of the contents of the file to search through.
+
+    Returns:
+        A list of tuples (owner, repo_name) referencing GitHub repos.
+    """
+    bundles = _VUNDLE_PLUGIN_REGEX.findall(file_contents)
+    if not bundles:
+        return []
+
+    plugin_repos = []
+    for bundle in bundles:
+        match = _BUNDLE_OWNER_REPO_REGEX.search(bundle)
+        if match and len(match.groups()) == 2:
+            owner, repo = match.groups()
+            owner = 'vim-scripts' if owner is None else owner
+            plugin_repos.append((owner, repo))
+        else:
+            cprint('Failed to extract owner/repo from "%s"' % bundle, 'red')
+
+    return plugin_repos
+
+
+def _extract_vundle_repos_from_dir(dir_data):
+    """Extracts references to Vundle plugin repositories from a GitHub dotfiles
+    directory.
+
+    Will recursively search through directories likely to contain vim config
+    files (lots of people seem to like putting their vim config in a "vim"
+    subdirectory).
+
+    Arguments:
+        dir_data: API response from GitHub of a directory or repo's contents.
+
+    Returns:
+        A list of tuples (owner, repo_name) referencing GitHub repos.
+    """
+    # First, look for top-level files that are likely to contain references to
+    # vim plugins.
+    files = filter(lambda f: f['type'] == 'file', dir_data)
+    for file_data in files:
+        filename = file_data['name'].lower()
+
+        if 'gvimrc' in filename:
+            continue
+
+        if not any((f in filename) for f in _VIMRC_FILENAMES):
+            continue
+
+        # Ok, there could potentially be references to vim plugins here.
+        _, file_contents = get_api_page(file_data['url'])
+        contents_decoded = base64.b64decode(file_contents.get('content', ''))
+        plugin_repos = _extract_vundle_repos_from_file(contents_decoded)
+
+        if plugin_repos:
+            return plugin_repos
+
+    # No plugins were found, so look in subdirectories that could potentially
+    # have vim config files.
+    dirs = filter(lambda f: f['type'] == 'dir', dir_data)
+    for dir_data in dirs:
+        filename = dir_data['name'].lower()
+        if not any((f in filename) for f in _VIM_DIRECTORIES):
+            continue
+
+        # Ok, there could potentially be vim config files in here.
+        _, subdir_data = get_api_page(dir_data['url'])
+        plugin_repos = _extract_vundle_repos_from_dir(subdir_data)
+
+        if plugin_repos:
+            return plugin_repos
+
+    return []
+
+
+def _extract_pathogen_repos(repo_contents):
+    return []  # TODO(david)
+
+
+def _get_plugin_repos_from_dotfiles(repo_data, search_keyword):
+    """Search for references to vim plugin repos from a dotfiles repository,
+    and insert them into DB.
+
+    Arguments:
+        repo_data: API response from GitHub of a repository.
+        search_keyword: The keyword used that found this repo.
+    """
+    owner_repo = repo_data['full_name']
+
+    # Print w/o newline.
+    print "    scraping %s ..." % owner_repo,
+    sys.stdout.flush()
+
+    res, contents_data = get_api_page('repos/%s/contents' % owner_repo)
+
+    if res.status_code == 404 or not isinstance(contents_data, list):
+        print "contents not found"
+        return
+
+    vundle_repos = _extract_vundle_repos_from_dir(contents_data)
+    pathogen_repos = _extract_pathogen_repos(contents_data)
+
+    owner, repo_name = owner_repo.split('/')
+    db_repo = DotfilesGithubRepos.get_with_owner_repo(owner, repo_name)
+    pushed_date = dateutil.parser.parse(repo_data['pushed_at'])
+
+    def stringify_repo(owner_repo_tuple):
+        return '/'.join(owner_repo_tuple)
+
+    repo = dict(db_repo or {}, **{
+        'owner': owner,
+        'pushed_at': util.to_timestamp(pushed_date),
+        'repo_name': repo_name,
+        'search_keyword': search_keyword,
+        'vundle_repos': map(stringify_repo, vundle_repos),
+        'pathogen_repos': map(stringify_repo, pathogen_repos),
+    })
+
+    DotfilesGithubRepos.log_scrape(repo)
+    DotfilesGithubRepos.upsert_with_owner_repo(repo)
+
+    print 'found %s Vundles, %s Pathogens' % (
+            len(vundle_repos), len(pathogen_repos))
+
+    return {
+        'pathogen_repos_count': len(pathogen_repos),
+        'vundle_repos_count': len(vundle_repos),
+    }
+
+
+def scrape_dotfiles_repos(num):
+    """Scrape at most num dotfiles repos from GitHub for references to Vim
+    plugin repos.
+
+    We perform a search on GitHub repositories that are likely to contain
+    Vundle and Pathogen bundles instead of a code search matching
+    Vundle/Pathogen commands (which has higher precision and recall), because
+    GitHub's API requires code search to be limited to
+    a user/repo/organization. :(
+    """
+    # Earliest allowable updated date to start scraping from (so we won't be
+    # scraping repos that were last pushed before this date).
+    EARLIEST_PUSHED_DATE = datetime.datetime(2013, 1, 1)
+
+    repos_scraped = 0
+    scraped_counter = collections.Counter()
+
+    for repo_name in _DOTFILE_REPO_NAMES:
+        latest_repo = DotfilesGithubRepos.get_latest_with_keyword(repo_name)
+
+        if latest_repo and latest_repo.get('pushed_at'):
+            last_pushed_date = max(datetime.datetime.utcfromtimestamp(
+                    latest_repo['pushed_at']), EARLIEST_PUSHED_DATE)
+        else:
+            last_pushed_date = EARLIEST_PUSHED_DATE
+
+        # We're going to scrape all repos updated after the latest updated repo
+        # in our DB, starting with the least recently updated.  This maintains
+        # the invariant that we have scraped all repos pushed before the latest
+        # push date (and after EARLIEST_PUSHED_DATE).
+        while True:
+
+            start_date_iso = last_pushed_date.isoformat()
+            search_params = {
+                'q': '%s in:name pushed:>%s' % (repo_name, start_date_iso),
+                'sort': 'updated',
+                'order': 'asc',
+            }
+
+            per_page = 100
+            response, search_data = get_api_page('search/repositories',
+                    query_params=search_params, page=1, per_page=per_page)
+
+            items = search_data.get('items', [])
+            for item in items:
+                stats = _get_plugin_repos_from_dotfiles(item, repo_name)
+                scraped_counter.update(stats)
+
+                # If we've scraped the number repos desired, we can quit.
+                repos_scraped += 1
+                if repos_scraped >= num:
+                    return repos_scraped, scraped_counter
+
+            # If we're about to exceed the rate limit (20 requests / min),
+            # sleep until the limit resets.
+            maybe_wait_until_api_limit_resets(response.headers)
+
+            # If we've scraped all repos with this name, move on to the next
+            # repo name.
+            if len(items) < per_page:
+                break
+            else:
+                last_pushed_date = dateutil.parser.parse(
+                        items[-1]['pushed_at'])
+
+    return repos_scraped, scraped_counter
