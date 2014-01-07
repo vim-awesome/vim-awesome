@@ -100,6 +100,24 @@ _ROW_SCHEMA = {
 }
 
 
+# Reserve some slug names for potential pages in case we want to be able to
+# link to plugins top-level, as in vimawesome.com/:slug
+_RESERVED_SLUGS = set([
+    'plugins',
+    'plugin',
+    'p',
+    'tags',
+    'tag',
+    't',
+    'about',
+    'submit',
+    'upload',
+    'search',
+    'faq',
+    'blog',
+])
+
+
 ###############################################################################
 # Routines for basic DB CRUD operations.
 
@@ -191,8 +209,9 @@ def _generate_unique_slug(plugin):
 
 
 def _slug_taken(slug):
-    """Returns whether a slug has already been used."""
-    return bool(r.table('plugins').get(slug).run(r_conn()))
+    """Returns whether a slug has already been used or is reserved."""
+    return bool(r.table('plugins').get(slug).run(r_conn())) or (
+            slug in _RESERVED_SLUGS)
 
 
 # FIXME(david): This will be going away (using the new 'slug' primary key).
