@@ -1,19 +1,114 @@
 """Utility functions for the plugins table."""
 
+import logging
+import random
+
 import rethinkdb as r
+from slugify import slugify
 
 import db.util
 
 r_conn = db.util.r_conn
 
 
-def ensure_table():
-    db.util.ensure_table('plugins')
+class RequiredProperty(object):
+    pass
 
-    db.util.ensure_index('plugins', 'vim_script_id')
-    db.util.ensure_index('plugins', 'name')
+
+_ROW_SCHEMA = {
+
+    # Primary key. Human-readable permalink for a plugin. Eg. 'python-2'
+    'slug': RequiredProperty(),
+
+    # A name used strictly for purposes of associating info from different
+    # sources together. Eg. "nerdtree" (instead of "the-NERD-Tree.vim")
+    'normalized_name': '',
+
+    # eg. ['C/C++', 'autocomplete']
+    'tags': [],
+
+    # Unix timestamp in seconds
+    'created_at': 0,
+    'updated_at': 0,
+
+    ###########################################################################
+    # Info from the script on vim.org.
+    # eg. http://www.vim.org/scripts/script.php?script_id=2736
+
+    # Eg. '1234' (string)
+    'vimorg_id': None,
+
+    # Eg. 'Syntastic'
+    'vimorg_name': '',
+
+    # Eg. 'Martin Grenfell'
+    'vimorg_author': '',
+
+    # eg. 'http://www.vim.org/scripts/script.php?script_id=2736'
+    'vimorg_url': '',
+
+    # eg. 'utility'
+    'vimorg_type': '',
+
+    'vimorg_rating': 0,
+    'vimorg_num_raters': 0,
+    'vimorg_downloads': 0,
+    'vimorg_short_desc': '',
+    'vimorg_long_desc': '',
+    'vimorg_install_details': '',
+
+    ###########################################################################
+    # Info from the author's GitHub repo (eg. github.com/scrooloose/syntastic)
+
+    # eg. 'scrooloose'
+    'github_owner': '',
+
+    # eg. 'syntastic'
+    'github_repo_name': '',
+
+    'github_stars': 0,
+
+    # eg. 'Syntax checking hacks for vim'
+    'github_short_desc': '',
+
+    # eg. 'http://valloric.github.io/YouCompleteMe/'
+    'github_homepage': '',
+
+    # TODO(david): Need to store filetype (eg. Markdown, plain, reST)
+    'github_readme': '',
+
+    ###########################################################################
+    # Info from the github.com/vim-scripts mirror.
+    # eg. github.com/vim-scripts/Syntastic
+
+    # Eg. 'syntastic'
+    'github_vim_scripts_repo_name': '',
+
+    'github_vim_scripts_stars': 0,
+
+    ###########################################################################
+    # Info derived from elsewhere
+
+    # Number of Vundle/Pathogen/NeoBundle etc. users that reference the
+    # author's GitHub repo.
+    'github_bundles': 0,
+
+    # Number of Vundle/Pathogen/NeoBundle etc. users that reference the
+    # vim-scripts GitHub mirror.
+    'github_vim_scripts_bundles': 0,
+
+}
+
+
+###############################################################################
+# Routines for basic DB CRUD operations.
+
+
+def ensure_table():
+    db.util.ensure_table('plugins', primary_key='slug')
+
+    db.util.ensure_index('plugins', 'vimorg_id')
     db.util.ensure_index('plugins', 'github_stars')
-    db.util.ensure_index('plugins', 'plugin_manager_users')
 
 
 # TODO(david): Yep, using an ODM enforcing a consistent schema on write AND
@@ -30,38 +125,77 @@ def insert(plugins, *args, **kwargs):
 
     mapped_plugins = []
     for plugin in plugins:
-        plugin_with_defaults = dict({
-            'tags': [],
-            'homepage': '',
-            'author': '',
-            'created_at': 0,  # Timestamp in seconds
-            'updated_at': 0,  # Timestamp in seconds
-            'vim_script_id': None,  # Integer >= 1
-            'vimorg_url': '',
-            'vimorg_type': '',
-            'vimorg_rating': 0,  # Integer
-            'vimorg_num_raters': 0,  # Integer >= 0
-            'vimorg_downloads': 0,  # Integer >= 0
-            'vimorg_short_desc': '',
-            'vimorg_long_desc': '',
-            'vimorg_install_details': '',
-            'github_stars': 0,  # Integer >= 0
-            'github_url': '',
-            'github_short_desc': '',
-            'github_readme': '',
 
-            # Number of Vundle/Pathogen/NeoBundle etc. users. Integer >= 0
-            'plugin_manager_users': 0,
-        }, **plugin)
+        # Generate a unique slug if not already present.
+        if not plugin.get('slug'):
+            plugin['slug'] = _generate_unique_slug(plugin)
 
-        assert plugin_with_defaults['name']
+        # FIXME(david): This is scaffolding code.
+        if not plugin.get('normalized_name'):
+            plugin['normalized_name'] = 'meredith grey swift'
 
-        mapped_plugins.append(plugin_with_defaults)
+        mapped_plugins.append(dict(_ROW_SCHEMA, **plugin))
 
     return r.table('plugins').insert(mapped_plugins, *args, **kwargs).run(
             r_conn())
 
 
+def _generate_unique_slug(plugin):
+    """Create a unique, human-readable ID for this plugin that can be used in
+    a permalink URL.
+
+    WARNING: Not thread-safe.
+    """
+    name = (plugin.get('vimorg_name') or plugin.get('github_repo_name') or
+            plugin.get('github_vim_scripts_repo_name'))
+    assert name
+
+    slug = slugify(name)
+    if not _slug_taken(slug):
+        return slug
+
+    # If the slug isn't unique, try appending different slug suffixes until we
+    # get a unique slug. Don't worry, these suffixes only show up in the URL.
+    # And it's more efficient to randomly permute these than using
+    # a monotonically increasing integer.
+    slug_suffixes = [
+        'all-too-well',
+        'back-to-december',
+        'better-than-revenge',
+        'come-back-be-here',
+        'enchanted',
+        'fearless',
+        'holy-ground',
+        'long-live',
+        'love-story',
+        'mine',
+        'ours',
+        'red',
+        'safe-and-sound',
+        'sparks-fly',
+        'state-of-grace',
+        'sweeter-than-fiction',
+        'treacherous',
+        'you-belong-with-me',
+    ]
+    random.shuffle(slug_suffixes)
+
+    for slug_suffix in slug_suffixes:
+        slug = slugify('%s-%s' % (name, slug_suffix))
+
+        if not _slug_taken(slug):
+            return slug
+
+    raise Exception('Uh oh, we need more song titles. Too many'
+            ' collisions of %s' % name)
+
+
+def _slug_taken(slug):
+    """Returns whether a slug has already been used."""
+    return bool(r.table('plugins').get(slug).run(r_conn()))
+
+
+# FIXME(david): This will be going away (using the new 'slug' primary key).
 def get_for_name(name):
     """Get the plugin model of the given name."""
     return db.util.get_first(r.table('plugins').get_all(name, index='name'))
@@ -81,6 +215,13 @@ def update_tags(plugin, tags):
 
     plugin['tags'] = tags
     r.table('plugins').update(plugin).run(r_conn())
+
+
+###############################################################################
+# Routines for merging in data from scraped sources.
+# TODO(david): Write a Craig-esque comment about how all this works.
+# TODO(david): Make most of these functions private once we get rid of
+#     db_upsert.py.
 
 
 def is_more_authoritative(repo1, repo2):
@@ -146,6 +287,67 @@ def _merge_dict_except_none(dict_a, dict_b):
     return dict(dict_a, **dict_b_filtered)
 
 
+def _find_matching_vimorg_plugins(plugin_data, repo=None):
+    """Attempts to find the matching vim.org plugin from the given data using
+    various heuristics.
+
+    Ideally, this would never return more than one matching plugin, but our
+    heuristics are not perfect and there are many similar vim.org plugins named
+    "python.vim," for example.
+
+    Arguments:
+        plugin_data: Scraped data about a plugin.
+        repo: (optional) If plugin_data is scraped from GitHub, the
+            corresponding github_repo document containing info about the GitHub
+            repo.
+
+    Returns:
+        A list of plugins that are likely to be the same as the given
+        plugin_data based on vim.org data.
+    """
+    # If we have a vimorg_id, then we have a direct key to a vim.org script
+    # if it's in DB.
+    if plugin_data.get('vimorg_id'):
+        query = r.table('plugins').get_all(plugin_data['vimorg_id'],
+                index='vimorg_id')
+        return list(query.run(r_conn()))
+
+    # FIXME(david): Handle no vimorg_id case (this is the infamous "associate
+    #     github repo with vim.org script" algorithm)
+
+
+def add_scraped_data(plugin_data, repo=None):
+    """Adds scraped plugin data from either vim.org, a github.com/vim-scripts
+    repo, or an arbitrary GitHub repo.
+
+    This will attempt to match the plugin data with an existing plugin already
+    in the DB using various heuristics. If found a reasonable match is found,
+    we update, else, we insert a new plugin.
+
+    Arguments:
+        plugin_data: Scraped data about a plugin.
+        repo: (optional) If plugin_data is scraped from GitHub, the
+            corresponding github_repo document containing info about the GitHub
+            repo.
+    """
+    plugins = _find_matching_vimorg_plugins(plugin_data)
+
+    if not plugins:
+        insert(plugin_data)
+    elif len(plugins) == 1:
+        updated_plugin = update_plugin(plugins[0], plugin_data)
+        insert(updated_plugin, upsert=True)
+    else:
+        logging.error(
+                'Uh oh, we found %s plugins that match the scraped data:\n'
+                'Scraped data: %s\nMatching plugin slugs: %s' % (
+                len(plugins), plugin_data, [p['slug'] for p in plugins]))
+
+
+###############################################################################
+# Utility functions for powering the web search.
+
+
 def get_search_index():
     """Returns a view of the plugins table that can be used for search.
 
@@ -162,8 +364,9 @@ def get_search_index():
     """
     query = r.table('plugins')
 
+    # FIXME(david): These fields need to change.
     query = query.pluck(['id', 'name', 'created_at', 'updated_at', 'tags',
-        'homepage', 'author', 'vim_script_id', 'vimorg_rating',
+        'homepage', 'author', 'vimorg_id', 'vimorg_rating',
         'vimorg_short_desc', 'github_stars', 'github_url', 'github_short_desc',
         'plugin_manager_users'])
 

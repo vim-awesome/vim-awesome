@@ -7,7 +7,7 @@ import requests
 import lxml.html
 import lxml.html.html5parser
 
-import tools.scrape.db_upsert as db_upsert
+import db
 import util
 
 
@@ -37,11 +37,11 @@ def scrape_scripts(num):
     for tr in scripts[2:-1]:
         link = tr[0][0].attrib['href']
 
-        script_id = int(re.search("script_id=(\d+)", link).group(1))
+        vimorg_id = re.search("script_id=(\d+)", link).group(1)
         name = tr[0][0].text
 
         # Print w/o newline.
-        print "    scraping %s (id=%s) ..." % (name, script_id),
+        print "    scraping %s (vimorg_id=%s) ..." % (name, vimorg_id),
         sys.stdout.flush()
 
         # TODO(david): Somehow also get a count of how many plugins failed to
@@ -56,19 +56,19 @@ def scrape_scripts(num):
             # Merge the data we get here with extra data from the details page.
             plugin = dict({
                 "vimorg_url": "http://www.vim.org/scripts/%s" % link,
-                "vim_script_id": script_id,
-                "name": tr[0][0].text,
+                "vimorg_id": vimorg_id,
+                "vimorg_name": tr[0][0].text,
                 "vimorg_type": tr[1].text,
                 "vimorg_rating": int(tr[2].text),
                 "vimorg_downloads": int(tr[3].text),
                 "vimorg_short_desc": tr[4][0].text,
-            }, **get_plugin_info(script_id))
-            db_upsert.upsert_plugin(plugin)
+            }, **get_plugin_info(vimorg_id))
+            db.plugins.add_scraped_data(plugin)
             print "done"
         except Exception:
             logging.exception(
-                    '\nError scraping %s (script_id=%s) from vim.org' %
-                    (name, script_id))
+                    '\nError scraping %s (vimorg_id=%s) from vim.org' %
+                    (name, vimorg_id))
 
 
 def _clean_text_node(node):
@@ -119,7 +119,7 @@ def _clean_text_node(node):
             elem.getparent().remove(elem)
 
 
-def get_plugin_info(script_id):
+def get_plugin_info(vimorg_id):
     """Gets some more detailed information about a vim.org script
 
     Scrapes a given vim.org script page, and returns some detailed information
@@ -127,7 +127,7 @@ def get_plugin_info(script_id):
     people rated a plugin, the author's name, and a long description.
     """
     res = requests.get(
-            'http://www.vim.org/scripts/script.php?script_id=%d' % script_id)
+            'http://www.vim.org/scripts/script.php?script_id=%s' % vimorg_id)
 
     html = lxml.html.html5parser.document_fromstring(res.text, parser=PARSER)
 
@@ -162,10 +162,9 @@ def get_plugin_info(script_id):
 
     return {
         "vimorg_num_raters": rating_denom,
-        "author": creator,
+        "vimorg_author": creator,
         "vimorg_long_desc": _get_innerhtml(description_node),
         "vimorg_install_details": _get_innerhtml(install_node),
-        # TODO(david): Upgrade rethink to >= 1.8 to get native datetime support
         "updated_at": util.to_timestamp(updated_date),
         "created_at": util.to_timestamp(created_date),
     }
