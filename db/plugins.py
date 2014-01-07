@@ -2,6 +2,7 @@
 
 import logging
 import random
+import re
 
 import rethinkdb as r
 from slugify import slugify
@@ -143,14 +144,11 @@ def insert(plugins, *args, **kwargs):
 
     mapped_plugins = []
     for plugin in plugins:
-
-        # Generate a unique slug if not already present.
         if not plugin.get('slug'):
             plugin['slug'] = _generate_unique_slug(plugin)
 
-        # FIXME(david): This is scaffolding code.
         if not plugin.get('normalized_name'):
-            plugin['normalized_name'] = 'meredith grey swift'
+            plugin['normalized_name'] = _normalize_name(plugin)
 
         mapped_plugins.append(dict(_ROW_SCHEMA, **plugin))
 
@@ -212,6 +210,30 @@ def _slug_taken(slug):
     """Returns whether a slug has already been used or is reserved."""
     return bool(r.table('plugins').get(slug).run(r_conn())) or (
             slug in _RESERVED_SLUGS)
+
+
+def _normalize_name(plugin):
+    """Returns a normalized name for a plugin that can be used for matching
+    against other similar names.
+    """
+    name = (plugin.get('vimorg_name') or plugin.get('github_repo_name') or
+            plugin.get('github_vim_scripts_repo_name'))
+    assert name
+
+    # Remove anything including and after the first '--', which vim-scripts
+    # uses as a separator to append author name to get unique repo names.
+    name = name.split('--', 1)[0]
+
+    # Remove accents from chars, lowercases, and remove non-ASCII
+    name = slugify(name)
+
+    # Remove non-alphanumerics
+    name = re.sub(r'[\W_]+', '', name)
+
+    # Remove any number of leading {'vim', 'the'}, and any trailing 'vim'
+    name = re.sub('(?:^(vim|the)+|vim$)', '', name)
+
+    return name
 
 
 # FIXME(david): This will be going away (using the new 'slug' primary key).

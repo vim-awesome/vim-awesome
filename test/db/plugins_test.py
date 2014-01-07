@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import unittest
 
 import db.plugins
@@ -123,3 +125,21 @@ class PluginsTest(unittest.TestCase):
         self.assertEquals(merge(a, b), {'a': 3, 'b': 2, 'c': 4})
         self.assertEquals(a, {'a': 1, 'b': 2})
         self.assertEquals(b, {'a': 3, 'c': 4})
+
+    def test_generate_normalized_name(self):
+        def test(name, expected):
+            gen = db.plugins._normalize_name
+            self.assertEquals(gen({'vimorg_name': name}), expected)
+
+        test('nerdcommenter', 'nerdcommenter')
+        test('The NERD Commenter', 'nerdcommenter')
+        test('The-NERD-Commenter', 'nerdcommenter')
+        test('The-vim-NERD-Commenter.vim', 'nerdcommenter')  # This I made up
+        test('NERD_tree', 'nerdtree')
+        test(u'oh-l\xe0-l\xe0', 'ohlala')
+        test(u'\u2605darkZ\u2605', 'darkz')
+        test('abc-vim', 'abc')
+        test('cscope.vim', 'cscope')
+        test('vim-powerline', 'powerline')
+        test('systemverilog.vim--Kanovsky', 'systemverilog')
+        test('Ruby/Sinatra', 'rubysinatra')
