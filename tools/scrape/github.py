@@ -310,11 +310,15 @@ def scrape_vim_scripts_repos(num):
 
             repo_name = repo_data['name']
 
-            # FIXME(david): Need to insert the number of plugin manager users.
+            repo = PluginGithubRepos.get_with_owner_repo('vim-scripts',
+                    repo_name)
+            num_bundles = repo['plugin_manager_users'] if repo else 0
+
             db.plugins.add_scraped_data({
                 'vimorg_id': vimorg_id,
                 'github_vim_scripts_repo_name': repo_name,
                 'github_vim_scripts_stars': repo_data['watchers'],
+                'github_vim_scripts_bundles': num_bundles,
             })
 
             # Also add to our index of known GitHub plugins.
