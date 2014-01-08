@@ -184,23 +184,34 @@ def _generate_unique_slug(plugin):
     # get a unique slug. Don't worry, these suffixes only show up in the URL.
     # And it's more efficient to randomly permute these than using
     # a monotonically increasing integer.
+    #
+    # Also this is just wayyyyyyyy more awesome than appending numbers. <3
     slug_suffixes = [
         'all-too-well',
         'back-to-december',
         'better-than-revenge',
         'come-back-be-here',
         'enchanted',
+        'everything-has-changed',
         'fearless',
+        'forever-and-always',
         'holy-ground',
+        'if-this-was-a-movie',
         'long-live',
         'love-story',
         'mine',
         'ours',
         'red',
+        'sad-beautiful-tragic',
         'safe-and-sound',
+        'shouldve-said-no',
         'sparks-fly',
+        'speak-now',
         'state-of-grace',
+        'superman',
         'sweeter-than-fiction',
+        'the-lucky-one',
+        'the-story-of-us',
         'treacherous',
         'you-belong-with-me',
     ]
