@@ -15,6 +15,7 @@ import rethinkdb as r
 from termcolor import colored
 
 from db.github_repos import PluginGithubRepos, DotfilesGithubRepos
+import db.plugins
 import db.util
 import tools.scrape.db_upsert as db_upsert
 import util
@@ -38,42 +39,8 @@ if not _GITHUB_API_TOKEN:
     logging.warn(colored(_NO_GITHUB_API_TOKEN_MESSAGE, 'red'))
 
 
-# The following are names of repos and locations where we search for
-# Vundle/Pathogen plugin references. They were found by manually going through
-# search results of
-# github.com/search?q=scrooloose%2Fsyntastic&ref=searchresults&type=Code
-
-# TODO(david): It would be good to add "vim", "settings", and "config", but
-#     there are too many false positives that need to be filtered out.
-_DOTFILE_REPO_NAMES = ['vimrc', 'vimfile', 'vim-file', 'vimconf',
-        'vim-conf', 'dotvim', 'vim-setting', 'myvim', 'dotfile', 'config-files']
-
-_VIMRC_FILENAMES = ['vimrc', 'bundle', 'vundle.vim', 'vundles.vim',
-        'vim.config', 'plugins.vim']
-
-_VIM_DIRECTORIES = ['vim', 'config', 'home']
-
-
-# Regexes for extracting plugin references from dotfile repos. See
-# github_test.py for examples of what they match and don't.
-
-# Matches eg. "Bundle 'gmarik/vundle'" or "Bundle 'taglist'"
-# [^\S\n] means whitespace except newline: stackoverflow.com/a/3469155/392426
-_BUNDLE_PLUGIN_REGEX_TEMPLATE = r'^[^\S\n]*%s[^\S\n]*[\'"]([^\'"\n\r]+)[\'"]'
-_VUNDLE_PLUGIN_REGEX = re.compile(_BUNDLE_PLUGIN_REGEX_TEMPLATE % 'Bundle',
-        re.MULTILINE)
-_NEOBUNDLE_PLUGIN_REGEX = re.compile( _BUNDLE_PLUGIN_REGEX_TEMPLATE %
-        '(?:NeoBundle|NeoBundleFetch|NeoBundleLazy)', re.MULTILINE)
-
-# Extracts owner and repo name from a bundle spec -- a git repo URI, implicity
-# github.com if host not given.
-# eg. ('gmarik', 'vundle') or (None, 'taglist')
-_BUNDLE_OWNER_REPO_REGEX = re.compile(
-        r'(?:([^:\'"/]+)/)?([^\'"\n\r/]+?)(?:\.git|/)?$')
-
-# Matches a .gitmodules section heading that's likely of a Pathogen bundle.
-_SUBMODULE_IS_BUNDLE_REGEX = re.compile(r'submodule.+bundles?/.+',
-        re.IGNORECASE)
+###############################################################################
+# General utilities for interacting with the GitHub API.
 
 
 class ApiRateLimitExceededError(Exception):
@@ -124,6 +91,13 @@ def get_api_page(url_or_path, query_params=None, page=1, per_page=100):
     return res, res.json()
 
 
+def get_requests_left():
+    """Retrieve how many API requests are remaining"""
+    _, data = get_api_page('rate_limit')
+
+    return data['rate']['remaining']
+
+
 def maybe_wait_until_api_limit_resets(response_headers):
     """If we're about to exceed our API limit, sleeps until our API limit is
     reset.
@@ -135,6 +109,25 @@ def maybe_wait_until_api_limit_resets(response_headers):
         seconds_to_wait = (reset_date - now).seconds + 1
         print "Sleeping %s seconds for API limit to reset." % seconds_to_wait
         time.sleep(seconds_to_wait)
+
+
+###############################################################################
+# Routines for scraping Vim plugin repos from GitHub.
+
+
+_VIMORG_ID_FROM_URL_REGEX = re.compile(
+        r'vim.org/scripts/script.php\?script_id=(\d+)')
+
+
+def _get_vimorg_id_from_url(url):
+    """Returns the vim.org script_id from a URL if it's of a vim.org script,
+    otherwise, returns None.
+    """
+    match = _VIMORG_ID_FROM_URL_REGEX.search(url or '')
+    if match:
+        return match.group(1)
+
+    return None
 
 
 def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
@@ -168,14 +161,8 @@ def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
     readme_base64_decoded = base64.b64decode(readme_data.get('content', ''))
     readme = unicode(readme_base64_decoded, 'utf-8', errors='ignore')
 
-    vim_script_id = None
     homepage = repo_data['homepage']
-
-    if homepage and homepage.startswith('http://www.vim.org/scripts/'):
-        vim_script_url = homepage
-        match = re.search('script_id=(\d+)', vim_script_url)
-        if match:
-            vim_script_id = int(match.group(1))
+    vimorg_id = _get_vimorg_id_from_url(homepage)
 
     repo_created_date = dateutil.parser.parse(repo_data['created_at'])
 
@@ -216,7 +203,7 @@ def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
     repo = {
         'name': repo_name,
         'github_url': repo_data['html_url'],
-        'vim_script_id': vim_script_id,
+        'vimorg_id': vimorg_id,
         'homepage': homepage,
         'github_stars': repo_data['watchers'],
         'github_short_desc': repo_data['description'],
@@ -231,17 +218,15 @@ def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
     return (repo, repo_data)
 
 
-def get_requests_left():
-    """Retrieve how many API requests are remaining"""
-    _, data = get_api_page('rate_limit')
-
-    return data['rate']['remaining']
-
-
 def scrape_plugin_repos(num):
     """Scrapes the num plugin repos that have been least recently scraped."""
     query = r.table('plugin_github_repos').filter({'is_blacklisted': False})
     query = query.filter({'is_fork': False}, default=True)
+
+    # We scrape vim-scripts separately using the batch /users/:user/repos call
+    # ...
+    # FIXME(david): Filter-out vim-scripts owner
+
     query = query.order_by('last_scraped_at').limit(num)
     repos = query.run(r_conn())
 
@@ -294,9 +279,9 @@ def scrape_plugin_repos(num):
             # scripts before a global search.
             query_filter = None
             if repo.get('from_vim_scripts'):
-                vim_script_ids = repo['from_vim_scripts']
+                vimorg_ids = repo['from_vim_scripts']
                 query_filter = (lambda plugin:
-                        plugin['vim_script_id'] in vim_script_ids)
+                        plugin['vimorg_id'] in vimorg_ids)
 
             try:
                 db_upsert.upsert_plugin(plugin, query_filter)
@@ -313,6 +298,100 @@ def scrape_plugin_repos(num):
             #     not found
             print 'not found.'
             continue
+
+
+def scrape_vim_scripts_repos(num):
+    """Scrape at least num repos from the vim-scripts GitHub user."""
+    _, user_data = get_api_page('users/vim-scripts')
+
+    # Calculate how many pages of repositories there are.
+    num_repos = user_data['public_repos']
+    num_pages = (num_repos + 99) / 100  # ceil(num_repos / 100.0)
+
+    num_inserted = 0
+    num_scraped = 0
+
+    for page in range(1, num_pages + 1):
+        if num_scraped >= num:
+            break
+
+        _, repos_data = get_api_page('users/vim-scripts/repos', page=page)
+
+        for repo_data in repos_data:
+
+            # Scrape plugin-relevant data. We don't need much info from
+            # vim-scripts because it's a mirror of vim.org.
+
+            # vimorg_id is required for associating with the corresponding
+            # vim.org-scraped plugin.
+            vimorg_id = _get_vimorg_id_from_url(repo_data['homepage'])
+            assert vimorg_id
+
+            repo_name = repo_data['name']
+
+            db.plugins.add_scraped_data({
+                'vimorg_id': vimorg_id,
+                'github_vim_scripts_repo_name': repo_name,
+                'github_vim_scripts_stars': repo_data['watchers'],
+            })
+
+            # Also add to our index of known GitHub plugins.
+            inserted = PluginGithubRepos.upsert_with_owner_repo({
+                'owner': 'vim-scripts',
+                'repo_name': repo_name,
+                'repo_data': repo_data,
+            })
+
+            num_inserted += int(inserted)
+            num_scraped += 1
+
+        print '    scraped %s repos' % num_scraped
+
+    print "\nScraped %s vim-scripts GitHub repos; inserted %s new ones." % (
+            num_scraped, num_inserted)
+
+
+###############################################################################
+# Code to scrape GitHub dotfiles repos to extract plugins used.
+# TODO(david): Write up a blurb on how all of this works.
+
+
+# The following are names of repos and locations where we search for
+# Vundle/Pathogen plugin references. They were found by manually going through
+# search results of
+# github.com/search?q=scrooloose%2Fsyntastic&ref=searchresults&type=Code
+
+# TODO(david): It would be good to add "vim", "settings", and "config", but
+#     there are too many false positives that need to be filtered out.
+_DOTFILE_REPO_NAMES = ['vimrc', 'vimfile', 'vim-file', 'vimconf',
+        'vim-conf', 'dotvim', 'vim-setting', 'myvim', 'dotfile', 'config-files']
+
+_VIMRC_FILENAMES = ['vimrc', 'bundle', 'vundle.vim', 'vundles.vim',
+        'vim.config', 'plugins.vim']
+
+_VIM_DIRECTORIES = ['vim', 'config', 'home']
+
+
+# Regexes for extracting plugin references from dotfile repos. See
+# github_test.py for examples of what they match and don't.
+
+# Matches eg. "Bundle 'gmarik/vundle'" or "Bundle 'taglist'"
+# [^\S\n] means whitespace except newline: stackoverflow.com/a/3469155/392426
+_BUNDLE_PLUGIN_REGEX_TEMPLATE = r'^[^\S\n]*%s[^\S\n]*[\'"]([^\'"\n\r]+)[\'"]'
+_VUNDLE_PLUGIN_REGEX = re.compile(_BUNDLE_PLUGIN_REGEX_TEMPLATE % 'Bundle',
+        re.MULTILINE)
+_NEOBUNDLE_PLUGIN_REGEX = re.compile( _BUNDLE_PLUGIN_REGEX_TEMPLATE %
+        '(?:NeoBundle|NeoBundleFetch|NeoBundleLazy)', re.MULTILINE)
+
+# Extracts owner and repo name from a bundle spec -- a git repo URI, implicity
+# github.com if host not given.
+# eg. ('gmarik', 'vundle') or (None, 'taglist')
+_BUNDLE_OWNER_REPO_REGEX = re.compile(
+        r'(?:([^:\'"/]+)/)?([^\'"\n\r/]+?)(?:\.git|/)?$')
+
+# Matches a .gitmodules section heading that's likely of a Pathogen bundle.
+_SUBMODULE_IS_BUNDLE_REGEX = re.compile(r'submodule.+bundles?/.+',
+        re.IGNORECASE)
 
 
 def _extract_bundles_with_regex(file_contents, bundle_plugin_regex):

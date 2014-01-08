@@ -9,7 +9,6 @@ import rethinkdb as r
 
 import db.util
 from db.github_repos import PluginGithubRepos
-from tools.scrape.github import get_api_page
 
 r_conn = db.util.r_conn
 
@@ -92,33 +91,6 @@ def get_repos_from_vimorg_descriptions():
             len(repo_urls_dict), num_inserted)
 
 
-def get_vim_scripts_repos():
-    """Retrieve all of the repos from the vim-scripts GitHub user."""
-    print "Discovering repositories from https://github.com/vim-scripts ..."
-    _, user_data = get_api_page('users/vim-scripts')
-
-    # Calculate how many pages of repositories there are.
-    num_repos = user_data['public_repos']
-    num_pages = (num_repos + 99) / 100  # ceil(num_repos / 100.0)
-
-    num_inserted = 0
-
-    for page in range(num_pages):
-        _, repos_data = get_api_page('users/vim-scripts/repos',
-                page=(page + 1))
-
-        for repo_data in repos_data:
-            inserted = PluginGithubRepos.upsert_with_owner_repo({
-                'owner': 'vim-scripts',
-                'repo_name': repo_data['name'],
-                'repo_data': repo_data,
-            })
-            num_inserted += int(inserted)
-
-    print "Found %s vim-scripts GitHub repos; inserted %s new ones." % (
-            num_repos, num_inserted)
-
-
 def aggregate_repos_from_dotfiles():
     """Aggregate plugin references scraped from dotfiles repos on GitHub.
 
@@ -182,7 +154,6 @@ if __name__ == '__main__':
 
     extract_fns = {
         "vim.org": get_repos_from_vimorg_descriptions,
-        "vim-scripts": get_vim_scripts_repos,
         "dotfiles": aggregate_repos_from_dotfiles,
     }
 

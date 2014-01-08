@@ -10,6 +10,12 @@ def scrape_github_plugins(num):
     print "%s GitHub API requests remaining." % github.get_requests_left()
 
 
+def scrape_github_vim_scripts(num):
+    print "\nScraping plugins from the github.com/vim-scripts user..."
+    github.scrape_vim_scripts_repos(num)
+    print "%s GitHub API requests remaining." % github.get_requests_left()
+
+
 def scrape_github_dotfiles(num):
     print "\nScraping dotfiles from github.com..."
     num_scraped, scraped_counter = github.scrape_dotfiles_repos(num)
@@ -29,6 +35,7 @@ if __name__ == "__main__":
     scrape_fns = {
         "vim.org": scrape_vimorg,
         "github-plugins": scrape_github_plugins,
+        "github-vim-scripts": scrape_github_vim_scripts,
         "github-dotfiles": scrape_github_dotfiles,
     }
 
