@@ -65,8 +65,7 @@ def get_repos_from_vimorg_descriptions():
     print "Discovering GitHub repos from vim.org long descriptions ..."
 
     # A map of repo URL to the vimorg_ids they were found in.
-    # TODO(david): This should be a defaultdict of a set.
-    repo_urls_dict = collections.defaultdict(list)
+    repo_urls_dict = collections.defaultdict(set)
 
     all_plugins = r.table('plugins').run(r_conn())
     for plugin in all_plugins:
@@ -76,7 +75,7 @@ def get_repos_from_vimorg_descriptions():
                 vimorg_id = plugin['vimorg_id']
                 assert vimorg_id
                 for repo_url in repo_urls:
-                    repo_urls_dict[repo_url].append(vimorg_id)
+                    repo_urls_dict[repo_url].add(vimorg_id)
 
     num_inserted = 0
     for repo_url, vimorg_ids in repo_urls_dict.iteritems():
@@ -84,7 +83,7 @@ def get_repos_from_vimorg_descriptions():
         inserted = PluginGithubRepos.upsert_with_owner_repo({
             'owner': owner,
             'repo_name': repo_name,
-            'from_vim_scripts': vimorg_ids,
+            'from_vim_scripts': list(vimorg_ids),
         })
         num_inserted += int(inserted)
 

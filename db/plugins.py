@@ -272,7 +272,7 @@ def to_json(p, extended=False):
     name = (p['vimorg_name'] or p['github_repo_name'] or
             p['github_vim_scripts_repo_name'])
 
-    author = (p['vimorg_author'] or p['github_author'])
+    author = (p['vimorg_author'].strip() or p['github_author'].strip())
     plugin_manager_users = (p['github_bundles'] +
             p['github_vim_scripts_bundles'])
     short_desc = p['github_short_desc'] or p['vimorg_short_desc']
