@@ -228,7 +228,7 @@ var Pager = React.createClass({
 
 var Plugin = React.createClass({
   getInitialState: function() {
-    var pluginId = this.props.plugin.id;
+    var pluginId = this.props.plugin.slug;
     var pluginStore = pluginId && store.enabled &&
         store.get("plugin-" + pluginId);
 
@@ -259,7 +259,7 @@ var Plugin = React.createClass({
   },
 
   goToDetailsPage: function() {
-    Backbone.history.navigate("plugin/" + this.props.plugin.name, true);
+    Backbone.history.navigate("plugin/" + this.props.plugin.slug, true);
   },
 
   render: function() {
@@ -269,12 +269,12 @@ var Plugin = React.createClass({
 
     var hasNavFocus = this.props.hasNavFocus;
     // TODO(david): Map color from tag/category or just hash of name
-    var color = "accent-" + (plugin.name.charCodeAt(0) % 9);
+    var color = "accent-" + (plugin.name.length % 9);
     return <li
         className={"plugin" + (hasNavFocus ? " nav-focus" : "") +
             (this.state.hasVisited ? " visited" : "")}
         onMouseEnter={this.props.onMouseEnter}>
-      <a href={"plugin/" + plugin.name}>
+      <a href={"plugin/" + plugin.slug}>
         <h3 className={"plugin-name " + color}>{plugin.name}</h3>
         {plugin.author && <span className="by">by</span>}
         {plugin.author && <span className="author">{" " + plugin.author}</span>}
@@ -284,16 +284,14 @@ var Plugin = React.createClass({
             {plugin.github_stars} <i className="icon-star"></i>
           </div>
         }
-        {!!plugin.plugin_manager_users &&
+        {plugin.plugin_manager_users > 0 &&
           <div className="plugin-users"
               title={plugin.plugin_manager_users +
               " Vundle/Pathogen/NeoBundle users on GitHub"}>
             {plugin.plugin_manager_users} <i className="icon-user"></i>
           </div>
         }
-        <p className="short-desc">
-          {plugin.github_short_desc || plugin.vimorg_short_desc}
-        </p>
+        <p className="short-desc">{plugin.short_desc}</p>
       </a>
     </li>;
   }
@@ -449,7 +447,7 @@ var PluginList = React.createClass({
         var hasNavFocus = (index === this.state.selectedIndex);
         return <Plugin
             ref={hasNavFocus ? "navFocus" : ""}
-            key={plugin.id}
+            key={plugin.slug}
             hasNavFocus={hasNavFocus}
             plugin={plugin}
             onMouseEnter={this.onPluginMouseEnter.bind(this, index)} />;
@@ -724,19 +722,15 @@ var Tags = React.createClass({
 
 var Markdown = React.createClass({
   render: function() {
-    return <div
-        dangerouslySetInnerHTML={{__html: marked(this.props.children)}} />;
+    var html = this.props.children || '';
+    return <div dangerouslySetInnerHTML={{__html: marked(html)}} />;
   }
 });
 
 // Permalink page with more details about a plugin.
 var PluginPage = React.createClass({
   getInitialState: function() {
-    return {
-      // TODO(david): placeholders
-      created_at: 1286809444,
-      updated_at: 1371265409
-    };
+    return {};
   },
 
   componentDidMount: function() {
@@ -749,14 +743,14 @@ var PluginPage = React.createClass({
   },
 
   fetchPlugin: function() {
-    $.getJSON("/api/plugins/" + this.props.name, function(data) {
+    $.getJSON("/api/plugins/" + this.props.slug, function(data) {
       this.setState(data);
 
       // Save in localStorage that this plugin has been visited.
       if (store.enabled) {
-        var pluginStore = store.get("plugin-" + data.id) || {};
+        var pluginStore = store.get("plugin-" + data.slug) || {};
         pluginStore.hasVisited = true;
-        store.set("plugin-" + data.id, pluginStore);
+        store.set("plugin-" + data.slug, pluginStore);
       }
     }.bind(this));
   },
@@ -793,7 +787,7 @@ var PluginPage = React.createClass({
     var newTags = _.uniq(tags);
     this.setState({tags: newTags});
     $.ajax({
-      url: "/api/plugins/" + this.props.name + "/tags",
+      url: "/api/plugins/" + this.props.slug + "/tags",
       type: "POST",
       contentType: "application/json",
       dataType: "json",
@@ -805,24 +799,13 @@ var PluginPage = React.createClass({
   },
 
   render: function() {
-    var longDesc;
-
-    // For rendering long description, prefer GitHub's README if it's not from
-    // the vim-scripts mirror.
-    if (this.state.github_readme &&
-        this.state.github_url.indexOf("github.com/vim-scripts") === -1) {
-      longDesc = this.state.github_readme;
-    } else {
-      longDesc = this.state.vimorg_long_desc || this.state.github_readme || "";
-    }
-
     // TODO(david): Need to also scrape the link to the archive download (for
     //     the manual install mode).
     var installDetails = this.state.vimorg_install_details;
 
-    var vimOrgUrl = this.state.vim_script_id &&
+    var vimOrgUrl = this.state.vimorg_id &&
         ("http://www.vim.org/scripts/script.php?script_id=" +
-        encodeURIComponent(this.state.vim_script_id));
+        encodeURIComponent(this.state.vimorg_id));
 
     return <div className="plugin-page">
       <Plugin plugin={this.state} />
@@ -871,7 +854,7 @@ var PluginPage = React.createClass({
 
       <div className="row-fluid">
         <div className="span12 long-desc">
-          <Markdown>{longDesc}</Markdown>
+          <Markdown>{this.state.long_desc}</Markdown>
           {!!installDetails &&
             <div>
               <h2>Installation</h2>
@@ -999,7 +982,7 @@ var Page = React.createClass({
 var Router = Backbone.Router.extend({
   routes: {
     "": "home",
-    "plugin/:name": "plugin"
+    "plugin/:slug": "plugin"
   },
 
   _showPage: function(component) {
@@ -1010,8 +993,8 @@ var Router = Backbone.Router.extend({
     this._showPage(<PluginListPage />);
   },
 
-  plugin: function(name) {
-    this._showPage(<PluginPage name={name} />);
+  plugin: function(slug) {
+    this._showPage(<PluginPage slug={slug} />);
   }
 });
 

@@ -92,21 +92,26 @@ def get_plugins():
     })
 
 
-@app.route('/api/plugins/<name>', methods=['GET'])
-def get_plugin(name):
-    plugin = db.plugins.get_for_name(name)
+@app.route('/api/plugins/<slug>', methods=['GET'])
+def get_plugin(slug):
+    plugin = r.table('plugins').get(slug).run(r_conn())
+
     if plugin:
-        return json.dumps(plugin)
+        return json.dumps(db.plugins.to_json(plugin, extended=True))
     else:
-        return util.api_not_found('No plugin with name %s' % name)
+        return util.api_not_found('No plugin with slug %s' % slug)
 
 
 # TODO(david): Make it not so easy for an attacker to completely obliterate all
 #     of our tags, or at least be able to recover from it.
-@app.route('/api/plugins/<name>/tags', methods=['POST', 'PUT'])
-def update_plugin_tags(name):
+@app.route('/api/plugins/<slug>/tags', methods=['POST', 'PUT'])
+def update_plugin_tags(slug):
     data = json.loads(flask.request.data)
-    plugin = db.plugins.get_for_name(name)
+    plugin = r.table('plugins').get(slug).run(r_conn())
+
+    if not plugin:
+        return util.api_not_found('No plugin with slug %s' % slug)
+
     db.plugins.update_tags(plugin, data['tags'])
     return json.dumps({'tags': plugin['tags']})
 

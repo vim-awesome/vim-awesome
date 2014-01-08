@@ -127,6 +127,9 @@ _RESERVED_SLUGS = set([
 # Routines for basic DB CRUD operations.
 
 
+_GITHUB_REPO_URL_TEMPLATE = 'https://github.com/%s/%s'
+
+
 def ensure_table():
     db.util.ensure_table('plugins', primary_key='slug')
 
@@ -246,12 +249,6 @@ def _normalize_name(plugin):
     return name
 
 
-# FIXME(david): This will be going away (using the new 'slug' primary key).
-def get_for_name(name):
-    """Get the plugin model of the given name."""
-    return db.util.get_first(r.table('plugins').get_all(name, index='name'))
-
-
 def update_tags(plugin, tags):
     """Updates a plugin's tags to the given set, and updates aggregate tag
     counts.
@@ -266,6 +263,48 @@ def update_tags(plugin, tags):
 
     plugin['tags'] = tags
     r.table('plugins').update(plugin).run(r_conn())
+
+
+def to_json(p, extended=False):
+    """Returns a JSON-compatible dict of a plugin that can be serialized and
+    sent to clients.
+    """
+    name = (p['vimorg_name'] or p['github_repo_name'] or
+            p['github_vim_scripts_repo_name'])
+
+    author = (p['vimorg_author'] or p['github_author'])
+    plugin_manager_users = (p['github_bundles'] +
+            p['github_vim_scripts_bundles'])
+    short_desc = p['github_short_desc'] or p['vimorg_short_desc']
+
+    if p['github_owner'] and p['github_stars'] > p['github_vim_scripts_stars']:
+        github_url = _GITHUB_REPO_URL_TEMPLATE % (
+                p['github_owner'], p['github_repo_name'])
+        github_stars = p['github_stars']
+    elif p['github_vim_scripts_repo_name']:
+        github_url = _GITHUB_REPO_URL_TEMPLATE % (
+                'vim-scripts', p['github_vim_scripts_repo_name'])
+        github_stars = p['github_vim_scripts_stars']
+    else:
+        github_url = None
+        github_stars = 0
+
+    plugin = dict(p, **{
+        'name': name,
+        'author': author,
+        'plugin_manager_users': plugin_manager_users,
+        'short_desc': short_desc,
+        'github_url': github_url,
+        'github_stars': github_stars,
+    })
+
+    if extended:
+        # TODO(david): Also send down type of long description (eg. markdown).
+        plugin.update({
+            'long_desc': p['github_readme'] or p['vimorg_long_desc'],
+        })
+
+    return plugin
 
 
 ###############################################################################
@@ -478,14 +517,10 @@ def get_search_index():
     The return value of this function should be cached for these gains.
     """
     query = r.table('plugins')
+    query = query.without(['vimorg_long_desc', 'vimorg_install_details',
+            'github_long_desc'])
 
-    # FIXME(david): These fields need to change.
-    query = query.pluck(['id', 'name', 'created_at', 'updated_at', 'tags',
-        'homepage', 'author', 'vimorg_id', 'vimorg_rating',
-        'vimorg_short_desc', 'github_stars', 'github_url', 'github_short_desc',
-        'plugin_manager_users'])
-
-    plugins = list(query.run(r_conn()))
+    plugins = map(to_json, query.run(r_conn()))
 
     # We can't order_by on multiple fields with secondary indexes due to the
     # following RethinkDB bug: https://github.com/rethinkdb/docs/issues/160
@@ -497,7 +532,7 @@ def get_search_index():
 
     for plugin in plugins:
         tokens = _get_search_tokens_for_plugin(plugin)
-        plugin['keywords'] = ' '.join(tokens)
+        plugin['keywords'] = ' '.join(sorted(tokens))
 
     return plugins
 
@@ -506,8 +541,8 @@ def _get_search_tokens_for_plugin(plugin):
     """Returns a set of lowercased keywords generated from various fields on
     the plugin that can be used for searching.
     """
-    search_fields = ['name', 'tags', 'author', 'vimorg_short_desc',
-            'github_short_desc']
+    search_fields = ['name', 'tags', 'vimorg_author', 'github_author',
+            'vimorg_short_desc', 'github_short_desc']
     tokens = set()
 
     for field in search_fields:
