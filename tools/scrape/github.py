@@ -17,7 +17,6 @@ from termcolor import colored
 from db.github_repos import PluginGithubRepos, DotfilesGithubRepos
 import db.plugins
 import db.util
-import tools.scrape.db_upsert as db_upsert
 import util
 
 r_conn = db.util.r_conn
@@ -134,6 +133,8 @@ def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
         scrape_fork=False):
     """Fetch info relevant to a plugin from a GitHub repo.
 
+    This should not be used to fetch info from the vim-scripts user's repos.
+
     Arguments:
         owner: The repo's owner's login, eg. "gmarik"
         repo_name: The repo name, eg. "vundle"
@@ -142,10 +143,12 @@ def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
         scrape_fork: Whether to bother scraping this repo if it's a fork
 
     Returns:
-        A tuple (plugin_info, repo_data) where plugin_info is a dict of
+        A tuple (plugin_data, repo_data) where plugin_data is a dict of
         properties that can be inserted as a row in the plugins table, and
         repo_data is the API /repos response for this repo.
     """
+    assert owner != 'vim-scripts'
+
     if not repo_data:
         res, repo_data = get_api_page('repos/%s/%s' % (owner, repo_name))
         if res.status_code == 404:
@@ -194,28 +197,23 @@ def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
 
     # Fetch owner info to get author name.
     owner_login = repo_data['owner']['login']
-    if owner_login == 'vim-scripts':
-        author = None
-    else:
-        _, owner_data = get_api_page('users/%s' % owner_login)
-        author = owner_data.get('name') or owner_data.get('login')
+    _, owner_data = get_api_page('users/%s' % owner_login)
+    author = owner_data.get('name') or owner_data.get('login')
 
-    repo = {
-        'name': repo_name,
-        'github_url': repo_data['html_url'],
-        'vimorg_id': vimorg_id,
-        'homepage': homepage,
-        'github_stars': repo_data['watchers'],
-        'github_short_desc': repo_data['description'],
-        'github_readme': readme,
+    plugin_data = {
         'created_at': util.to_timestamp(created_date),
         'updated_at': util.to_timestamp(updated_date),
+        'vimorg_id': vimorg_id,
+        'github_owner': owner,
+        'github_repo_name': repo_name,
+        'github_author': author,
+        'github_stars': repo_data['watchers'],
+        'github_homepage': homepage,
+        'github_short_desc': repo_data['description'],
+        'github_readme': readme,
     }
 
-    if author:
-        repo['author'] = author
-
-    return (repo, repo_data)
+    return (plugin_data, repo_data)
 
 
 def scrape_plugin_repos(num):
@@ -224,8 +222,7 @@ def scrape_plugin_repos(num):
     query = query.filter({'is_fork': False}, default=True)
 
     # We scrape vim-scripts separately using the batch /users/:user/repos call
-    # ...
-    # FIXME(david): Filter-out vim-scripts owner
+    query = query.filter(r.row['owner'] != 'vim-scripts')
 
     query = query.order_by('last_scraped_at').limit(num)
     repos = query.run(r_conn())
@@ -245,7 +242,7 @@ def scrape_plugin_repos(num):
         #     vim-scripts repos in build_github_index.py). But the
         #     implementation here should not be coupled with implemenation
         #     details in build_github_index.py.
-        plugin, repo_data = fetch_plugin(repo_owner, repo_name)
+        plugin_data, repo_data = fetch_plugin(repo_owner, repo_name)
 
         repo['repo_data'] = repo_data
         PluginGithubRepos.log_scrape(repo)
@@ -268,29 +265,13 @@ def scrape_plugin_repos(num):
             print 'skipping fork of %s' % repo_data['parent']['full_name']
             continue
 
-        if plugin:
+        if plugin_data:
 
             # Insert the number of plugin manager users if present.
             if repo.get('plugin_manager_users'):
-                plugin['plugin_manager_users'] = repo['plugin_manager_users']
+                plugin_data['github_bundles'] = repo['plugin_manager_users']
 
-            # If this plugin's repo was mentioned in vim.org script
-            # descriptions, try to see if this plugin matches any of those
-            # scripts before a global search.
-            query_filter = None
-            if repo.get('from_vim_scripts'):
-                vimorg_ids = repo['from_vim_scripts']
-                query_filter = (lambda plugin:
-                        plugin['vimorg_id'] in vimorg_ids)
-
-            try:
-                db_upsert.upsert_plugin(plugin, query_filter)
-            except db_upsert.MultiplePluginsWithSameNormalizedNameError:
-                # TODO(david): Yeah. Figure this out. We need to clearly define
-                #     the schema for the plugins table and the keys to use.
-                logging.exception('Aw crap, I really need to think through how'
-                        ' we\'re going to deal with name collisions.')
-
+            db.plugins.add_scraped_data(plugin_data, repo)
             print 'done'
 
         else:
@@ -329,6 +310,7 @@ def scrape_vim_scripts_repos(num):
 
             repo_name = repo_data['name']
 
+            # FIXME(david): Need to insert the number of plugin manager users.
             db.plugins.add_scraped_data({
                 'vimorg_id': vimorg_id,
                 'github_vim_scripts_repo_name': repo_name,

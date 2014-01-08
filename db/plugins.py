@@ -1,5 +1,6 @@
 """Utility functions for the plugins table."""
 
+import difflib
 import logging
 import random
 import re
@@ -37,12 +38,12 @@ _ROW_SCHEMA = {
     # eg. http://www.vim.org/scripts/script.php?script_id=2736
 
     # Eg. '1234' (string)
-    'vimorg_id': None,
+    'vimorg_id': '',
 
     # Eg. 'Syntastic'
     'vimorg_name': '',
 
-    # Eg. 'Martin Grenfell'
+    # Eg. 'Marty Grenfell'
     'vimorg_author': '',
 
     # eg. 'http://www.vim.org/scripts/script.php?script_id=2736'
@@ -66,6 +67,9 @@ _ROW_SCHEMA = {
 
     # eg. 'syntastic'
     'github_repo_name': '',
+
+    # Eg. 'Martin Grenfell'
+    'github_author': '',
 
     'github_stars': 0,
 
@@ -128,6 +132,9 @@ def ensure_table():
 
     db.util.ensure_index('plugins', 'vimorg_id')
     db.util.ensure_index('plugins', 'github_stars')
+    db.util.ensure_index('plugins', 'normalized_name')
+    db.util.ensure_index('plugins', 'github_owner_repo',
+            lambda p: [p['github_owner'], p['github_repo_name']])
 
 
 # TODO(david): Yep, using an ODM enforcing a consistent schema on write AND
@@ -224,6 +231,9 @@ def _normalize_name(plugin):
     # uses as a separator to append author name to get unique repo names.
     name = name.split('--', 1)[0]
 
+    # Remove any trailing '.zip'
+    name = re.sub('\.zip$', '', name)
+
     # Remove accents from chars, lowercases, and remove non-ASCII
     name = slugify(name)
 
@@ -265,9 +275,10 @@ def update_tags(plugin, tags):
 #     db_upsert.py.
 
 
-def is_more_authoritative(repo1, repo2):
-    """Returns whether repo1 is a different and more authoritative GitHub repo
-    about a certain plugin than repo2.
+# TODO(david): Take into account # of plugin manager users.
+def is_more_authoritative(plugin1, plugin2):
+    """Returns whether plugin1 is a different and more authoritative
+    GitHub-derived plugin than plugin2.
 
     For example, the original author's GitHub repo for Syntastic
     (https://github.com/scrooloose/syntastic) is more authoritative than
@@ -275,12 +286,14 @@ def is_more_authoritative(repo1, repo2):
     """
     # If we have two different GitHub repos, take the latest updated, and break
     # ties by # of stars.
-    if (repo1.get('github_url') and repo2.get('github_url') and
-            repo1['github_url'] != repo2['github_url']):
-        if repo1.get('updated_at', 0) > repo2.get('updated_at', 0):
+    if (plugin1.get('github_owner') and plugin2.get('github_owner') and
+            (plugin1['github_owner'], plugin1['github_repo_name']) !=
+            (plugin2['github_owner'], plugin2['github_repo_name'])):
+        if plugin1.get('updated_at', 0) > plugin2.get('updated_at', 0):
             return True
-        elif repo1.get('updated_at', 0) == repo2.get('updated_at', 0):
-            return repo1.get('github_stars', 0) > repo2.get('github_stars', 0)
+        elif plugin1.get('updated_at', 0) == plugin2.get('updated_at', 0):
+            return (plugin1.get('github_stars', 0) >
+                    plugin2.get('github_stars', 0))
         else:
             return False
     else:
@@ -328,9 +341,28 @@ def _merge_dict_except_none(dict_a, dict_b):
     return dict(dict_a, **dict_b_filtered)
 
 
-def _find_matching_vimorg_plugins(plugin_data, repo=None):
-    """Attempts to find the matching vim.org plugin from the given data using
-    various heuristics.
+def _is_similar_author_name(name1, name2):
+    """Returns whether two author names are similar enough that they're
+    probably the same person.
+    """
+    def normalize_author_name(name):
+        # Remove accents from chars, lowercases, and remove non-ASCII
+        name = slugify(name)
+
+        # Remove non-alphanumerics
+        name = re.sub(r'[\W_]+', '', name)
+
+        return name
+
+    name1 = normalize_author_name(name1)
+    name2 = normalize_author_name(name2)
+
+    return difflib.SequenceMatcher(None, name1, name2).ratio() >= 0.6
+
+
+def _find_matching_plugins(plugin_data, repo=None):
+    """Attempts to find the matching plugin from the given data using various
+    heuristics.
 
     Ideally, this would never return more than one matching plugin, but our
     heuristics are not perfect and there are many similar vim.org plugins named
@@ -344,7 +376,7 @@ def _find_matching_vimorg_plugins(plugin_data, repo=None):
 
     Returns:
         A list of plugins that are likely to be the same as the given
-        plugin_data based on vim.org data.
+        plugin_data.
     """
     # If we have a vimorg_id, then we have a direct key to a vim.org script
     # if it's in DB.
@@ -353,8 +385,50 @@ def _find_matching_vimorg_plugins(plugin_data, repo=None):
                 index='vimorg_id')
         return list(query.run(r_conn()))
 
-    # FIXME(david): Handle no vimorg_id case (this is the infamous "associate
-    #     github repo with vim.org script" algorithm)
+    # If we have a (github_owner, github_repo_name) pair, try to match it with
+    # an existing github-scraped plugin.
+    if plugin_data.get('github_owner') and plugin_data.get('github_repo_name'):
+        query = r.table('plugins').get_all(
+                [plugin_data['github_owner'], plugin_data['github_repo_name']],
+                index='github_owner_repo')
+        matching_plugins = list(query.run(r_conn()))
+        if matching_plugins:
+            return matching_plugins
+
+    # Ok, now we know we have a GitHub-scraped plugin that we haven't scraped
+    # before. Try to find an associated vim.org plugin.
+
+    normalized_name = _normalize_name(plugin_data)
+
+    # If there's a set of vim.org plugins that reference this GitHub repo, see
+    # if we find any with a similar name in that set.
+    if repo.get('from_vim_scripts'):
+        vimorg_ids = set(repo['from_vim_scripts'])
+
+        matching_plugins = list(r.table('plugins').get_all(
+                *list(vimorg_ids), index='vimorg_id').run(r_conn()))
+
+        # If any of the matched plugin names are slightly similar, consider
+        # that a match. This is for cases like 'vim-colors-solarized' -->
+        # 'solarized' or 'Python-mode-klen' --> 'python-mode'
+        matching_plugins = filter(lambda plugin: difflib.SequenceMatcher(None,
+                plugin['normalized_name'], normalized_name).ratio() >= 0.6,
+                matching_plugins)
+
+        if matching_plugins:
+            return matching_plugins
+
+    # Ok, last chance. Find a plugin with the same normalized name AND
+    # a similar author name among all plugins.
+    query = r.table('plugins').get_all(
+            normalized_name, index='normalized_name')
+    matching_plugins = list(query.run(r_conn()))
+
+    author = plugin_data['github_author']
+    assert author
+
+    return filter(lambda plugin: _is_similar_author_name(
+        plugin.get('vimorg_author', ''), author), matching_plugins)
 
 
 def add_scraped_data(plugin_data, repo=None):
@@ -371,7 +445,7 @@ def add_scraped_data(plugin_data, repo=None):
             corresponding github_repo document containing info about the GitHub
             repo.
     """
-    plugins = _find_matching_vimorg_plugins(plugin_data)
+    plugins = _find_matching_plugins(plugin_data, repo)
 
     if not plugins:
         insert(plugin_data)

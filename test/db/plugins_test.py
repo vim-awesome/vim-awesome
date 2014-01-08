@@ -12,63 +12,67 @@ class PluginsTest(unittest.TestCase):
 
         # Plugins are not all generated from GitHub data. Cannot compare.
         self.assertFalse(ima({}, {}))
-        self.assertFalse(ima({'github_url': 'old'}, {}))
+        self.assertFalse(ima({'github_owner': 'old'}, {}))
         self.assertFalse(ima({}, {'github_url': 'new'}))
 
+        def name(a_name, plugin):
+            return dict({'github_owner': a_name, 'github_repo_name': a_name},
+                    **plugin)
+
         # Generated from the same GitHub repo. Not more authoritative.
-        self.assertFalse(ima({'github_url': 'It was rare, I was there'},
-                             {'github_url': 'It was rare, I was there'}))
+        self.assertFalse(ima(name('It was rare, I was there', {}),
+                             name('It was rare, I was there', {})))
 
         # More recently updated repo is more authoritative.
         self.assertFalse(ima(
-                {'github_url': 'old', 'updated_at': 1},
-                {'github_url': 'new', 'updated_at': 1}))
+                name('old', {'updated_at': 1}),
+                name('new', {'updated_at': 1})))
         self.assertFalse(ima(
-                {'github_url': 'old', 'updated_at': 1},
-                {'github_url': 'new', 'updated_at': 5}))
+                name('old', {'updated_at': 1}),
+                name('new', {'updated_at': 5})))
         self.assertTrue(ima(
-                {'github_url': 'old', 'updated_at': 5},
-                {'github_url': 'new', 'updated_at': 1}))
+                name('old', {'updated_at': 5}),
+                name('new', {'updated_at': 1})))
 
         # ... regardless of # of stars.
         self.assertFalse(ima(
-                {'github_url': 'old', 'updated_at': 1, 'github_stars': 1},
-                {'github_url': 'new', 'updated_at': 5, 'github_stars': 1}))
+                name('old', {'updated_at': 1, 'github_stars': 1}),
+                name('new', {'updated_at': 5, 'github_stars': 1})))
         self.assertFalse(ima(
-                {'github_url': 'old', 'updated_at': 1, 'github_stars': 1},
-                {'github_url': 'new', 'updated_at': 5, 'github_stars': 5}))
+                name('old', {'updated_at': 1, 'github_stars': 1}),
+                name('new', {'updated_at': 5, 'github_stars': 5})))
         self.assertFalse(ima(
-                {'github_url': 'old', 'updated_at': 1, 'github_stars': 5},
-                {'github_url': 'new', 'updated_at': 5, 'github_stars': 1}))
+                name('old', {'updated_at': 1, 'github_stars': 5}),
+                name('new', {'updated_at': 5, 'github_stars': 1})))
         self.assertTrue(ima(
-                {'github_url': 'old', 'updated_at': 5, 'github_stars': 1},
-                {'github_url': 'new', 'updated_at': 1, 'github_stars': 1}))
+                name('old', {'updated_at': 5, 'github_stars': 1}),
+                name('new', {'updated_at': 1, 'github_stars': 1})))
         self.assertTrue(ima(
-                {'github_url': 'old', 'updated_at': 5, 'github_stars': 1},
-                {'github_url': 'new', 'updated_at': 1, 'github_stars': 5}))
+                name('old', {'updated_at': 5, 'github_stars': 1}),
+                name('new', {'updated_at': 1, 'github_stars': 5})))
         self.assertTrue(ima(
-                {'github_url': 'old', 'updated_at': 5, 'github_stars': 5},
-                {'github_url': 'new', 'updated_at': 1, 'github_stars': 1}))
+                name('old', {'updated_at': 5, 'github_stars': 5}),
+                name('new', {'updated_at': 1, 'github_stars': 1})))
 
         # Break ties with # of stars.
         self.assertFalse(ima(
-                {'github_url': 'old', 'github_stars': 1},
-                {'github_url': 'new', 'github_stars': 1}))
+                name('old', {'github_stars': 1}),
+                name('new', {'github_stars': 1})))
         self.assertFalse(ima(
-                {'github_url': 'old', 'github_stars': 1},
-                {'github_url': 'new', 'github_stars': 5}))
+                name('old', {'github_stars': 1}),
+                name('new', {'github_stars': 5})))
         self.assertTrue(ima(
-                {'github_url': 'old', 'github_stars': 5},
-                {'github_url': 'new', 'github_stars': 1}))
+                name('old', {'github_stars': 5}),
+                name('new', {'github_stars': 1})))
         self.assertFalse(ima(
-                {'github_url': 'old', 'updated_at': 1, 'github_stars': 1},
-                {'github_url': 'new', 'updated_at': 1, 'github_stars': 1}))
+                name('old', {'updated_at': 1, 'github_stars': 1}),
+                name('new', {'updated_at': 1, 'github_stars': 1})))
         self.assertFalse(ima(
-                {'github_url': 'old', 'updated_at': 1, 'github_stars': 1},
-                {'github_url': 'new', 'updated_at': 1, 'github_stars': 5}))
+                name('old', {'updated_at': 1, 'github_stars': 1}),
+                name('new', {'updated_at': 1, 'github_stars': 5})))
         self.assertTrue(ima(
-                {'github_url': 'old', 'updated_at': 1, 'github_stars': 5},
-                {'github_url': 'new', 'updated_at': 1, 'github_stars': 1}))
+                name('old', {'updated_at': 1, 'github_stars': 5}),
+                name('new', {'updated_at': 1, 'github_stars': 1})))
 
     def test_update_plugin(self):
         def assert_update(old, new, expected):
@@ -88,21 +92,6 @@ class PluginsTest(unittest.TestCase):
         assert_update({'created_at': 1}, {}, {'created_at': 1})
         assert_update({}, {'created_at': 5}, {'created_at': 5})
         assert_update({'created_at': 1}, {'created_at': 5}, {'created_at': 1})
-
-        # Should keep GitHub URL of the more authoritative repo.
-        assert_update({'github_url': 'old'}, {}, {'github_url': 'old'})
-        assert_update({}, {'github_url': 'new'}, {'github_url': 'new'})
-        assert_update({'github_url': 'old'}, {'github_url': 'new'},
-                {'github_url': 'new'})
-        assert_update({'github_url': 'old'},
-                {'github_url': 'new', 'updated_at': 5},
-                {'github_url': 'new', 'updated_at': 5})
-        assert_update({'github_url': 'old', 'updated_at': 1},
-                {'github_url': 'new', 'updated_at': 5},
-                {'github_url': 'new', 'updated_at': 5})
-        assert_update({'github_url': 'old', 'updated_at': 5},
-                {'github_url': 'new', 'updated_at': 1},
-                {'github_url': 'old', 'updated_at': 5})
 
     def test_merge_dict_except_none(self):
         merge = db.plugins._merge_dict_except_none
@@ -143,3 +132,25 @@ class PluginsTest(unittest.TestCase):
         test('vim-powerline', 'powerline')
         test('systemverilog.vim--Kanovsky', 'systemverilog')
         test('Ruby/Sinatra', 'rubysinatra')
+        test('bufexplorer.zip', 'bufexplorer')
+        test('runzip', 'runzip')
+
+
+    def test_is_similar_author_name(self):
+        similar = db.plugins._is_similar_author_name
+
+        self.assertTrue(similar('Tim Pope', 'Tim Pope'))
+        self.assertTrue(similar(u'Kim Silkeb\xe6kken', u'Kim Silkeb\xe6kken'))
+        self.assertTrue(similar('nanotech', 'NanoTech'))
+        self.assertTrue(similar('Marty Grenfell', 'Martin Grenfell'))
+        self.assertTrue(similar('gmarik', 'gmarik gmarik'))
+        self.assertTrue(similar('Miles Sterrett', 'Miles Z. Sterrett'))
+        self.assertTrue(similar('Suan', 'Suan Yeo'))
+        self.assertTrue(similar('jlanzarotta', 'jeff lanzarotta'))
+
+        # Unfortunately, the following will cause some assertions below to fail
+        #self.assertTrue(similar('Shougo', 'Shougo Matsushita'))
+
+        self.assertFalse(similar('Bob', 'Joe'))
+        self.assertFalse(similar('Paul Graham', 'Paul Bucheit'))
+        self.assertFalse(similar('Taylor Swift', 'Barack Obama'))

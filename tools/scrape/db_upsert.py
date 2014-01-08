@@ -96,20 +96,6 @@ def _find_by_similar_name(name, query_filter=None):
         return None
 
 
-def _get_normalized_name_regex(name):
-    """Returns a regex that will match the given name against another name if
-    their normalized names matches.
-
-    A normalized name is a lowercased name without "vim" as a prefix or suffix.
-    """
-    name = re.sub('^vim-', '', name)
-    name = re.sub('\.vim$', '', name)
-
-    # The leading (?i) means case-insensitive match. See
-    # http://www.rethinkdb.com/api/python/match/
-    return '(?i)^(?:vim-)?' + re.escape(name) + '(?:\.vim$)?$'
-
-
 def upsert_plugin(plugin, query_filter=None):
     """Update or insert the given plugin into the DB."""
 
