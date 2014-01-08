@@ -45,8 +45,8 @@ if not _GITHUB_API_TOKEN:
 
 # TODO(david): It would be good to add "vim", "settings", and "config", but
 #     there are too many false positives that need to be filtered out.
-_DOTFILE_REPO_NAMES = ['dotfile', 'vimrc', 'vimfile', 'vim-file', 'vimconf',
-        'vim-conf', 'dotvim', 'config-files', 'vim-setting', 'myvim']
+_DOTFILE_REPO_NAMES = ['vimrc', 'vimfile', 'vim-file', 'vimconf',
+        'vim-conf', 'dotvim', 'vim-setting', 'myvim', 'dotfile', 'config-files']
 
 _VIMRC_FILENAMES = ['vimrc', 'bundle', 'vundle.vim', 'vundles.vim',
         'vim.config', 'plugins.vim']
