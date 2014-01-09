@@ -288,7 +288,8 @@ def to_json(p, extended=False):
             p['github_vim_scripts_bundles'])
     short_desc = p['vimorg_short_desc']
 
-    if p['github_owner'] and p['github_stars'] > p['github_vim_scripts_stars']:
+    if (p['github_owner'] and
+            p['github_stars'] >= p['github_vim_scripts_stars']):
         github_url = _GITHUB_REPO_URL_TEMPLATE % (
                 p['github_owner'], p['github_repo_name'])
         github_stars = p['github_stars']
