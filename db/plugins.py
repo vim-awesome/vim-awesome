@@ -286,12 +286,13 @@ def to_json(p, extended=False):
     author = (p['vimorg_author'].strip() or p['github_author'].strip())
     plugin_manager_users = (p['github_bundles'] +
             p['github_vim_scripts_bundles'])
-    short_desc = p['github_short_desc'] or p['vimorg_short_desc']
+    short_desc = p['vimorg_short_desc']
 
     if p['github_owner'] and p['github_stars'] > p['github_vim_scripts_stars']:
         github_url = _GITHUB_REPO_URL_TEMPLATE % (
                 p['github_owner'], p['github_repo_name'])
         github_stars = p['github_stars']
+        short_desc = p['github_short_desc']
     elif p['github_vim_scripts_repo_name']:
         github_url = _GITHUB_REPO_URL_TEMPLATE % (
                 'vim-scripts', p['github_vim_scripts_repo_name'])
