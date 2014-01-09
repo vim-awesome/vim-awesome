@@ -459,8 +459,15 @@ def _find_matching_plugins(plugin_data, repo=None):
         matching_plugins = list(r.table('plugins').get_all(
                 *list(vimorg_ids), index='vimorg_id').run(r_conn()))
 
-        # If any of the matched plugin names are slightly similar, consider
-        # that a match. This is for cases like 'vim-colors-solarized' -->
+        # First, see if we get a normalized name match from that set.
+        normalized_name_matches = filter(lambda p:
+                p['normalized_name'] == normalized_name, matching_plugins)
+
+        if normalized_name_matches:
+            return normalized_name_matches
+
+        # If not, broaden the search to any matched plugin names that are
+        # slightly similar. This is for cases like 'vim-colors-solarized' -->
         # 'solarized' or 'Python-mode-klen' --> 'python-mode'
         matching_plugins = filter(lambda plugin: difflib.SequenceMatcher(None,
                 plugin['normalized_name'], normalized_name).ratio() >= 0.6,
