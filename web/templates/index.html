@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8">
 
-  <!-- TODO(david): Load locally for offline development -->
   {% if env == 'prod' %}
     <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,400italic,700|Open+Sans:400,300,200,700' rel='stylesheet' type='text/css'>
   {% else %}
@@ -34,7 +33,22 @@
     <script src="/static/lib/js/react-0.5.1.js"></script>
   {% endif %}
 
-  <!-- TODO(alpert): In production, precompile JSX -->
+  {# TODO(alpert): In production, precompile JSX #}
   <script src="/static/js/app.js" type="text/jsx"></script>
+
+  {% if env == 'dev' %}
+    {# Google Analytics #}
+    {# TODO(david): Track page views in router. #}
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-47015552-1', 'vimawesome.com');
+      ga('send', 'pageview');
+    </script>
+  {% endif %}
+
 </body>
 </html>
