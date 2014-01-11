@@ -1,7 +1,6 @@
 """Utility functions for the plugins table."""
 
 import difflib
-import logging
 import random
 import re
 
@@ -327,31 +326,6 @@ def to_json(p, extended=False):
 #     db_upsert.py.
 
 
-# TODO(david): Take into account # of plugin manager users.
-def is_more_authoritative(plugin1, plugin2):
-    """Returns whether plugin1 is a different and more authoritative
-    GitHub-derived plugin than plugin2.
-
-    For example, the original author's GitHub repo for Syntastic
-    (https://github.com/scrooloose/syntastic) is more authoritative than
-    vim-scripts's mirror (https://github.com/vim-scripts/Syntastic).
-    """
-    # If we have two different GitHub repos, take the latest updated, and break
-    # ties by # of stars.
-    if (plugin1.get('github_owner') and plugin2.get('github_owner') and
-            (plugin1['github_owner'], plugin1['github_repo_name']) !=
-            (plugin2['github_owner'], plugin2['github_repo_name'])):
-        if plugin1.get('updated_at', 0) > plugin2.get('updated_at', 0):
-            return True
-        elif plugin1.get('updated_at', 0) == plugin2.get('updated_at', 0):
-            return (plugin1.get('github_stars', 0) >
-                    plugin2.get('github_stars', 0))
-        else:
-            return False
-    else:
-        return False
-
-
 def update_plugin(old_plugin, new_plugin):
     """Merges properties of new_plugin onto old_plugin, much like a dict
     update.
@@ -362,13 +336,7 @@ def update_plugin(old_plugin, new_plugin):
 
     Does not mutate any arguments. Returns the updated plugin.
     """
-    # If the old_plugin is constituted from information from a more
-    # authoritative GitHub repo (eg. the author's) than new_plugin, then we
-    # want to use old_plugin's data where possible.
-    if is_more_authoritative(old_plugin, new_plugin):
-        updated_plugin = _merge_dict_except_none(new_plugin, old_plugin)
-    else:
-        updated_plugin = _merge_dict_except_none(old_plugin, new_plugin)
+    updated_plugin = _merge_dict_except_none(old_plugin, new_plugin)
 
     # Keep the latest updated date.
     if old_plugin.get('updated_at') and new_plugin.get('updated_at'):
@@ -490,13 +458,28 @@ def _find_matching_plugins(plugin_data, repo=None):
         plugin.get('vimorg_author', ''), author), matching_plugins)
 
 
+def _are_plugins_different(p1, p2):
+    """Returns whether two plugins should be two different DB rows."""
+    if (p1.get('vimorg_id') and p2.get('vimorg_id') and
+            p1['vimorg_id'] != p2['vimorg_id']):
+        return True
+
+    if (p1.get('github_owner') and p1.get('github_repo_name') and
+            p2.get('github_owner') and p2.get('github_repo_name') and
+            (p1['github_owner'], p1['github_repo_name']) !=
+            (p2['github_owner'], p2['github_repo_name'])):
+        return True
+
+    return False
+
+
 def add_scraped_data(plugin_data, repo=None):
     """Adds scraped plugin data from either vim.org, a github.com/vim-scripts
     repo, or an arbitrary GitHub repo.
 
     This will attempt to match the plugin data with an existing plugin already
-    in the DB using various heuristics. If found a reasonable match is found,
-    we update, else, we insert a new plugin.
+    in the DB using various heuristics. If a reasonable match is found, we
+    update, else, we insert a new plugin.
 
     Arguments:
         plugin_data: Scraped data about a plugin.
@@ -506,16 +489,12 @@ def add_scraped_data(plugin_data, repo=None):
     """
     plugins = _find_matching_plugins(plugin_data, repo)
 
-    if not plugins:
-        insert(plugin_data)
-    elif len(plugins) == 1:
+    if len(plugins) == 1 and not _are_plugins_different(
+            plugins[0], plugin_data):
         updated_plugin = update_plugin(plugins[0], plugin_data)
         insert(updated_plugin, upsert=True)
     else:
-        logging.error(
-                'Uh oh, we found %s plugins that match the scraped data:\n'
-                'Scraped data: %s\nMatching plugin slugs: %s' % (
-                len(plugins), plugin_data, [p['slug'] for p in plugins]))
+        insert(plugin_data)
 
 
 ###############################################################################

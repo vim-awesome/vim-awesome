@@ -7,73 +7,6 @@ import db.plugins
 
 class PluginsTest(unittest.TestCase):
 
-    def test_is_more_authoritative(self):
-        ima = db.plugins.is_more_authoritative
-
-        # Plugins are not all generated from GitHub data. Cannot compare.
-        self.assertFalse(ima({}, {}))
-        self.assertFalse(ima({'github_owner': 'old'}, {}))
-        self.assertFalse(ima({}, {'github_url': 'new'}))
-
-        def name(a_name, plugin):
-            return dict({'github_owner': a_name, 'github_repo_name': a_name},
-                    **plugin)
-
-        # Generated from the same GitHub repo. Not more authoritative.
-        self.assertFalse(ima(name('It was rare, I was there', {}),
-                             name('It was rare, I was there', {})))
-
-        # More recently updated repo is more authoritative.
-        self.assertFalse(ima(
-                name('old', {'updated_at': 1}),
-                name('new', {'updated_at': 1})))
-        self.assertFalse(ima(
-                name('old', {'updated_at': 1}),
-                name('new', {'updated_at': 5})))
-        self.assertTrue(ima(
-                name('old', {'updated_at': 5}),
-                name('new', {'updated_at': 1})))
-
-        # ... regardless of # of stars.
-        self.assertFalse(ima(
-                name('old', {'updated_at': 1, 'github_stars': 1}),
-                name('new', {'updated_at': 5, 'github_stars': 1})))
-        self.assertFalse(ima(
-                name('old', {'updated_at': 1, 'github_stars': 1}),
-                name('new', {'updated_at': 5, 'github_stars': 5})))
-        self.assertFalse(ima(
-                name('old', {'updated_at': 1, 'github_stars': 5}),
-                name('new', {'updated_at': 5, 'github_stars': 1})))
-        self.assertTrue(ima(
-                name('old', {'updated_at': 5, 'github_stars': 1}),
-                name('new', {'updated_at': 1, 'github_stars': 1})))
-        self.assertTrue(ima(
-                name('old', {'updated_at': 5, 'github_stars': 1}),
-                name('new', {'updated_at': 1, 'github_stars': 5})))
-        self.assertTrue(ima(
-                name('old', {'updated_at': 5, 'github_stars': 5}),
-                name('new', {'updated_at': 1, 'github_stars': 1})))
-
-        # Break ties with # of stars.
-        self.assertFalse(ima(
-                name('old', {'github_stars': 1}),
-                name('new', {'github_stars': 1})))
-        self.assertFalse(ima(
-                name('old', {'github_stars': 1}),
-                name('new', {'github_stars': 5})))
-        self.assertTrue(ima(
-                name('old', {'github_stars': 5}),
-                name('new', {'github_stars': 1})))
-        self.assertFalse(ima(
-                name('old', {'updated_at': 1, 'github_stars': 1}),
-                name('new', {'updated_at': 1, 'github_stars': 1})))
-        self.assertFalse(ima(
-                name('old', {'updated_at': 1, 'github_stars': 1}),
-                name('new', {'updated_at': 1, 'github_stars': 5})))
-        self.assertTrue(ima(
-                name('old', {'updated_at': 1, 'github_stars': 5}),
-                name('new', {'updated_at': 1, 'github_stars': 1})))
-
     def test_update_plugin(self):
         def assert_update(old, new, expected):
             updated = db.plugins.update_plugin(old, new)
@@ -154,3 +87,28 @@ class PluginsTest(unittest.TestCase):
         self.assertFalse(similar('Bob', 'Joe'))
         self.assertFalse(similar('Paul Graham', 'Paul Bucheit'))
         self.assertFalse(similar('Taylor Swift', 'Barack Obama'))
+
+    def test_are_plugins_different(self):
+        diff = db.plugins._are_plugins_different
+
+        self.assertTrue(diff({'vimorg_id': 1}, {'vimorg_id': 2}))
+        self.assertTrue(diff(
+                {'github_owner': 'tpope', 'github_repo_name': 'Red'},
+                {'github_owner': 'tpope', 'github_repo_name': 'Long Live'}))
+        self.assertTrue(diff(
+                {'github_owner': 'tpope', 'github_repo_name': 'bbq'},
+                {'github_owner': 'sjl', 'github_repo_name': 'bbq'}))
+
+        self.assertFalse(diff({}, {}))
+        self.assertFalse(diff({'vimorg_id': 1}, {}))
+        self.assertFalse(diff({}, {'vimorg_id': 1}))
+        self.assertFalse(diff({'vimorg_id': 1}, {'vimorg_id': 1}))
+        self.assertFalse(diff({},
+                {'github_owner': 'sjl', 'github_repo_name': 'Gundo'}))
+        self.assertFalse(diff(
+            {'github_owner': 'sjl', 'github_repo_name': 'Gundo'}, {}))
+        self.assertFalse(diff(
+                {'github_owner': 'sjl', 'github_repo_name': 'Gundo'},
+                {'github_owner': 'sjl', 'github_repo_name': 'Gundo'}))
+        self.assertFalse(diff({'vimorg_id': 1},
+                {'github_owner': 'sjl', 'github_repo_name': 'Gundo'}))
