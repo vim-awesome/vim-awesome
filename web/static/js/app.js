@@ -11,6 +11,7 @@ var D_KEYCODE = 'D'.charCodeAt(0),
     K_KEYCODE = 'K'.charCodeAt(0),
     L_KEYCODE = 'L'.charCodeAt(0),
     N_KEYCODE = 'N'.charCodeAt(0),
+    O_KEYCODE = 'O'.charCodeAt(0),
     P_KEYCODE = 'P'.charCodeAt(0),
     U_KEYCODE = 'U'.charCodeAt(0),
     ENTER_KEYCODE = 13,
@@ -416,7 +417,8 @@ var PluginList = React.createClass({
         if (this.refs && this.refs.navFocus) {
           scrollToNode(this.refs.navFocus.getDOMNode(), 105 /* context */);
         }
-      } else if (key === ENTER_KEYCODE && this.refs && this.refs.navFocus) {
+      } else if ((key === ENTER_KEYCODE || key === O_KEYCODE) &&
+          this.refs && this.refs.navFocus) {
         e.preventDefault();
         this.refs.navFocus.goToDetailsPage();
       }
@@ -991,7 +993,7 @@ var PluginListPage = React.createClass({
           onBlur={this.onSearchBlur} />
       <div className="keyboard-tips">
         Tip: use <code>/</code> to search,
-        <code>ESC</code>/<code>J</code>/<code>K</code>, to navigate,
+        <code>J</code>/<code>K</code> to navigate,
         <code>N</code>/<code>P</code> to flip pages
       </div>
       <PluginList ref="pluginList" searchQuery={this.state.searchQuery}
