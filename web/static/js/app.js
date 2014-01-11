@@ -64,6 +64,18 @@ var scrollToNode = function(domNode, context) {
   }
 };
 
+var WipNotice = React.createClass({
+  render: function() {
+    return <div className="wip-notice">
+      Hi, you{"'"}ve discovered a work-in-progress!
+      <a href="https://docs.google.com/document/d/1hUYiWCjup9JMWirASnO_Z2k7AJJL-KPgFKZ0C7vvUMU/edit#" target="_blank">
+        See this Google Doc for more info
+      </a>
+      and to leave any feedback. Thank you. :)
+    </div>;
+  }
+});
+
 var Sidebar = React.createClass({
   render: function() {
     var categories = _.map([
@@ -94,6 +106,7 @@ var Sidebar = React.createClass({
         </div>
       </div>
       <ul className="categories">{categories}</ul>
+      <WipNotice />
     </div>;
   }
 });
