@@ -64,6 +64,26 @@ var scrollToNode = function(domNode, context) {
   }
 };
 
+/**
+ * Force Backbone's router to navigate to the given destination. By default
+ * Backbone is query-parameter agnostic[1] and will not navigate to a new route
+ * for which only query params differ. This is admittedly a hack to make
+ * Backbone not think that the current route matches the desired route and thus
+ * force a navigate.
+ *
+ * Arguments are the same as documentcloud.github.io/backbone/#Router-navigate
+ *
+ * [1]: https://github.com/jashkenas/backbone/issues/891
+ */
+var forceBackboneNavigate = function() {
+  // TODO(david): Figure out a less hacky way of doing this.
+  Backbone.history.fragment = "_force_backbone_navigate";
+  Backbone.history.navigate.apply(Backbone.history, arguments);
+};
+
+/**
+ * A temporary notice that this site is still a work in progress!
+ */
 var WipNotice = React.createClass({
   render: function() {
     return <div className="wip-notice">
@@ -946,7 +966,8 @@ var PluginListPage = React.createClass({
 
     var queryParams = $.param(queryObject);
     var path = queryParams ? '?' + queryParams : '';
-    Backbone.history.navigate(path);
+
+    forceBackboneNavigate(path);
   },
 
   onPluginsFetched: function() {
@@ -993,6 +1014,7 @@ var Page = React.createClass({
 });
 
 // TODO(alpert): Get rid of Backbone?
+// TODO(david): +1 above. Backbone's router doesn't know about query params.
 var Router = Backbone.Router.extend({
   routes: {
     "": "home",
@@ -1031,7 +1053,7 @@ if (Backbone.history && Backbone.history._hasPushState) {
     if (href && href.substr(0, protocol.length) !== protocol &&
         href[0] !== '#') {
       evt.preventDefault();
-      Backbone.history.navigate(href, true);
+      forceBackboneNavigate(href, true);
 
       // Scroll to top. Chrome has this weird issue where it will retain the
       // current scroll position, even if it's beyond the document's height.
