@@ -13,3 +13,6 @@ Flask-Cache==0.12
 # and the ConfigParser modules that comes with Python 2.7 is ancient and sucky.
 # This is the backported version from Python 3.
 configparser==3.3.0r2
+
+# For generating human-friendly and URL-friendly slugs
+python-slugify==0.0.6

@@ -635,7 +635,8 @@ var Tags = React.createClass({
       highlighter: function(item) {
         var Typeahead = $.fn.typeahead.Constructor;
         var tagName = capitalizeFirstLetter(item);
-        var highlighted = Typeahead.prototype.highlighter.call(this, tagName);
+        var tagNameEscaped = $('<div>').text(tagName).html();
+        var highlighted = Typeahead.prototype.highlighter.call(this, tagNameEscaped);
         return highlighted + "<span class=\"count\">&times; " +
             allTags[item].count + "</span>";
       },
