@@ -14,10 +14,10 @@ def get_first(query):
     return results[0] if results else None
 
 
-def ensure_table(table_name):
+def ensure_table(table_name, *args, **kwargs):
     """Creates a table if it doesn't exist."""
     try:
-        r.table_create(table_name).run(r_conn())
+        r.table_create(table_name, *args, **kwargs).run(r_conn())
     except r.RqlRuntimeError:
         pass  # Ignore db already created
 
