@@ -98,6 +98,12 @@ class PluginsTest(unittest.TestCase):
         self.assertTrue(diff(
                 {'github_owner': 'tpope', 'github_repo_name': 'bbq'},
                 {'github_owner': 'sjl', 'github_repo_name': 'bbq'}))
+        self.assertTrue(diff(
+                {'vimorg_id': 1, 'github_owner': 2, 'github_repo_name': 2},
+                {'vimorg_id': 1, 'github_owner': 3, 'github_repo_name': 3}))
+        self.assertTrue(diff(
+                {'vimorg_id': 2, 'github_owner': 1, 'github_repo_name': 1},
+                {'vimorg_id': 3, 'github_owner': 1, 'github_repo_name': 1}))
 
         self.assertFalse(diff({}, {}))
         self.assertFalse(diff({'vimorg_id': 1}, {}))
