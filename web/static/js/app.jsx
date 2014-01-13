@@ -88,7 +88,7 @@ var forceBackboneNavigate = function() {
 var WipNotice = React.createClass({
   render: function() {
     return <div className="wip-notice">
-      Hi, you{"'"}ve discovered a work-in-progress!
+      Hi, you've discovered a work in progress!
       <a href="https://docs.google.com/document/d/1hUYiWCjup9JMWirASnO_Z2k7AJJL-KPgFKZ0C7vvUMU/edit#" target="_blank">
         See this Google Doc for more info
       </a>
