@@ -13,6 +13,9 @@ git clone git@github.com:divad12/vim-awesome.git $NEW_CLONE > /dev/null
 echo "Installing Python requirements"
 sudo pip install -r $NEW_CLONE/requirements.txt
 
+echo "Precompile JSX"
+( cd $NEW_CLONE && jsx -x jsx web/static/js web/static/build/js )
+
 echo "Compass compile sass files"
 ( cd $NEW_CLONE && \
   compass compile --config conf/compass.rb --output-style compressed )
