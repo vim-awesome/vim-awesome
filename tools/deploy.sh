@@ -20,6 +20,9 @@ echo "Compass compile sass files"
 ( cd $NEW_CLONE && \
   compass compile --config conf/compass.rb --output-style compressed )
 
+echo "Linking in secrets.py"
+( cd $NEW_CLONE && ln -s $HOME/secrets.py . )
+
 echo "Linking new vim-awesome into place"
 ln -snf $NEW_CLONE vim-awesome
 
