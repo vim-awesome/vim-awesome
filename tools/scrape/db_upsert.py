@@ -1,7 +1,5 @@
 # TODO(david): Rename this file or just move into plugins.py.
 
-import re
-
 import rethinkdb as r
 
 import db.util

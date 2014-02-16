@@ -68,7 +68,6 @@ class PluginsTest(unittest.TestCase):
         test('bufexplorer.zip', 'bufexplorer')
         test('runzip', 'runzip')
 
-
     def test_is_similar_author_name(self):
         similar = db.plugins._is_similar_author_name
 

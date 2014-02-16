@@ -350,7 +350,8 @@ def scrape_vim_scripts_repos(num):
 # TODO(david): It would be good to add "vim", "settings", and "config", but
 #     there are too many false positives that need to be filtered out.
 _DOTFILE_REPO_NAMES = ['vimrc', 'vimfile', 'vim-file', 'vimconf',
-        'vim-conf', 'dotvim', 'vim-setting', 'myvim', 'dotfile', 'config-files']
+        'vim-conf', 'dotvim', 'vim-setting', 'myvim', 'dotfile',
+        'config-files']
 
 _VIMRC_FILENAMES = ['vimrc', 'bundle', 'vundle.vim', 'vundles.vim',
         'vim.config', 'plugins.vim']
@@ -366,7 +367,7 @@ _VIM_DIRECTORIES = ['vim', 'config', 'home']
 _BUNDLE_PLUGIN_REGEX_TEMPLATE = r'^[^\S\n]*%s[^\S\n]*[\'"]([^\'"\n\r]+)[\'"]'
 _VUNDLE_PLUGIN_REGEX = re.compile(_BUNDLE_PLUGIN_REGEX_TEMPLATE % 'Bundle',
         re.MULTILINE)
-_NEOBUNDLE_PLUGIN_REGEX = re.compile( _BUNDLE_PLUGIN_REGEX_TEMPLATE %
+_NEOBUNDLE_PLUGIN_REGEX = re.compile(_BUNDLE_PLUGIN_REGEX_TEMPLATE %
         '(?:NeoBundle|NeoBundleFetch|NeoBundleLazy)', re.MULTILINE)
 
 # Extracts owner and repo name from a bundle spec -- a git repo URI, implicity

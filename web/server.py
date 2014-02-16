@@ -73,7 +73,7 @@ def get_plugins():
         # `search` there is a corresponding word in S that begins with K.
         tokens = (t.lower() for t in sorted(search.split()))
         tokens_regex = (r'\b%s' % re.escape(t) for t in tokens)
-        search_regex =  re.compile('.*'.join(tokens_regex))
+        search_regex = re.compile('.*'.join(tokens_regex))
 
         # Surprisingly, regex matching like this is slightly faster than
         # prefix-matching two sorted lists of tokens.

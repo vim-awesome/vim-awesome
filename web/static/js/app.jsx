@@ -47,8 +47,8 @@ var getQueryParams = function() {
 /**
  * Scrolls the window so that the entirety of `domNode` is visible.
  * @param {Element} domNode The DOM node to scroll into view.
- * @param {number=} context An optional amount of context (minimum distance from
- *     top or bottom of screen) to keep in pixels. Defaults to 0.
+ * @param {number=} context An optional amount of context (minimum distance
+ * from top or bottom of screen) to keep in pixels. Defaults to 0.
  */
 var scrollToNode = function(domNode, context) {
   context = context || 0;
@@ -299,7 +299,9 @@ var Plugin = React.createClass({
   render: function() {
     // TODO(david): Animations on initial render
     var plugin = this.props.plugin;
-    if (!plugin || !plugin.name) return <li className="plugin"></li>;
+    if (!plugin || !plugin.name) {
+      return <li className="plugin"></li>;
+    }
 
     var hasNavFocus = this.props.hasNavFocus;
     // TODO(david): Map color from tag/category or just hash of name
@@ -311,7 +313,8 @@ var Plugin = React.createClass({
       <a href={"plugin/" + plugin.slug}>
         <h3 className={"plugin-name " + color}>{plugin.name}</h3>
         {plugin.author && <span className="by">by</span>}
-        {plugin.author && <span className="author">{" " + plugin.author}</span>}
+        {plugin.author &&
+          <span className="author">{" " + plugin.author}</span>}
         {plugin.github_stars > 0 &&
           <div className="github-stars"
               title={plugin.github_stars + " stars on GitHub"}>
@@ -400,11 +403,13 @@ var PluginList = React.createClass({
         // Go to next or previous plugin
         var direction = (key === J_KEYCODE ? 1 : -1);
         var maxIndex = this.state.plugins.length - 1;
-        var newIndex = clamp(this.state.selectedIndex + direction, 0, maxIndex);
+        var newIndex = clamp(
+          this.state.selectedIndex + direction,
+          0, maxIndex);
 
-        // Disable hover when navigating plugins, because when the screen scrolls,
-        // a MouseEnter event will be fired if the mouse is over a plugin, causing
-        // the selection to jump back.
+        // Disable hover when navigating plugins, because when the screen
+        // scrolls, a MouseEnter event will be fired if the mouse is over a
+        // plugin, causing the selection to jump back.
         this.setState({selectedIndex: newIndex, hoverDisabled: true});
 
         // Re-enable hover after a delay
@@ -427,7 +432,9 @@ var PluginList = React.createClass({
 
   onPluginMouseEnter: function(index, e) {
     // TODO(david): This is not as quick/snappy as CSS :hover ...
-    if (this.state.hoverDisabled) return;
+    if (this.state.hoverDisabled) {
+      return;
+    }
     this.setState({selectedIndex: index});
   },
 
@@ -474,8 +481,8 @@ var PluginList = React.createClass({
   }, 500),
 
   render: function() {
-    // TODO(david): We should not update the page number and other search-params
-    //     UI until new data has arrived to keep things consistent.
+    // TODO(david): We should not update the page number and other
+    // search-params UI until new data has arrived to keep things consistent.
 
     var plugins = _.chain(this.state.plugins)
       .map(function(plugin, index) {
@@ -613,7 +620,8 @@ var Install = React.createClass({
               className={this.state.tabActive === "vundle" ? "active" : ""}>
             Vundle
           </li>
-          <li onClick={this.onTabClick.bind(this, "pathogen")} ref="pathogenTab"
+          <li onClick={this.onTabClick.bind(this, "pathogen")}
+              ref="pathogenTab"
               className={this.state.tabActive === "pathogen" ? "active" : ""}>
             Pathogen
           </li>
@@ -682,7 +690,9 @@ var Tags = React.createClass({
   },
 
   fetchAllTags: function() {
-    if (!_.isEmpty(allTags)) return;
+    if (!_.isEmpty(allTags)) {
+      return;
+    }
 
     $.getJSON("/api/tags", function(data) {
       allTags = {};
@@ -711,7 +721,9 @@ var Tags = React.createClass({
       var $input = $(this.refs.tagInput.getDOMNode());
       // TODO(david): This needs to use autocomplete
       var tagId = $input.val().replace(/,$/, "").toLowerCase();
-      if (!tagId) return;
+      if (!tagId) {
+        return;
+      }
       $input.val("");
       this.props.onTagsChange(this.props.tags.concat(tagId));
     }
@@ -828,7 +840,7 @@ var PluginPage = React.createClass({
       dataType: "json",
       data: JSON.stringify({tags: newTags}),
       success: function(data) {
-        this.setState({tags: data.tags})
+        this.setState({tags: data.tags});
       }.bind(this)
     });
   },

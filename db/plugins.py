@@ -357,7 +357,7 @@ def _merge_dict_except_none(dict_a, dict_b):
 
     Does not mutate arguments. Also, please don't drink and drive.
     """
-    dict_b_filtered = {k:v for k, v in dict_b.iteritems() if v is not None}
+    dict_b_filtered = {k: v for k, v in dict_b.iteritems() if v is not None}
     return dict(dict_a, **dict_b_filtered)
 
 
