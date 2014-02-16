@@ -88,11 +88,11 @@ var forceBackboneNavigate = function() {
 var WipNotice = React.createClass({
   render: function() {
     return <div className="wip-notice">
-      Hi, you've discovered a work in progress!
+      Hi, you've discovered a work in progress!{' '}
       <a href="https://docs.google.com/document/d/1hUYiWCjup9JMWirASnO_Z2k7AJJL-KPgFKZ0C7vvUMU/edit#" target="_blank">
         See this Google Doc for more info
       </a>
-      and to leave any feedback. Thank you. :)
+      {' '}and to leave any feedback. Thank you. :)
     </div>;
   }
 });
@@ -109,7 +109,7 @@ var Sidebar = React.createClass({
       "Integrations"
     ], function(category) {
       return <li key={category}>
-        <a href="#/blah"><i className="icon-fighter-jet"></i> {category}</a>
+        <a href="#/blah"><i className="icon-fighter-jet"></i>{category}</a>
       </li>;
     });
 
@@ -239,7 +239,7 @@ var Pager = React.createClass({
           <li>
             <a className="pager-button prev-page-button" href="#"
                 onClick={this.onPrevClick}>
-              {"\u2190"} <code>P</code>
+              {"\u2190"}<code>P</code>
             </a>
           </li>
         }
@@ -250,7 +250,7 @@ var Pager = React.createClass({
           <li>
             <a className="pager-button next-page-button" href="#"
                 onClick={this.onNextClick}>
-              <code>N</code> Next page
+              <code>N</code> Next page{' '}
               <span className="right-arrow">{"\u2192"}</span>
             </a>
           </li>
@@ -315,14 +315,14 @@ var Plugin = React.createClass({
         {plugin.github_stars > 0 &&
           <div className="github-stars"
               title={plugin.github_stars + " stars on GitHub"}>
-            {plugin.github_stars} <i className="icon-star"></i>
+            {plugin.github_stars}<i className="icon-star"></i>
           </div>
         }
         {plugin.plugin_manager_users > 0 &&
           <div className="plugin-users"
               title={plugin.plugin_manager_users +
               " Vundle/Pathogen/NeoBundle users on GitHub"}>
-            {plugin.plugin_manager_users} <i className="icon-user"></i>
+            {plugin.plugin_manager_users}<i className="icon-user"></i>
           </div>
         }
         <p className="short-desc">{plugin.short_desc}</p>
@@ -545,7 +545,7 @@ var VundleTabPopover = React.createClass({
   render: function() {
     return <div>
       Vundle is short for Vim Bundle and is a plugin manager for Vim.
-      <br/><br/>See
+      <br/><br/>See{' '}
       <a href="https://github.com/gmarik/vundle" target="_blank">
         <i className="icon-github" /> gmarik/vundle
       </a>
@@ -559,7 +559,7 @@ var PathogenTabPopover = React.createClass({
     return <div>
       Pathogen makes it super easy to install plugins and runtime files
       in their own private directories.
-      <br/><br/>See
+      <br/><br/>See{' '}
       <a href="https://github.com/tpope/vim-pathogen" target="_blank">
         <i className="icon-github" /> tpope/vim-pathogen
       </a>
@@ -584,16 +584,15 @@ var Install = React.createClass({
 
     var self = this;
     _.each(popovers, function(component, ref) {
-      React.renderComponentToString(component, function(markup) {
-        var $tabElem = $(self.refs[ref].getDOMNode());
-        $tabElem.popover({
-          html: true,
-          content: markup,
-          placement: "left",
-          animation: false,
-          trigger: "hover",
-          container: $tabElem
-        });
+      var markup = React.renderComponentToString(component);
+      var $tabElem = $(self.refs[ref].getDOMNode());
+      $tabElem.popover({
+        html: true,
+        content: markup,
+        placement: "left",
+        animation: false,
+        trigger: "hover",
+        container: $tabElem
       });
     });
   },
@@ -992,8 +991,8 @@ var PluginListPage = React.createClass({
           onChange={this.onSearchChange} onFocus={this.onSearchFocus}
           onBlur={this.onSearchBlur} />
       <div className="keyboard-tips">
-        Tip: use <code>/</code> to search,
-        <code>J</code>/<code>K</code> to navigate,
+        Tip: use <code>/</code> to search,{' '}
+        <code>J</code>/<code>K</code> to navigate,{' '}
         <code>N</code>/<code>P</code> to flip pages
       </div>
       <PluginList ref="pluginList" searchQuery={this.state.searchQuery}
