@@ -914,10 +914,10 @@ code {
       $vertical-padding: 8px;
       position: absolute;
       right: 0;
-      bottom: 0;
-      left: 0;
+      top: 0;
+      width: 68px;
+      height: 30px;
       border: none;
-      background: rgba($bg-dark-1, 0.1);
       color: $content-4;
       text-shadow: none;
       border-radius: 0;
@@ -925,14 +925,13 @@ code {
       text-transform: uppercase;
       font-size: 12px;
       line-height: 12px;
-      text-align: left;
-      padding: $vertical-padding 0 $vertical-padding $box-padding;
-      margin-bottom: $box-padding - $vertical-padding;
+      text-align: center;
       outline: 0;
+      -webkit-backface-visibility: hidden;  // Fixes 1px wobble on Chrome
 
       @include transition(all 0.2s ease-out);
       opacity: 0.5;
-      background: none;
+      background: rgba($bg-dark-1, 0.1);
 
       &.done-btn {
         background: $cyan;
@@ -942,10 +941,6 @@ code {
       &:hover {
         @include transition(all 0.2s ease-out);
         opacity: 1.0;
-
-        &.edit-btn {
-          background: rgba($bg-dark-1, 0.1);
-        }
       }
 
       i {

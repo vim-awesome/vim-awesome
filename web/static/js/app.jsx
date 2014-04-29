@@ -28,6 +28,10 @@ var capitalizeFirstLetter = function(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+var startsWith = function(str, startStr) {
+  return str.indexOf(startStr) === 0;
+};
+
 // Adapted from http://stackoverflow.com/a/2880929/392426
 var getQueryParams = function() {
   var match,
@@ -676,6 +680,11 @@ var Tags = React.createClass({
 
   componentDidMount: function() {
     this.fetchAllTags();
+    $('body').on('click', this.onBodyClick);
+  },
+
+  componentWillUnmount: function() {
+    $('body').off('click', this.onBodyClick);
   },
 
   componentDidUpdate: function() {
@@ -687,15 +696,37 @@ var Tags = React.createClass({
   },
 
   initTypeahead: function($input) {
+    var sortTagsByCount = function(items) {
+      return _.sortBy(items, function(tag) {
+        return -allTags[tag].count;
+      });
+    };
+
     // Uses Bootstrap's lightweight typeahead:
     // http://getbootstrap.com/2.3.2/javascript.html#typeahead
     $input.typeahead({
       source: _.keys(allTags),
 
       sorter: function(items) {
-        return _.sortBy(items, function(tagId) {
-          return -allTags[tagId].count;
+        var exactMatches = [];
+        var prefixMatches = [];
+        var otherMatches = [];
+        var lowerCaseQuery = this.query.toLowerCase();
+
+        // Group matches into exact matches, prefix matches, and remaining
+        _.each(items, function(tag) {
+          var lowerCaseTag = tag.toLowerCase();
+          if (lowerCaseTag === lowerCaseQuery) {
+            exactMatches.push(tag);
+          } else if (startsWith(lowerCaseTag, lowerCaseQuery)) {
+            prefixMatches.push(tag);
+          } else {
+            otherMatches.push(tag);
+          }
         });
+
+        return sortTagsByCount(exactMatches).concat(
+            sortTagsByCount(prefixMatches), sortTagsByCount(otherMatches));
       },
 
       highlighter: function(item) {
@@ -724,6 +755,12 @@ var Tags = React.createClass({
         allTags[tag.id] = tag;
       });
     });
+  },
+
+  onBodyClick: function(e) {
+    if (!$(e.target).closest('.tags').length) {
+      this.setState({isEditing: false});
+    }
   },
 
   onEditBtnClick: function() {
@@ -807,6 +844,9 @@ var PluginPage = React.createClass({
   componentDidMount: function() {
     this.fetchPlugin();
     window.addEventListener("keydown", this.onWindowKeyDown, false);
+
+    this.tagXhrQueue = $.Deferred();
+    this.tagXhrQueue.resolve();
   },
 
   componentWillUnmount: function() {
@@ -828,6 +868,11 @@ var PluginPage = React.createClass({
 
   // TODO(david): Maybe use keypress?
   onWindowKeyDown: function(e) {
+    var tag = e.target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA") {
+      return;
+    }
+
     var key = e.keyCode;
     var direction;
     var gPressed = (key === G_KEYCODE && !e.altKey && !e.ctrlKey &&
@@ -857,15 +902,20 @@ var PluginPage = React.createClass({
   onTagsChange: function(tags) {
     var newTags = _.uniq(tags);
     this.setState({tags: newTags});
-    $.ajax({
-      url: "/api/plugins/" + this.props.slug + "/tags",
-      type: "POST",
-      contentType: "application/json",
-      dataType: "json",
-      data: JSON.stringify({tags: newTags}),
-      success: function(data) {
-        this.setState({tags: data.tags});
-      }.bind(this)
+
+    // We queue up AJAX requests to avoid race conditions on the server.
+    var self = this;
+    this.tagXhrQueue.done(function() {
+      $.ajax({
+        url: "/api/plugins/" + self.props.slug + "/tags",
+        type: "POST",
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify({tags: newTags}),
+        success: function() {
+          self.tagXhrQueue.resolve();
+        }
+      });
     });
   },
 
