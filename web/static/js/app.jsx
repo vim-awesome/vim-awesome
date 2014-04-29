@@ -101,15 +101,39 @@ var Sidebar = React.createClass({
   render: function() {
     var categories = _.map([
       "Language",
-      "Syntax",
-      "Navigation",
-      "Movement",
-      "Buffer",
-      "Info",
-      "Integrations"
+      "Completion",
+      "Code display",
+      "Integrations",
+      "Explorer",
+      "Interface",
+      "Commands",
+      "Other"
     ], function(category) {
-      return <li key={category}>
-        <a href="#/blah"><i className="icon-fighter-jet"></i>{category}</a>
+      var tagsClass = category.replace(/ /g, '_') + "-tags";
+
+      return <li className="accordion-group category" key={category}>
+        <a href="#" data-toggle="collapse" data-target={"." + tagsClass}
+            data-parent=".categories" className="category-link">
+          <i className="icon-code"></i>{category}
+        </a>
+        <div className={"collapse " + tagsClass}>
+          <ul className="category-tags">
+            <li><a href="#" className="tag-link">Lint</a></li>
+            <li><a href="#" className="tag-link">Tmux</a></li>
+            <li><a href="#" className="tag-link">Unix</a></li>
+            <li><a href="#" className="tag-link">Pep8</a></li>
+            <li><a href="#" className="tag-link">Pyflakes</a></li>
+            <li><a href="#" className="tag-link">Dash</a></li>
+            <li><a href="#" className="tag-link">Ack</a></li>
+            <li><a href="#" className="tag-link">Grep</a></li>
+            <li><a href="#" className="tag-link">Git</a></li>
+            <li><a href="#" className="tag-link">Linux</a></li>
+            <li><a href="#" className="tag-link">Diff</a></li>
+            <li><a href="#" className="tag-link">Filesystem</a></li>
+            <li><a href="#" className="tag-link">Github</a></li>
+            <li><a href="#" className="tag-link">Gist</a></li>
+          </ul>
+        </div>
       </li>;
     });
 
