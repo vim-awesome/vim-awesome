@@ -923,8 +923,8 @@ var PluginPage = React.createClass({
         </div>
       </div>
 
-      <div className="row-fluid">
-        <div className="span12 long-desc">
+      <div className="row-fluid long-desc-container">
+        <div className="long-desc">
           <Markdown>{this.state.long_desc}</Markdown>
           {!!installDetails &&
             <div>

@@ -9,9 +9,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Global variables, mixins, and utility classes
 
-$page-max-width: 1200px;
-$page-min-width: 1000px;
-
 $sidebar-width: 290px;
 $topbar-height: 64px;
 $content-margin-top: 10px;
@@ -25,22 +22,21 @@ $content-margin-left: $sidebar-width + 50px;
 // Site chrome and theme
 
 .page-container {
-  max-width: $page-max-width;
-  min-width: $page-min-width;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 40px;
-  padding-right: 40px;
+  padding-left: 30px;
+  padding-right: 30px;
+  width: 1140px;
 }
 
 a {
-  color: $blue;
-  @include transition(color 0.2s ease-out);
+  color: $cyan;
+  @include transition(color 0.1s ease-out);
 
   &:hover, &:focus {
-    color: darken($blue, 15%);
+    color: mix($cyan, $bg-dark-1, 50%);
     text-decoration: none;
-    @include transition(color 0.2s ease-out);
+    @include transition(color 0.1s ease-out);
   }
 }
 
@@ -988,8 +984,21 @@ code {
     }
   }
 
+  $long-desc-bg: #FBFBFB;
+  .long-desc-container {
+    margin-top: 45px;
+    padding: 40px;
+    @include box-sizing(border-box);
+    background: mix($bg-light-2, $bg-light-1, 40%);
+    @include box-shadow(0 1px 1px rgba(black, 0.1));
+    background: $long-desc-bg;
+  }
+
   .long-desc {
-    margin-top: $box-margin;
+    $line-height: 1.7;
+
+    line-height: $line-height;
+    -webkit-font-smoothing: antialiased;
 
     h1, h2, h3, h4, h5 {
       line-height: normal;
@@ -1017,22 +1026,40 @@ code {
       margin: 30px 0 15px 0;
     }
 
+    h4 {
+      margin: 20px 0 10px 0;
+    }
+
     li {
-      line-height: 20px;
-      margin-bottom: 10px;
+      margin-bottom: 2px;
+      line-height: $line-height;
     }
 
     p {
-      line-height: 25px;
       margin: 15px 0;
     }
 
     pre {
-      background-color: $bg-light-2;
+      background-color: mix($long-desc-bg, black, 97%);
       border-radius: 0;
       border: none;
       color: $content-4;
-      border-left: 6px solid mix($bg-light-2, black, 92%);
+      border-left: 6px solid mix($long-desc-bg, black, 92%);
+    }
+
+    blockquote {
+      border-left: 6px solid mix($long-desc-bg, black, 92%);
+
+      p {
+        font-weight: normal;
+        line-height: $line-height;
+        font-size: $baseFontSize;
+      }
+    }
+
+    hr {
+      border-top: 2px solid mix($bg-light-2, black, 92%);
+      border-bottom: none;
     }
   }
 }
