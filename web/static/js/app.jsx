@@ -104,21 +104,22 @@ var WipNotice = React.createClass({
 var Sidebar = React.createClass({
   render: function() {
     var categories = _.map([
-      "Language",
-      "Completion",
-      "Code display",
-      "Integrations",
-      "Explorer",
-      "Interface",
-      "Commands",
-      "Other"
+      { text: "Language", icon: "icon-flag" },
+      { text: "Completion", icon: "icon-ellipsis-horizontal" },
+      { text: "Code display", icon: "icon-code" },
+      { text: "Integrations", icon: "icon-external-link" },
+      { text: "Explorer", icon: "icon-folder-open" },
+      { text: "Interface", icon: "icon-eye-open" },
+      { text: "Commands", icon: "icon-terminal" },
+      { text: "Other", icon: "icon-asterisk" }
     ], function(category) {
-      var tagsClass = category.replace(/ /g, '_') + "-tags";
+      var categoryText = category.text;
+      var tagsClass = categoryText.replace(/ /g, '_') + "-tags";
 
-      return <li className="accordion-group category" key={category}>
+      return <li className="accordion-group category" key={categoryText}>
         <a href="#" data-toggle="collapse" data-target={"." + tagsClass}
             data-parent=".categories" className="category-link">
-          <i className="icon-code"></i>{category}
+          <i className={category.icon}></i>{categoryText}
         </a>
         <div className={"collapse " + tagsClass}>
           <ul className="category-tags">

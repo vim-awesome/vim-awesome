@@ -174,7 +174,7 @@ code {
         letter-spacing: 1px;
         color: $textColor;
         display: block;
-        padding-left: 20px;
+        padding-left: 0;
         border-left: 5px solid;
 
         @include transition(all 0.1s ease-out);
@@ -188,9 +188,11 @@ code {
         }
 
         i {
-          margin-right: 14px;
           color: rgba($textColor, 0.8);
-          font-size: 20px;
+          font-size: 18px;
+          display: inline-block;
+          width: 60px;
+          text-align: center;
         }
       }
 
