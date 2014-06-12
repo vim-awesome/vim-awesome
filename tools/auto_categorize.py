@@ -49,7 +49,7 @@ def main():
             for v in _CATEGORY_TAGS_MAP[k]}
 
     for plugin in query.run(r_conn()):
-        if plugin['category']:
+        if plugin['category'] != 'uncategorized':
             has_category_count += 1
             continue
 

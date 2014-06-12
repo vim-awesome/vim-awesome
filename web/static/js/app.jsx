@@ -134,35 +134,38 @@ var Sidebar = React.createClass({
   },
 
   render: function() {
-    var categoryElements = _.map(this.state.categories, function(category) {
-      var tagsClass = category.id + "-tags";
+    var categoryElements = _.chain(this.state.categories)
+      .reject(function(category) { return category.id === "uncategorized"; })
+      .map(function(category) {
+        var tagsClass = category.id + "-tags";
 
-      return <li className={"accordion-group category " + category.id}
-          key={category.id}>
-        <a href="#" data-toggle="collapse" data-target={"." + tagsClass}
-            data-parent=".categories" className="category-link">
-          <i className={category.icon}></i>{category.name}
-        </a>
-        <div className={"collapse " + tagsClass}>
-          <ul className="category-tags">
-            <li><a href="#" className="tag-link">Lint</a></li>
-            <li><a href="#" className="tag-link">Tmux</a></li>
-            <li><a href="#" className="tag-link">Unix</a></li>
-            <li><a href="#" className="tag-link">Pep8</a></li>
-            <li><a href="#" className="tag-link">Pyflakes</a></li>
-            <li><a href="#" className="tag-link">Dash</a></li>
-            <li><a href="#" className="tag-link">Ack</a></li>
-            <li><a href="#" className="tag-link">Grep</a></li>
-            <li><a href="#" className="tag-link">Git</a></li>
-            <li><a href="#" className="tag-link">Linux</a></li>
-            <li><a href="#" className="tag-link">Diff</a></li>
-            <li><a href="#" className="tag-link">Filesystem</a></li>
-            <li><a href="#" className="tag-link">Github</a></li>
-            <li><a href="#" className="tag-link">Gist</a></li>
-          </ul>
-        </div>
-      </li>;
-    });
+        return <li className={"accordion-group category " + category.id}
+            key={category.id}>
+          <a href="#" data-toggle="collapse" data-target={"." + tagsClass}
+              data-parent=".categories" className="category-link">
+            <i className={category.icon}></i>{category.name}
+          </a>
+          <div className={"collapse " + tagsClass}>
+            <ul className="category-tags">
+              <li><a href="#" className="tag-link">Lint</a></li>
+              <li><a href="#" className="tag-link">Tmux</a></li>
+              <li><a href="#" className="tag-link">Unix</a></li>
+              <li><a href="#" className="tag-link">Pep8</a></li>
+              <li><a href="#" className="tag-link">Pyflakes</a></li>
+              <li><a href="#" className="tag-link">Dash</a></li>
+              <li><a href="#" className="tag-link">Ack</a></li>
+              <li><a href="#" className="tag-link">Grep</a></li>
+              <li><a href="#" className="tag-link">Git</a></li>
+              <li><a href="#" className="tag-link">Linux</a></li>
+              <li><a href="#" className="tag-link">Diff</a></li>
+              <li><a href="#" className="tag-link">Filesystem</a></li>
+              <li><a href="#" className="tag-link">Github</a></li>
+              <li><a href="#" className="tag-link">Gist</a></li>
+            </ul>
+          </div>
+        </li>;
+      })
+      .value();
 
     return <div className="sidebar">
       <h1 className="title">
@@ -731,27 +734,21 @@ var Category = React.createClass({
   },
 
   render: function() {
-    var categoryElements = _.map(this.state.categories, function(category) {
-      return <li key={category.id}>
-        <a title={category.description} data-placement="left" href="#"
-            className="category-item"
-            onClick={this.onCategoryOptionClick.bind(this, category.id)}>
-          <i className={"category-icon " + category.icon}></i>
-          {category.name}
-        </a>
-      </li>;
-    }.bind(this));
+    var categoryElements = _.chain(this.state.categories)
+      .reject(function(category) { return category.id === "uncategorized"; })
+      .map(function(category) {
+        return <li key={category.id}>
+          <a title={category.description} data-placement="left" href="#"
+              className="category-item"
+              onClick={this.onCategoryOptionClick.bind(this, category.id)}>
+            <i className={"category-icon " + category.icon}></i>
+            {category.name}
+          </a>
+        </li>;
+      }.bind(this));
 
     var category = _.findWhere(this.state.categories,
-        {id: this.props.category});
-    if (!category) {  // TODO(david): Add this to categories.yaml.
-      category = {
-        name: "Uncategorized",
-        icon: "icon-question",
-        id: "uncategorized",
-        description: "Plugins that have not yet been categorized"
-      };
-    }
+        {id: this.props.category}) || {};
 
     return <div className="category">
       <a title={category.description} data-placement="left"

@@ -32,3 +32,8 @@
   name: Other
   icon: icon-asterisk
   description: Plugins that don't belong in other categories
+
+- id: uncategorized
+  name: Uncategorized
+  icon: icon-question
+  description: Plugins that have not yet been categorized
