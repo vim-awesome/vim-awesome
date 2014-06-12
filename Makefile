@@ -34,6 +34,14 @@ build_github_index:
 test:
 	PYTHONPATH=. nosetests -v
 
+dump:
+	rethinkdb dump -e vim_awesome -f rethinkdb_dump.tar.gz
+
+restore:
+	scp vim@vimawesome.com:~/vim-awesome/rethinkdb_dump.tar.gz \
+		rethinkdb_dump_remote.tar.gz
+	rethinkdb restore rethinkdb_dump_remote.tar.gz --force
+
 clean:
 	find . -name '*.pyc' -delete
 	bundle exec compass clean --config conf/compass.rb
