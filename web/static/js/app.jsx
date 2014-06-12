@@ -95,7 +95,7 @@ var forceBackboneNavigate = function() {
  *     available.
  */
 var fetchAllCategories = function(callback) {
-  if (!allCategories.length) {
+  if (allCategories.length) {
     callback(allCategories);
   } else {
     $.getJSON("/api/categories", function(data) {
