@@ -1,27 +1,27 @@
 - id: language
   name: Language
   icon: icon-flag
-  description: Plugins that reduce typing and complete code
+  description: Plugins or syntax highlighting for a language or library
 
 - id: completion
   name: Completion
   icon: icon-ellipsis-horizontal
-  description: Plugins or syntax highlighting for a specific language, library, or framework
+  description: Plugins that reduce typing and complete code
 
 - id: code-display
   name: Code display
   icon: icon-code
-  description: Plugins that enhance code display and layout, including color schemes
+  description: Plugins and color schemes that enhance code display
 
 - id: integration
   name: Integrations
   icon: icon-external-link
-  description: Plugins that integrate Vim with external tools or the operating system
+  description: Plugins that integrate Vim with external tools or the OS
 
 - id: interface
   name: Interface
   icon: icon-eye-open
-  description: Plugins that adds an additional UI element or changes an existing one
+  description: Plugins that add or change a UI element
 
 - id: command
   name: Commands
@@ -31,4 +31,4 @@
 - id: other
   name: Other
   icon: icon-asterisk
-  description: All other plugins that do not belong to another category
+  description: Plugins that don't belong in other categories
