@@ -236,7 +236,15 @@ code {
   $bg-color: $content-4;
   opacity: 1.0;
 
-  .tooltip-arrow {
+  &.left {
+    margin-left: -12px;
+  }
+
+  &.left .tooltip-arrow {
+    border-left-color: $bg-color;
+  }
+
+  &.top .tooltip-arrow {
     border-top-color: $bg-color;
   }
 
@@ -683,19 +691,18 @@ code {
 .plugin-page {
   $box-padding: 18px;
   $box-margin: 20px;
-  $box-height: 110px;
   $box-bg-color: $bg-light-2;
 
   .plugin {
-    margin: 45px 0 $box-margin 0;
+    margin: 45px 0 0 0;
     opacity: 1.0;
   }
 
   .accent-box {
     padding: $box-padding;
-    height: $box-height;
     background-color: $box-bg-color;
     color: $content-3;
+    margin-top: $box-margin;
   }
 
   .accent-box-label {
@@ -711,7 +718,11 @@ code {
     color: $content-1;
   }
 
+  $dates-box-height: 110px;
   .dates {
+    @extend .accent-box;
+    height: $dates-box-height;
+
     .date-box {
       width: 50%;
       display: inline-block;
@@ -729,6 +740,8 @@ code {
   }
 
   .links {
+    @extend .accent-box;
+    height: $dates-box-height;
     padding: 0;
 
     a {
@@ -813,7 +826,7 @@ code {
     }
   }
 
-  $install-height: 200px;
+  $install-height: 240px;
   .install {
     @extend .accent-box;
     margin-top: $box-margin;
@@ -869,10 +882,138 @@ code {
     }
   }
 
+  $category-height: 34px;
+  .category {
+    @extend .accent-box;
+    font-size: 13px;
+    padding: 0;
+    height: $category-height;
+    position: relative;
+
+    .category-link {
+      $border-width: 5px;
+
+      color: $content-1;
+      padding-left: $box-padding - $border-width;
+      border-left: $border-width solid mix($box-bg-color, $bg-dark-1, 90%);
+      line-height: $category-height;
+      display: block;
+      @include transition(all 0.1s ease-out);
+
+      &:hover {
+        @include transition(all 0.1s ease-out);
+
+        // TODO(david): Duplication of category colors (used for sidebar too)
+        &.language      { color: $red;    border-left-color: $red; }
+        &.completion    { color: $yellow; border-left-color: $yellow; }
+        &.code-display  { color: $green;  border-left-color: $green; }
+        &.integration   { color: $cyan;   border-left-color: $cyan; }
+        &.interface     { color: $blue;   border-left-color: $blue; }
+        &.command       { color: $violet; border-left-color: $violet; }
+        &.other         { color: $gray;   border-left-color: $gray; }
+      }
+    }
+
+    .category-icon {
+      margin-right: 5px;
+    }
+
+    .dropdown {
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 100%;
+      width: 30px;
+      text-align: center;
+    }
+
+    .dropdown-toggle {
+      height: 100%;
+      width: 100%;
+      display: block;
+      background: rgba($bg-dark-1, 0.1);
+      font-size: 14px;
+      line-height: $category-height;
+      color: $content-4;
+
+      @include transition(all 0.2s ease-out);
+      opacity: 0.5;
+      background: rgba($bg-dark-1, 0.1);
+
+      &:hover {
+        @include transition(all 0.2s ease-out);
+        opacity: 1.0;
+        cursor: pointer;
+      }
+    }
+
+    .dropdown-menu {
+      $bg-color: $content-4;
+
+      box-shadow: none;
+      border: none;
+      background-color: $bg-color;
+      text-align: left;
+      width: 187px;  // TODO(david): Don't hardcode this
+
+      @include transition(all 0.2s ease-out);
+      opacity: 0;
+      margin-top: 0;
+      display: block;
+      visibility: hidden;
+
+      &:after {
+        content: '';
+        border-style: solid;
+        border-width: 0 7px 6px;
+        border-color: transparent transparent $bg-color transparent;
+        height: 0;
+        margin-top: -6px;
+        position: absolute;
+        right: 10px;
+        top: 0;
+        width: 0;
+        z-index: 10;
+      }
+    }
+
+    .open > .dropdown-menu {
+      @include transition(all 0.2s ease-out);
+      margin-top: 12px;
+      opacity: 1.0;
+      visibility: visible;
+    }
+
+    .category-item {
+      color: mix($content-1, white, 20%);
+      line-height: 1.8;
+
+      &:hover {
+        background: $blue;
+        color: white;
+      }
+
+      .category-icon {
+        display: inline-block;
+        width: 20px;
+      }
+    }
+
+    .select-heading {
+      color: #CCC;
+      font-size: 12px;
+      text-transform: uppercase;
+
+      &:hover {
+        color: #CCC;
+      }
+    }
+  }
+
   .tags {
     @extend .accent-box;
     margin-top: $box-margin;
-    height: $install-height;
+    height: $install-height - $category-height - $box-margin;
     box-sizing: border-box;
     position: relative;
 

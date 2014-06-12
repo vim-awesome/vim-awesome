@@ -6,6 +6,10 @@ def api_not_found(message):
     return (message, 404)
 
 
+def api_bad_request(message):
+    return (message, 400)
+
+
 def to_timestamp(dt):
     return calendar.timegm(dt.timetuple())
 

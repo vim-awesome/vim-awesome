@@ -127,6 +127,20 @@ def get_categories():
     return json.dumps(db.categories.get_all())
 
 
+@app.route('/api/plugins/<slug>/category/<category>', methods=['PUT'])
+def update_plugin_category(slug, category):
+    plugin = r.table('plugins').get(slug).run(r_conn())
+    if not plugin:
+        return util.api_not_found('No plugin with slug %s' % slug)
+
+    if not category in [c['id'] for c in db.categories.get_all()]:
+        return util.api_bad_request('No such category %s' % category)
+
+    plugin['category'] = category
+    r.table('plugins').update(plugin).run(r_conn())
+    return json.dumps({'category': plugin['category']})
+
+
 if __name__ == '__main__':
     app.debug = True
     app.run(port=5001)

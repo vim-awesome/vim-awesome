@@ -335,8 +335,6 @@ var Plugin = React.createClass({
   },
 
   addBootstrapTooltips: function() {
-    // TODO(david): Do something about tooltips being cut off on details page
-    //     (eg. add a sentence about keyboard tips on the top of the page).
     $(this.getDOMNode()).find('[title]').tooltip({
       animation: false,
       container: 'body'
@@ -693,6 +691,90 @@ var Install = React.createClass({
   }
 });
 
+// This is the category link and edit widget on the details page.
+var Category = React.createClass({
+  getInitialState: function() {
+    return {
+      categories: []
+    };
+  },
+
+  componentDidMount: function() {
+    fetchAllCategories(function(categories) {
+      this.setState({categories: categories})
+    }.bind(this));
+    this.addBootstrapTooltips();
+  },
+
+  componentWillUnmount: function() {
+    $(this.getDOMNode()).find('[title]').tooltip('destroy');
+  },
+
+  componentDidUpdate: function() {
+    this.addBootstrapTooltips();
+  },
+
+  addBootstrapTooltips: function() {
+    _.delay(function() {
+      $(this.getDOMNode()).find('[title]')
+        .tooltip('destroy')
+        .tooltip({
+          animation: false,
+          container: 'body'
+        });
+    }.bind(this), 200);
+  },
+
+  onCategoryOptionClick: function(categoryId, e) {
+    e.preventDefault();
+    this.props.onCategoryChange(categoryId);
+  },
+
+  render: function() {
+    var categoryElements = _.map(this.state.categories, function(category) {
+      return <li key={category.id}>
+        <a title={category.description} data-placement="left" href="#"
+            className="category-item"
+            onClick={this.onCategoryOptionClick.bind(this, category.id)}>
+          <i className={"category-icon " + category.icon}></i>
+          {category.name}
+        </a>
+      </li>;
+    }.bind(this));
+
+    var category = _.findWhere(this.state.categories,
+        {id: this.props.category});
+    if (!category) {  // TODO(david): Add this to categories.yaml.
+      category = {
+        name: "Uncategorized",
+        icon: "icon-question",
+        id: "uncategorized",
+        description: "Plugins that have not yet been categorized"
+      };
+    }
+
+    return <div className="category">
+      <a title={category.description} data-placement="left"
+          className={category.id + " category-link"} href="#">
+        <i className={category.icon + " category-icon"}></i> {category.name}
+      </a>
+
+      <div className="dropdown">
+        <a className="dropdown-toggle" data-toggle="dropdown"
+            data-target="#">
+          <i className="icon-edit"></i>
+        </a>
+        <ul className="dropdown-menu pull-right">
+          <li className="disabled">
+            <a className="select-heading">Change category</a>
+          </li>
+          {categoryElements}
+        </ul>
+      </div>
+    </div>;
+  }
+});
+
 // This is the tags widget on the details page.
 var Tags = React.createClass({
   getInitialState: function() {
@@ -814,7 +896,7 @@ var Tags = React.createClass({
   },
 
   render: function() {
-    var MAX_TAGS = 5;
+    var MAX_TAGS = 4;
 
     var actionBtn;
     if (this.state.isEditing) {
@@ -921,6 +1003,15 @@ var PluginPage = React.createClass({
     this.gLastPressed = gPressed;
   },
 
+  onCategoryChange: function(categoryId) {
+    this.setState({category: categoryId});
+
+    $.ajax({
+      url: "/api/plugins/" + this.props.slug + "/category/" + categoryId,
+      type: "PUT"
+    });
+  },
+
   // TODO(david): Should we adopt the "handleTagsChange" naming convention?
   onTagsChange: function(tags) {
     var newTags = _.uniq(tags);
@@ -955,7 +1046,7 @@ var PluginPage = React.createClass({
       <Plugin plugin={this.state} />
 
       <div className="row-fluid">
-        <div className="span9 accent-box dates">
+        <div className="span9 dates">
           <div className="row-fluid">
             <div className="span6">
               <h3 className="date-label">Created</h3>
@@ -971,7 +1062,7 @@ var PluginPage = React.createClass({
             </div>
           </div>
         </div>
-        <div className="span3 accent-box links">
+        <div className="span3 links">
           <a href={vimOrgUrl || "#"} target="_blank" className={"vim-link" +
               (vimOrgUrl ? "" : " disabled")}>
             <i className="vim-icon dark"></i>
@@ -992,7 +1083,17 @@ var PluginPage = React.createClass({
           <Install github_url={this.state.github_url} />
         </div>
         <div className="span3">
-          <Tags tags={this.state.tags} onTagsChange={this.onTagsChange} />
+          <div className="row-fluid">
+            <div className="span12">
+              <Category category={this.state.category}
+                  onCategoryChange={this.onCategoryChange} />
+            </div>
+          </div>
+          <div className="row-fluid">
+            <div className="span12">
+              <Tags tags={this.state.tags} onTagsChange={this.onTagsChange} />
+            </div>
+          </div>
         </div>
       </div>
 
