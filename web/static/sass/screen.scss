@@ -196,15 +196,13 @@ code {
         }
       }
 
-      // TODO(david): Temporary. Apply colors on category classes instead.
-      &:nth-child(1) .category-link { border-left-color: $red; }
-      &:nth-child(2) .category-link { border-left-color: $orange; }
-      &:nth-child(3) .category-link { border-left-color: $yellow; }
-      &:nth-child(4) .category-link { border-left-color: $green; }
-      &:nth-child(5) .category-link { border-left-color: $cyan; }
-      &:nth-child(6) .category-link { border-left-color: $blue; }
-      &:nth-child(7) .category-link { border-left-color: $violet; }
-      &:nth-child(8) .category-link { border-left-color: $gray; }
+      &.language      .category-link { border-left-color: $red; }
+      &.completion    .category-link { border-left-color: $yellow; }
+      &.code-display  .category-link { border-left-color: $green; }
+      &.integrations  .category-link { border-left-color: $cyan; }
+      &.interface     .category-link { border-left-color: $blue; }
+      &.commands      .category-link { border-left-color: $violet; }
+      &.other         .category-link { border-left-color: $gray; }
     }
 
     .category-tags {

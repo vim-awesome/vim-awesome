@@ -137,7 +137,8 @@ var Sidebar = React.createClass({
     var categoryElements = _.map(this.state.categories, function(category) {
       var tagsClass = category.id + "-tags";
 
-      return <li className="accordion-group category" key={category.id}>
+      return <li className={"accordion-group category " + category.id}
+          key={category.id}>
         <a href="#" data-toggle="collapse" data-target={"." + tagsClass}
             data-parent=".categories" className="category-link">
           <i className={category.icon}></i>{category.name}
