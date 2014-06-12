@@ -13,7 +13,7 @@
   icon: icon-code
   description: Plugins that enhance code display and layout, including color schemes
 
-- id: integrations
+- id: integration
   name: Integrations
   icon: icon-external-link
   description: Plugins that integrate Vim with external tools or the operating system
@@ -23,7 +23,7 @@
   icon: icon-eye-open
   description: Plugins that adds an additional UI element or changes an existing one
 
-- id: commands
+- id: command
   name: Commands
   icon: icon-terminal
   description: Plugins that introduce or change a Vim command

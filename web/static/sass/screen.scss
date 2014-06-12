@@ -199,9 +199,9 @@ code {
       &.language      .category-link { border-left-color: $red; }
       &.completion    .category-link { border-left-color: $yellow; }
       &.code-display  .category-link { border-left-color: $green; }
-      &.integrations  .category-link { border-left-color: $cyan; }
+      &.integration  .category-link { border-left-color: $cyan; }
       &.interface     .category-link { border-left-color: $blue; }
-      &.commands      .category-link { border-left-color: $violet; }
+      &.command      .category-link { border-left-color: $violet; }
       &.other         .category-link { border-left-color: $gray; }
     }
 

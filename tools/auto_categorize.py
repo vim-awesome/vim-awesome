@@ -4,7 +4,6 @@ It is conservative and will not categorize if there is any ambiguity. Also
 refuses to overwrite plugin categories, and is thus idempotent.
 """
 
-
 import rethinkdb as r
 
 import db.plugins
