@@ -42,6 +42,9 @@ restore:
 		rethinkdb_dump_remote.tar.gz
 	rethinkdb restore rethinkdb_dump_remote.tar.gz --force
 
+auto_categorize:
+	PYTHONPATH=. python tools/auto_categorize.py
+
 clean:
 	find . -name '*.pyc' -delete
 	bundle exec compass clean --config conf/compass.rb

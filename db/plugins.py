@@ -25,6 +25,10 @@ _ROW_SCHEMA = {
     # sources together. Eg. "nerdtree" (instead of "the-NERD-Tree.vim")
     'normalized_name': '',
 
+    # One of the IDs from db/categories.yaml, or None for uncategorized.
+    # Eg. 'language'
+    'category': None,
+
     # eg. ['C/C++', 'autocomplete']
     'tags': [],
 
