@@ -356,14 +356,12 @@ var Plugin = React.createClass({
     }
 
     var hasNavFocus = this.props.hasNavFocus;
-    // TODO(david): Map color from tag/category or just hash of name
-    var color = "accent-" + (plugin.name.length % 9);
     return <li
         className={"plugin" + (hasNavFocus ? " nav-focus" : "") +
             (this.state.hasVisited ? " visited" : "")}
         onMouseEnter={this.props.onMouseEnter}>
       <a href={"plugin/" + plugin.slug}>
-        <h3 className={"plugin-name " + color}>{plugin.name}</h3>
+        <h3 className={"plugin-name " + plugin.category}>{plugin.name}</h3>
         {plugin.author && <span className="by">by</span>}
         {plugin.author &&
           <span className="author">{" " + plugin.author}</span>}

@@ -136,6 +136,7 @@ def update_plugin_category(slug, category):
     if not category in [c['id'] for c in db.categories.get_all()]:
         return util.api_bad_request('No such category %s' % category)
 
+    # TODO(david): Also update search index (stale cache)
     plugin['category'] = category
     r.table('plugins').update(plugin).run(r_conn())
     return json.dumps({'category': plugin['category']})
