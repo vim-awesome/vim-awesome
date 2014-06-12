@@ -7,6 +7,7 @@ termcolor==1.1.0
 python-dateutil==2.1
 nose==1.1.2
 Flask-Cache==0.12
+PyYAML==3.11
 
 # For parsing .gitmodules from dotfiles repos (to extract Pathogen plugins).
 # configobj does not support comments beginning with semicolon,

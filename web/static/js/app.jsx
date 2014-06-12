@@ -20,6 +20,9 @@ var D_KEYCODE = 'D'.charCodeAt(0),
 // A cache of all tag IDs and their counts.
 var allTags = {};
 
+// A cache of all categories and their corresponding tags.
+var allCategories = [];
+
 var clamp = function(num, min, max) {
   return Math.min(Math.max(num, min), max);
 };
@@ -87,6 +90,22 @@ var forceBackboneNavigate = function() {
 };
 
 /**
+ * Fetches all plugin categories from server, caching into a variable.
+ * @param {Function} callback Invoked with an array of all categories when
+ *     available.
+ */
+var fetchAllCategories = function(callback) {
+  if (!allCategories.length) {
+    callback(allCategories);
+  } else {
+    $.getJSON("/api/categories", function(data) {
+      allCategories = data;
+      callback(allCategories);
+    });
+  }
+};
+
+/**
  * A temporary notice that this site is still a work in progress!
  */
 var WipNotice = React.createClass({
@@ -102,24 +121,26 @@ var WipNotice = React.createClass({
 });
 
 var Sidebar = React.createClass({
-  render: function() {
-    var categories = _.map([
-      { text: "Language", icon: "icon-flag" },
-      { text: "Completion", icon: "icon-ellipsis-horizontal" },
-      { text: "Code display", icon: "icon-code" },
-      { text: "Integrations", icon: "icon-external-link" },
-      { text: "Explorer", icon: "icon-folder-open" },
-      { text: "Interface", icon: "icon-eye-open" },
-      { text: "Commands", icon: "icon-terminal" },
-      { text: "Other", icon: "icon-asterisk" }
-    ], function(category) {
-      var categoryText = category.text;
-      var tagsClass = categoryText.replace(/ /g, '_') + "-tags";
+  getInitialState: function() {
+    return {
+      categories: []
+    };
+  },
 
-      return <li className="accordion-group category" key={categoryText}>
+  componentDidMount: function() {
+    fetchAllCategories(function(categories) {
+      this.setState({categories: categories})
+    }.bind(this));
+  },
+
+  render: function() {
+    var categoryElements = _.map(this.state.categories, function(category) {
+      var tagsClass = category.id + "-tags";
+
+      return <li className="accordion-group category" key={category.id}>
         <a href="#" data-toggle="collapse" data-target={"." + tagsClass}
             data-parent=".categories" className="category-link">
-          <i className={category.icon}></i>{categoryText}
+          <i className={category.icon}></i>{category.name}
         </a>
         <div className={"collapse " + tagsClass}>
           <ul className="category-tags">
@@ -155,7 +176,7 @@ var Sidebar = React.createClass({
           <div className="line2">across the Universe</div>
         </div>
       </div>
-      <ul className="categories">{categories}</ul>
+      <ul className="categories">{categoryElements}</ul>
       <WipNotice />
     </div>;
   }

@@ -122,6 +122,11 @@ def get_tags():
     return json.dumps(list(tags))
 
 
+@app.route('/api/categories', methods=['GET'])
+def get_categories():
+    return json.dumps(db.categories.get_all())
+
+
 if __name__ == '__main__':
     app.debug = True
     app.run(port=5001)
