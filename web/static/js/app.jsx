@@ -138,6 +138,11 @@ var Sidebar = React.createClass({
       .reject(function(category) { return category.id === "uncategorized"; })
       .map(function(category) {
         var tagsClass = category.id + "-tags";
+        var tagElements = _.map(category.tags, function(tag) {
+          return <li>
+            <a href="#" className="tag-link">{tag.id} x {tag.count}</a>
+          </li>;
+        });
 
         return <li className={"accordion-group category " + category.id}
             key={category.id}>
@@ -146,22 +151,7 @@ var Sidebar = React.createClass({
             <i className={category.icon}></i>{category.name}
           </a>
           <div className={"collapse " + tagsClass}>
-            <ul className="category-tags">
-              <li><a href="#" className="tag-link">Lint</a></li>
-              <li><a href="#" className="tag-link">Tmux</a></li>
-              <li><a href="#" className="tag-link">Unix</a></li>
-              <li><a href="#" className="tag-link">Pep8</a></li>
-              <li><a href="#" className="tag-link">Pyflakes</a></li>
-              <li><a href="#" className="tag-link">Dash</a></li>
-              <li><a href="#" className="tag-link">Ack</a></li>
-              <li><a href="#" className="tag-link">Grep</a></li>
-              <li><a href="#" className="tag-link">Git</a></li>
-              <li><a href="#" className="tag-link">Linux</a></li>
-              <li><a href="#" className="tag-link">Diff</a></li>
-              <li><a href="#" className="tag-link">Filesystem</a></li>
-              <li><a href="#" className="tag-link">Github</a></li>
-              <li><a href="#" className="tag-link">Gist</a></li>
-            </ul>
+            <ul className="category-tags">{tagElements}</ul>
           </div>
         </li>;
       })
