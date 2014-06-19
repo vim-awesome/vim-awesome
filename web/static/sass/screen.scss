@@ -215,8 +215,9 @@ code {
       background: mix($bg-light-2, $bg-light-1);
       margin-left: 0;
       padding: 10px 24px 5px 24px;
-      font-size: 15px;
       line-height: normal;
+      max-height: 160px;
+      overflow: scroll;
 
       > li {
         list-style-type: none;
@@ -227,6 +228,12 @@ code {
         @extend .plugin-tag;
         color: $content-4;
         padding: 3px 5px;
+        font-size: 13px;
+      }
+
+      .tag-count {
+        font-size: 10px;
+        color: $content-2;
       }
     }
   }

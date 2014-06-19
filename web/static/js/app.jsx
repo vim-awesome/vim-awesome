@@ -140,7 +140,12 @@ var Sidebar = React.createClass({
         var tagsClass = category.id + "-tags";
         var tagElements = _.map(category.tags, function(tag) {
           return <li>
-            <a href="#" className="tag-link">{tag.id} x {tag.count}</a>
+            <a href="#" className="tag-link">
+              <span className="tag-id">{tag.id}</span>
+              {tag.count > 1 &&
+                <span className="tag-count"> × {tag.count}</span>
+              }
+            </a>
           </li>;
         });
 
