@@ -1,4 +1,5 @@
 import json
+import itertools
 import logging
 import re
 
@@ -69,9 +70,21 @@ def get_plugins():
     results = get_search_index_cached()
 
     if search:
+        tokens = [t.lower() for t in sorted(search.split())]
+
+        # Look for any tag meta-keywords (e.g. tag:python)
+        tag_filter = lambda t: t.startswith('tag:')
+        tag_tokens = filter(tag_filter, tokens)
+        tokens = list(itertools.ifilterfalse(tag_filter, tokens))
+
+        # ... and apply these tag filters to the results
+        if tag_tokens:
+            required_tags = set(t[len('tag:'):] for t in tag_tokens)
+            results = filter(lambda plugin:
+                    required_tags <= set(plugin['tags']), results)
+
         # Create a regex that matches a string S iff for each keyword K in
         # `search` there is a corresponding word in S that begins with K.
-        tokens = (t.lower() for t in sorted(search.split()))
         tokens_regex = (r'\b%s' % re.escape(t) for t in tokens)
         search_regex = re.compile('.*'.join(tokens_regex))
 
