@@ -211,6 +211,14 @@ def update_plugin_category(slug, category):
     return json.dumps({'category': plugin['category']})
 
 
+@app.route('/api/submit', methods=['POST'])
+def submit_plugin():
+    # TODO(david): Actually do something with the data (next revision).
+    print "submit plugin!!!"
+    print flask.request.form
+    return flask.redirect('/submit')
+
+
 if __name__ == '__main__':
     app.debug = True
     app.run(port=5001)

@@ -6,6 +6,8 @@
 @import 'compass';
 @import 'variables';
 
+// TODO(david): Split up this giant file, use @imports, and minify.
+
 ////////////////////////////////////////////////////////////////////////////////
 // Global variables, mixins, and utility classes
 
@@ -14,15 +16,27 @@ $topbar-height: 64px;
 $content-margin-top: 10px;
 $content-margin-left: $sidebar-width + 50px;
 
-.tac {
-  text-align: center;
-}
-
 // TODO(david): Upgrade Sass and refactor to use a map
 $categories: 'language', 'completion', 'code-display', 'integration',
     'interface', 'command', 'other', 'uncategorized';
 $category-colors: $red, $yellow, $green, $cyan, $blue, $violet, $magenta,
     $gray;
+
+$box-padding: 18px;
+$box-margin: 20px;
+$box-bg-color: $bg-light-2;
+
+.tac {
+  text-align: center;
+}
+
+// From http://stackoverflow.com/a/20320475/392426
+@mixin placeholder {
+  &::-webkit-input-placeholder {@content}
+  &:-moz-placeholder           {@content}
+  &::-moz-placeholder          {@content}
+  &:-ms-input-placeholder      {@content}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Site chrome and theme
@@ -404,6 +418,320 @@ code {
   background: #DFDED1;
 }
 
+.accent-box {
+  padding: $box-padding;
+  background-color: $box-bg-color;
+  color: $content-3;
+  margin-top: $box-margin;
+}
+
+.accent-box-label {
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: normal;
+  color: $content-1;
+  margin: 0;
+  margin-bottom: 10px;
+  line-height: normal;
+  font-family: $sansFontFamily;
+}
+
+@mixin category-select-mixin($width, $height) {
+  @extend .accent-box;
+  font-size: 13px;
+  padding: 0;
+  height: $height;
+  position: relative;
+
+  .category-link {
+    $border-width: 5px;
+
+    color: $content-1;
+    padding-left: $box-padding - $border-width;
+    border-left: $border-width solid mix($box-bg-color, $bg-dark-1, 90%);
+    line-height: $height;
+    display: block;
+    @include transition(all 0.1s ease-out);
+
+    &:hover {
+      @include transition(all 0.1s ease-out);
+
+      @for $i from 0 to length($categories) {
+        $category: nth($categories, $i + 1);
+        $category-color: nth($category-colors, $i + 1);
+        &.#{$category} {
+          color: $category-color;
+          border-left-color: $category-color;
+        }
+      }
+    }
+  }
+
+  .category-icon {
+    margin-right: 5px;
+  }
+
+  .dropdown {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: $height;
+    text-align: center;
+  }
+
+  .dropdown-toggle {
+    height: 100%;
+    width: 100%;
+    display: block;
+    background: rgba($bg-dark-1, 0.1);
+    font-size: 14px;
+    line-height: $height;
+    color: $content-4;
+
+    @include transition(all 0.2s ease-out);
+    opacity: 0.5;
+    background: rgba($bg-dark-1, 0.1);
+
+    &:hover {
+      @include transition(all 0.2s ease-out);
+      opacity: 1.0;
+      cursor: pointer;
+    }
+  }
+
+  .dropdown-menu {
+    $bg-color: $content-4;
+
+    box-shadow: none;
+    border: none;
+    background-color: $bg-color;
+    text-align: left;
+    width: $width;
+
+    @include transition(all 0.2s ease-out);
+    opacity: 0;
+    margin-top: 0;
+    display: block;
+    visibility: hidden;
+
+    &:after {
+      content: '';
+      border-style: solid;
+      border-width: 0 7px 6px;
+      border-color: transparent transparent $bg-color transparent;
+      height: 0;
+      margin-top: -6px;
+      position: absolute;
+      right: 10px;
+      top: 0;
+      width: 0;
+      z-index: 10;
+    }
+  }
+
+  .open > .dropdown-menu {
+    @include transition(all 0.2s ease-out);
+    margin-top: 12px;
+    opacity: 1.0;
+    visibility: visible;
+  }
+
+  .category-item {
+    color: mix($content-1, white, 20%);
+    line-height: 1.8;
+
+    &:hover {
+      background: $blue;
+      color: white;
+    }
+
+    .category-icon {
+      display: inline-block;
+      width: 20px;
+    }
+  }
+
+  .select-heading {
+    color: #CCC;
+    font-size: 12px;
+    text-transform: uppercase;
+
+    &:hover {
+      color: #CCC;
+    }
+  }
+}
+
+.tags-select {
+  @extend .accent-box;
+  margin-top: $box-margin;
+  box-sizing: border-box;
+  position: relative;
+
+  .tags-label {
+    @extend .accent-box-label;
+  }
+
+  .tags-list {
+    margin: 0;
+  }
+
+  .tag {
+    @extend .plugin-tag;
+  }
+
+  .remove-btn {
+    display: none;
+  }
+
+  &.editing .remove-btn {
+    display: inline-block;
+    padding: 3px 4px 3px 0;
+    color: $content-1;
+
+    &:hover {
+      color: $orange;
+      cursor: pointer;
+    }
+  }
+
+  .tag-link {
+    color: $content-4;
+    padding: 3px 5px;
+    line-height: normal;
+    display: inline-block;
+  }
+
+  .action-btn {
+    $vertical-padding: 8px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 68px;
+    height: 30px;
+    border: none;
+    color: $content-4;
+    text-shadow: none;
+    border-radius: 0;
+    box-shadow: none;
+    text-transform: uppercase;
+    font-size: 12px;
+    line-height: 12px;
+    text-align: center;
+    outline: 0;
+    -webkit-backface-visibility: hidden;  // Fixes 1px wobble on Chrome
+
+    @include transition(all 0.2s ease-out);
+    opacity: 0.5;
+    background: rgba($bg-dark-1, 0.1);
+
+    &.done-btn {
+      background: $cyan;
+      color: white;
+    }
+
+    &:hover {
+      @include transition(all 0.2s ease-out);
+      opacity: 1.0;
+    }
+
+    i {
+      margin-right: 3px;
+    }
+  }
+
+  .tag-input {
+    padding: 15px 5px;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+  }
+
+  .typeahead {
+    border-radius: 0;
+    border: none;
+    background: rgba(white, 0.9);
+
+    .count {
+      float: right;
+      color: mix($content-1, white, 50%);
+      font-size: 10px;
+    }
+
+    > li > a {
+      color: $content-4;
+    }
+
+    .active > a {
+      background: $blue;
+      color: white;
+    }
+  }
+}
+
+.big-button-block {
+  padding: 20px;
+  line-height: 1;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 0;
+  color: $content-2;
+  outline: none;
+}
+
+.big-button {
+  @extend .big-button-block;
+  background: $bg-light-2;
+  @include transition(all 0.1s ease-out);
+
+  &:hover {
+    @include transition(all 0.1s ease-out);
+    background: $content-4;
+    color: white;
+
+    code {
+      @include transition(all 0.1s ease-out);
+      opacity: 1;
+    }
+  }
+}
+
+.right-arrow-button {
+  @extend .big-button;
+  position: relative;
+
+  .right-arrow {
+    margin-left: 14px;
+  }
+
+  &:after {
+    $arrow-width: 20px;
+    $arrow-height: 54px;  // TODO(david): Don't hardcode arrow height.
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 0;
+    height: 0;
+    right: 0;
+    margin-right: -$arrow-width;
+    border-left: $arrow-width solid $bg-light-2;
+    border-top: ($arrow-height / 2) solid transparent;
+    border-bottom: ($arrow-height / 2) solid transparent;
+    @include transition(all 0.1s ease-out);
+  }
+
+  &:hover:after {
+    @include transition(all 0.1s ease-out);
+    border-left-color: $content-4;
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Homepage
 
@@ -469,32 +797,12 @@ code {
   }
 
   .pagination-block {
-    padding: 20px;
-    line-height: 1;
-    font-size: 14px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    border: none;
-    border-radius: 0;
-    color: $content-2;
+    @extend .big-button-block;
   }
 
   // Grr bootstrap y u be so specific
   ul > li > a.pager-button {
-    @extend .pagination-block;
-    background: $bg-light-2;
-    @include transition(all 0.1s ease-out);
-
-    &:hover {
-      @include transition(all 0.1s ease-out);
-      background: $content-4;
-      color: white;
-
-      code {
-        @include transition(all 0.1s ease-out);
-        opacity: 1;
-      }
-    }
+    @extend .big-button;
 
     code {
       @include transition(all 0.1s ease-out);
@@ -513,35 +821,10 @@ code {
   }
 
   ul > li > a.next-page-button {
+    @extend .right-arrow-button;
+    margin-left: 30px;
     padding-left: 50px;
     padding-right: 90px;
-    margin-left: 30px;
-    position: relative;
-
-    .right-arrow {
-      margin-left: 10px;
-    }
-
-    &:after {
-      $arrow-width: 20px;
-      $arrow-height: 54px;  // TODO(david): Don't hardcode arrow height.
-      content: '';
-      position: absolute;
-      top: 0;
-      width: 0;
-      height: 0;
-      right: 0;
-      margin-right: -$arrow-width;
-      border-left: $arrow-width solid $bg-light-2;
-      border-top: ($arrow-height / 2) solid transparent;
-      border-bottom: ($arrow-height / 2) solid transparent;
-      @include transition(all 0.1s ease-out);
-    }
-
-    &:hover:after {
-      @include transition(all 0.1s ease-out);
-      border-left-color: $content-4;
-    }
   }
 
   .page-number {
@@ -730,33 +1013,9 @@ code {
 // Plugin details page
 
 .plugin-page {
-  $box-padding: 18px;
-  $box-margin: 20px;
-  $box-bg-color: $bg-light-2;
-
   .plugin {
     margin: 45px 0 0 0;
     opacity: 1.0;
-  }
-
-  .accent-box {
-    padding: $box-padding;
-    background-color: $box-bg-color;
-    color: $content-3;
-    margin-top: $box-margin;
-  }
-
-  .accent-box-label {
-    text-transform: uppercase;
-    font-size: 12px;
-    font-weight: normal;
-    color: rgba(white, 0.8);
-    margin: 0;
-    margin-bottom: 10px;
-    line-height: normal;
-    font-family: $sansFontFamily;
-
-    color: $content-1;
   }
 
   $dates-box-height: 110px;
@@ -924,241 +1183,13 @@ code {
   }
 
   $category-height: 34px;
-  .category {
-    @extend .accent-box;
-    font-size: 13px;
-    padding: 0;
-    height: $category-height;
-    position: relative;
-
-    .category-link {
-      $border-width: 5px;
-
-      color: $content-1;
-      padding-left: $box-padding - $border-width;
-      border-left: $border-width solid mix($box-bg-color, $bg-dark-1, 90%);
-      line-height: $category-height;
-      display: block;
-      @include transition(all 0.1s ease-out);
-
-      &:hover {
-        @include transition(all 0.1s ease-out);
-
-        @for $i from 0 to length($categories) {
-          $category: nth($categories, $i + 1);
-          $category-color: nth($category-colors, $i + 1);
-          &.#{$category} {
-            color: $category-color;
-            border-left-color: $category-color;
-          }
-        }
-      }
-    }
-
-    .category-icon {
-      margin-right: 5px;
-    }
-
-    .dropdown {
-      position: absolute;
-      right: 0;
-      top: 0;
-      height: 100%;
-      width: 30px;
-      text-align: center;
-    }
-
-    .dropdown-toggle {
-      height: 100%;
-      width: 100%;
-      display: block;
-      background: rgba($bg-dark-1, 0.1);
-      font-size: 14px;
-      line-height: $category-height;
-      color: $content-4;
-
-      @include transition(all 0.2s ease-out);
-      opacity: 0.5;
-      background: rgba($bg-dark-1, 0.1);
-
-      &:hover {
-        @include transition(all 0.2s ease-out);
-        opacity: 1.0;
-        cursor: pointer;
-      }
-    }
-
-    .dropdown-menu {
-      $bg-color: $content-4;
-
-      box-shadow: none;
-      border: none;
-      background-color: $bg-color;
-      text-align: left;
-      width: 187px;  // TODO(david): Don't hardcode this
-
-      @include transition(all 0.2s ease-out);
-      opacity: 0;
-      margin-top: 0;
-      display: block;
-      visibility: hidden;
-
-      &:after {
-        content: '';
-        border-style: solid;
-        border-width: 0 7px 6px;
-        border-color: transparent transparent $bg-color transparent;
-        height: 0;
-        margin-top: -6px;
-        position: absolute;
-        right: 10px;
-        top: 0;
-        width: 0;
-        z-index: 10;
-      }
-    }
-
-    .open > .dropdown-menu {
-      @include transition(all 0.2s ease-out);
-      margin-top: 12px;
-      opacity: 1.0;
-      visibility: visible;
-    }
-
-    .category-item {
-      color: mix($content-1, white, 20%);
-      line-height: 1.8;
-
-      &:hover {
-        background: $blue;
-        color: white;
-      }
-
-      .category-icon {
-        display: inline-block;
-        width: 20px;
-      }
-    }
-
-    .select-heading {
-      color: #CCC;
-      font-size: 12px;
-      text-transform: uppercase;
-
-      &:hover {
-        color: #CCC;
-      }
-    }
+  .category-select {
+    // TODO(david): Don't hardcode the width
+    @include category-select-mixin(187px, $category-height);
   }
 
-  .tags {
-    @extend .accent-box;
-    margin-top: $box-margin;
+  .tags-select {
     height: $install-height - $category-height - $box-margin;
-    box-sizing: border-box;
-    position: relative;
-
-    .tags-label {
-      @extend .accent-box-label;
-    }
-
-    .tags-list {
-      margin: 0;
-    }
-
-    .tag {
-      @extend .plugin-tag;
-    }
-
-    .remove-btn {
-      display: none;
-    }
-
-    &.editing .remove-btn {
-      display: inline-block;
-      padding: 3px 4px 3px 0;
-      color: $content-1;
-
-      &:hover {
-        color: $orange;
-        cursor: pointer;
-      }
-    }
-
-    .tag-link {
-      color: $content-4;
-      padding: 3px 5px;
-      line-height: normal;
-      display: inline-block;
-    }
-
-    .action-btn {
-      $vertical-padding: 8px;
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: 68px;
-      height: 30px;
-      border: none;
-      color: $content-4;
-      text-shadow: none;
-      border-radius: 0;
-      box-shadow: none;
-      text-transform: uppercase;
-      font-size: 12px;
-      line-height: 12px;
-      text-align: center;
-      outline: 0;
-      -webkit-backface-visibility: hidden;  // Fixes 1px wobble on Chrome
-
-      @include transition(all 0.2s ease-out);
-      opacity: 0.5;
-      background: rgba($bg-dark-1, 0.1);
-
-      &.done-btn {
-        background: $cyan;
-        color: white;
-      }
-
-      &:hover {
-        @include transition(all 0.2s ease-out);
-        opacity: 1.0;
-      }
-
-      i {
-        margin-right: 3px;
-      }
-    }
-
-    .tag-input {
-      padding: 15px 5px;
-      border: none;
-      border-radius: 0;
-      box-shadow: none;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    .typeahead {
-      border-radius: 0;
-      border: none;
-      background: rgba(white, 0.9);
-
-      .count {
-        float: right;
-        color: mix($content-1, white, 50%);
-        font-size: 10px;
-      }
-
-      > li > a {
-        color: $content-4;
-      }
-
-      .active > a {
-        background: $blue;
-        color: white;
-      }
-    }
   }
 
   $long-desc-bg: #FBFBFB;
@@ -1248,5 +1279,102 @@ code {
       border-top: 2px solid mix($bg-light-2, black, 92%);
       border-bottom: none;
     }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Submit plugin page
+
+.submit-page {
+  $input-height: 40px;
+  $input-width: 410px;
+
+  h1 {
+    margin: 40px 0 40px 0;
+    font-weight: normal;
+    text-transform: uppercase;
+  }
+
+  .control-label {
+    -webkit-font-smoothing: antialiased;
+    box-sizing: border-box;
+    height: $input-height;
+    line-height: 1.5;
+    padding-top: 7px;
+  }
+
+  input {
+    width: $input-width;
+    height: $input-height;
+  }
+
+  input[type="text"] {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    border-bottom: 2px solid transparent;
+    padding-left: 10px;
+    box-sizing: border-box;
+    color: $content-4;
+
+    @include transition(all 0.1s ease-out);
+    background: $bg-light-2;
+
+    &:hover {
+      @include transition(all 0.1s ease-out);
+      background: mix($bg-light-2, $bg-light-1);
+    }
+
+    &:focus {
+      @include transition(all 0.1s ease-out);
+      background: $bg-light-1;
+      border-bottom: 2px solid mix($content-1, $bg-light-1, 50%);
+    }
+
+    @include placeholder {
+      font-weight: 300;
+      font-size: 15px;
+      color: rgba($content-1, 0.8);
+    }
+  }
+
+  .category-select {
+    @include category-select-mixin($input-width, $input-height);
+    margin-top: 0;
+    width: $input-width;
+    font-size: 14px;
+
+    .category-link {
+      color: $content-4;
+
+      &.uncategorized {
+        font-weight: 300;
+        color: rgba($content-1, 0.8);
+      }
+    }
+  }
+
+  .tags-select {
+    margin-top: 0;
+    width: $input-width;
+    height: auto;
+    padding: 10px;
+
+    .tags-label {
+     display: none;
+    }
+  }
+
+  .other-info-blurb {
+    width: $input-width;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  button[type="submit"] {
+    @extend .right-arrow-button;
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-top: 20px;
   }
 }
