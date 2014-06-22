@@ -6,10 +6,19 @@ import re
 import flask
 from flask import request
 from flask.ext.cache import Cache
+import requests
 import rethinkdb as r
 
 import db
 import util
+
+try:
+    import secrets
+    _HIPCHAT_TOKEN = secrets.HIPCHAT_TOKEN
+    _HIPCHAT_ROOM_ID = secrets.HIPCHAT_ROOM_ID
+except ImportError:
+    _HIPCHAT_TOKEN = None
+    _HIPCHAT_ROOM_ID = None
 
 r_conn = db.util.r_conn
 
@@ -213,9 +222,32 @@ def update_plugin_category(slug, category):
 
 @app.route('/api/submit', methods=['POST'])
 def submit_plugin():
-    # TODO(david): Actually do something with the data (next revision).
-    print "submit plugin!!!"
-    print flask.request.form
+    plugin_data = flask.request.form.to_dict()
+    plugin_data['tags'] = json.loads(plugin_data['tags'])
+    db.submitted_plugins.insert(plugin_data)
+
+    # Notify HipChat of this submission.
+    # TODO(david): Also have email notifications.
+    if _HIPCHAT_TOKEN and _HIPCHAT_ROOM_ID:
+        message = "Someone just submitted a plugin!\n%s" % (
+               json.dumps(plugin_data, indent=4))  # JSON for pretty-printing
+        payload = {
+           'auth_token': _HIPCHAT_TOKEN,
+           'notify': 1,
+           'color': 'green',
+           'from': 'Vim Awesome',
+           'room_id': _HIPCHAT_ROOM_ID,
+           'message': message,
+           'message_format': 'text',
+        }
+
+        try:
+            requests.post('https://api.hipchat.com/v1/rooms/message',
+                    data=payload, timeout=10)
+        except Exception:
+            logging.exception('Failed to notify HipChat of plugin submisson')
+
+    # TODO(david): Redirect to page with a message (next revision).
     return flask.redirect('/submit')
 
 

@@ -1255,6 +1255,8 @@ var PluginListPage = React.createClass({
   }
 });
 
+// TODO(david): Form validation on submit! Not done right now because we
+//     currently just save this raw data to be manually reviewed.
 var SubmitPage = React.createClass({
   getInitialState: function() {
     return {
