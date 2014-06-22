@@ -140,7 +140,8 @@ var Sidebar = React.createClass({
         var tagsClass = category.id + "-tags";
         var tagElements = _.map(category.tags, function(tag) {
           return <li>
-            <a href="#" className="tag-link">
+            <a href={"/?q=tag:" + encodeURIComponent(tag.id)}
+                className="tag-link">
               <span className="tag-id">{tag.id}</span>
               {tag.count > 1 &&
                 <span className="tag-count"> × {tag.count}</span>
@@ -905,7 +906,9 @@ var Tags = React.createClass({
       // TODO(david): Should get tag name from map of tags that we send down.
       var tagName = capitalizeFirstLetter(tag);
       return <li key={tag} className="tag">
-        <a className="tag-link" href={"/tags/" + tag}>{tagName}</a>
+        <a className="tag-link" href={"/?q=tag:" + encodeURIComponent(tag)}>
+          {tagName}
+        </a>
         <i onClick={this.onRemoveBtnClick.bind(this, tag)}
             className="icon-remove-sign remove-btn"></i>
       </li>;
@@ -1218,7 +1221,7 @@ var Page = React.createClass({
 // TODO(david): +1 above. Backbone's router doesn't know about query params.
 var Router = Backbone.Router.extend({
   routes: {
-    "": "home",
+    "(?*querystring)": "home",
     "plugin/:slug": "plugin"
   },
 
