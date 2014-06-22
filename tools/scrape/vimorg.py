@@ -71,54 +71,6 @@ def scrape_scripts(num):
                     (name, vimorg_id))
 
 
-def _clean_text_node(node):
-    """Cleans a text description node on vim.org.
-
-    More precisely, this removes <br>s (newlines will be kept) and replaces <a>
-    tags with the text of the link.
-    """
-    # TODO(david): Check that all <br>s have been removed.
-
-    # Sometimes there's an <a> at the beginning of the description, and that
-    # breaks some code down below because there's no text in the body. This
-    # fixes that.
-    if len(node) > 0 and not node[0].getparent().text:
-        node[0].getparent().text = ""
-
-    # Iterate through the tags of the description
-    for elem in node:
-        # Remove <br> tags completely
-        if elem.tag == 'br':
-            # lxml wizardry to remove the tag but keep the text
-            if elem.tail:
-                if elem.getprevious():
-                    elem.getprevious().tail += elem.tail
-                else:
-                    elem.getparent().text += elem.tail
-            elem.getparent().remove(elem)
-        # Replace <a> tags with the text of the link
-        elif elem.tag == 'a':
-            # We've only identified links where the text is the same as the
-            # href, or which look like "vimscript #1923"
-            if elem.text == elem.attrib["href"] or 'vimscript' in elem.text:
-                # lxml wizardry to remove the tag but keep the text
-                if elem.getprevious():
-                    elem.getprevious().tail += elem.text
-                    if elem.tail:
-                        elem.getprevious().tail += elem.tail
-                else:
-                    elem.getparent().text += elem.text
-                    if elem.tail:
-                        elem.getparent().text += elem.tail
-            elif 'vimtip' in elem.text:
-                pass  # Ignore the rare link to www.vim.org/tips/index.php
-            else:
-                # Throw an error if it's not one of those types
-                raise Exception("Weird link to %s with text %s" %
-                        (elem.attrib["href"], elem.text))
-            elem.getparent().remove(elem)
-
-
 def get_plugin_info(vimorg_id):
     """Gets some more detailed information about a vim.org script
 
@@ -126,8 +78,8 @@ def get_plugin_info(vimorg_id):
     about the plugin that is not available from the search page, like how many
     people rated a plugin, the author's name, and a long description.
     """
-    res = requests.get(
-            'http://www.vim.org/scripts/script.php?script_id=%s' % vimorg_id)
+    res = requests.get('http://www.vim.org/scripts/script.php?script_id=%s' %
+            vimorg_id, timeout=10)
 
     html = lxml.html.html5parser.document_fromstring(res.text, parser=PARSER)
 
@@ -142,11 +94,9 @@ def get_plugin_info(vimorg_id):
 
     assert body_trs[6][0].text == "description"
     description_node = body_trs[7][0]
-    _clean_text_node(description_node)
 
     assert body_trs[9][0].text == "install details"
     install_node = body_trs[10][0]
-    _clean_text_node(install_node)
 
     download_trs = html.xpath(
             '//table[tbody/tr/th[text()="release notes"]]/*/*')
@@ -163,31 +113,21 @@ def get_plugin_info(vimorg_id):
     return {
         "vimorg_num_raters": rating_denom,
         "vimorg_author": creator,
-        "vimorg_long_desc": _get_innerhtml(description_node),
-        "vimorg_install_details": _get_innerhtml(install_node),
+        "vimorg_long_desc": _get_inner_text(description_node),
+        "vimorg_install_details": _get_inner_text(install_node),
         "updated_at": util.to_timestamp(updated_date),
         "created_at": util.to_timestamp(created_date),
     }
 
 
-# Stolen from KA scraping script
-def _get_outerhtml(html_node):
-    """Get a string representation of an HTML node.
+def _get_inner_text(html_node):
+    """Returns the plaintext of an HTML node.
 
-    (lxml doesn't provide an easy way to get the 'innerHTML'.)
-    Note: lxml also includes the trailing text for a node when you
-          call tostring on it, we need to snip that off too.
+    This turns out to do exactly what we want:
+        - strips out <br>s and other markup
+        - replace <a> tags with just their text
+        - converts HTML entities like &nbsp; and smart quotes into their
+          unicode equivalents
     """
-    html_string = lxml.html.tostring(html_node)
-    return re.sub(r'[^>]*$', '', html_string, count=1)
-
-
-# Stolen from KA scraping script
-def _get_innerhtml(html_node):
-    """Get a string representation of the contents of an HTML Node
-
-    This takes the outerhtml and pulls the two tags surrounding it off
-    """
-    html_string = _get_outerhtml(html_node)
-    html_string = re.sub(r'^<[^<>]*?>', '', html_string, count=1)
-    return re.sub(r'<[^<>]*?>$', '', html_string, count=1)
+    return lxml.html.tostring(html_node, encoding='utf-8', method='text',
+            with_tail=False)
