@@ -181,7 +181,9 @@ var Sidebar = React.createClass({
         </div>
       </div>
       <ul className="categories">{categoryElements}</ul>
-      <WipNotice />
+      <a href="#" className="submit-plugin">
+        <i className="icon-plus"></i>Submit plugin
+      </a>
     </div>;
   }
 });
@@ -1244,6 +1246,7 @@ var Page = React.createClass({
       <Sidebar />
       <div className="content">
         {this.props.content}
+        <WipNotice />
       </div>
     </div>;
   }
