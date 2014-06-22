@@ -44,6 +44,14 @@ if app.config['ENV'] == 'prod':
     app.logger.addHandler(file_handler)
     logging.getLogger('').addHandler(file_handler)  # Root handler
 
+    # Log all errors to HipChat as well.
+    from web.hipchat_log_handler import HipChatHandler
+    hipchat_handler = HipChatHandler(_HIPCHAT_TOKEN,
+            _HIPCHAT_ROOM_ID, notify=True, color='red', sender='Flask')
+    hipchat_handler.setLevel(logging.ERROR)
+    hipchat_handler.setFormatter(formatter)
+    logging.getLogger('').addHandler(hipchat_handler)
+
 
 @cache.cached(timeout=60 * 60 * 4)
 def get_search_index_cached():
