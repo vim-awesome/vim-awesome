@@ -163,6 +163,7 @@ def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
 
     readme_base64_decoded = base64.b64decode(readme_data.get('content', ''))
     readme = unicode(readme_base64_decoded, 'utf-8', errors='ignore')
+    readme_filename = readme_data.get('name', '')
 
     homepage = repo_data['homepage']
     vimorg_id = _get_vimorg_id_from_url(homepage)
@@ -211,6 +212,7 @@ def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
         'github_homepage': homepage,
         'github_short_desc': repo_data['description'],
         'github_readme': readme,
+        'github_readme_filename': readme_filename,
     }
 
     return (plugin_data, repo_data)
@@ -224,7 +226,8 @@ def scrape_plugin_repos(num):
     # We scrape vim-scripts separately using the batch /users/:user/repos call
     query = query.filter(r.row['owner'] != 'vim-scripts')
 
-    query = query.order_by('last_scraped_at').limit(num)
+    #query = query.order_by('last_scraped_at').limit(num)
+    query = query.order_by(r.desc('plugin_manager_users')).limit(num)
     repos = query.run(r_conn())
 
     # TODO(david): Print stats at the end: # successfully scraped, # not found,

@@ -1196,6 +1196,16 @@ code {
       border-left: 6px solid mix($long-desc-bg, black, 92%);
     }
 
+    .plain {
+      white-space: pre;
+      white-space: pre-wrap;
+
+      &.mono {
+        font-family: $monoFontFamily;
+        font-size: 13px;
+      }
+    }
+
     blockquote {
       border-left: 6px solid mix($long-desc-bg, black, 92%);
 

@@ -166,7 +166,7 @@ def get_plugin(slug):
     plugin = r.table('plugins').get(slug).run(r_conn())
 
     if plugin:
-        return json.dumps(db.plugins.to_json(plugin, extended=True))
+        return json.dumps(db.plugins.to_json(plugin))
     else:
         return util.api_not_found('No plugin with slug %s' % slug)
 

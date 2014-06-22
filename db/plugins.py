@@ -82,8 +82,9 @@ _ROW_SCHEMA = {
     # eg. 'http://valloric.github.io/YouCompleteMe/'
     'github_homepage': '',
 
-    # TODO(david): Need to store filetype (eg. Markdown, plain, reST)
     'github_readme': '',
+
+    'github_readme_filename': '',
 
     ###########################################################################
     # Info from the github.com/vim-scripts mirror.
@@ -279,7 +280,7 @@ def update_tags(plugin, tags):
     r.table('plugins').update(plugin).run(r_conn())
 
 
-def to_json(p, extended=False):
+def to_json(p):
     """Returns a JSON-compatible dict of a plugin that can be serialized and
     sent to clients.
     """
@@ -313,12 +314,6 @@ def to_json(p, extended=False):
         'github_url': github_url,
         'github_stars': github_stars,
     })
-
-    if extended:
-        # TODO(david): Also send down type of long description (eg. markdown).
-        plugin.update({
-            'long_desc': p['github_readme'] or p['vimorg_long_desc'],
-        })
 
     return plugin
 

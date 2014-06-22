@@ -35,6 +35,10 @@ var startsWith = function(str, startStr) {
   return str.indexOf(startStr) === 0;
 };
 
+var endsWith = function(str, endStr) {
+  return str.indexOf(endStr, str.length - endStr.length) !== -1;
+};
+
 // Adapted from http://stackoverflow.com/a/2880929/392426
 var getQueryParams = function() {
   var match,
@@ -139,7 +143,7 @@ var Sidebar = React.createClass({
       .map(function(category) {
         var tagsClass = category.id + "-tags";
         var tagElements = _.map(category.tags, function(tag) {
-          return <li>
+          return <li key={tag.id}>
             <a href={"/?q=tag:" + encodeURIComponent(tag.id)}
                 className="tag-link">
               <span className="tag-id">{tag.id}</span>
@@ -933,6 +937,17 @@ var Markdown = React.createClass({
   }
 });
 
+var Plaintext = React.createClass({
+  render: function() {
+    // TODO(david): Linkify <a> tags
+    // TODO(david): Linkify "vimscript #2136" references (e.g. surround-vim'
+    //     vim.org long description)
+    return <div className={"plain " + (this.props.className || '')}>
+      {this.props.children}
+    </div>;
+  }
+});
+
 // Permalink page with more details about a plugin.
 var PluginPage = React.createClass({
   getInitialState: function() {
@@ -1029,8 +1044,19 @@ var PluginPage = React.createClass({
   render: function() {
     // TODO(david): Need to also scrape the link to the archive download (for
     //     the manual install mode).
-    var longDesc = this.state.long_desc;
+    var longDesc = this.state.github_readme || this.state.vimorg_long_desc;
     var installDetails = this.state.vimorg_install_details;
+
+    // TODO(david): Handle rst filetype
+    var readmeFilename = (
+        this.state.github_readme_filename || '').toLowerCase();
+    var longDescType = "plain";
+    if (_.contains(["md", "markdown", "mkd", "mkdn"],
+        readmeFilename.split(".").pop())) {
+      longDescType = "markdown";
+    } else if (readmeFilename === "readme") {
+      longDescType = "mono";
+    }
 
     var vimOrgUrl = this.state.vimorg_id &&
         ("http://www.vim.org/scripts/script.php?script_id=" +
@@ -1094,11 +1120,14 @@ var PluginPage = React.createClass({
       {(longDesc || installDetails) &&
         <div className="row-fluid long-desc-container">
           <div className="long-desc">
-            <Markdown>{longDesc}</Markdown>
+            {longDescType === "markdown" && <Markdown>{longDesc}</Markdown>}
+            {longDescType === "mono" &&
+                <Plaintext className="mono">{longDesc}</Plaintext>}
+            {longDescType === "plain" && <Plaintext>{longDesc}</Plaintext>}
             {!!installDetails &&
               <div>
                 <h2>Installation</h2>
-                <Markdown>{installDetails}</Markdown>
+                <Plaintext>{installDetails}</Plaintext>
               </div>
             }
           </div>
