@@ -247,8 +247,7 @@ def submit_plugin():
         except Exception:
             logging.exception('Failed to notify HipChat of plugin submisson')
 
-    # TODO(david): Redirect to page with a message (next revision).
-    return flask.redirect('/submit')
+    return flask.redirect('/thanks-for-submitting')
 
 
 if __name__ == '__main__':

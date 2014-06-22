@@ -1355,6 +1355,19 @@ var SubmitPage = React.createClass({
   }
 });
 
+var ThanksForSubmittingPage = React.createClass({
+  render: function() {
+    return <div className="thanks-for-submitting-page">
+      <div className="thanks-box">
+        <h1>Thanks!</h1>
+        <p className="message">
+          Thank you for submitting a plugin! It will be reviewed shortly.
+        </p>
+      </div>
+    </div>;
+  }
+});
+
 var Page = React.createClass({
   render: function() {
     return <div className="page-container">
@@ -1374,7 +1387,8 @@ var Router = Backbone.Router.extend({
   routes: {
     "(?*querystring)": "home",
     "plugin/:slug": "plugin",
-    "submit": "submit"
+    "submit": "submit",
+    "thanks-for-submitting": "thanksForSubmitting"
   },
 
   _showPage: function(component) {
@@ -1391,6 +1405,10 @@ var Router = Backbone.Router.extend({
 
   submit: function() {
     this._showPage(<SubmitPage />);
+  },
+
+  thanksForSubmitting: function() {
+    this._showPage(<ThanksForSubmittingPage />);
   }
 });
 

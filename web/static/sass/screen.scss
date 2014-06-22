@@ -1378,3 +1378,49 @@ code {
     margin-top: 20px;
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Thanks-for-submitting-plugin page
+
+.thanks-for-submitting-page {
+  text-align: center;
+
+  .thanks-box {
+    $radius: 150px;
+
+    display: inline-block;
+    width: $radius * 2;
+    height: $radius * 2;
+    border-radius: $radius;
+    background-color: $bg-light-2;
+    text-align: center;
+    padding: 50px;
+    box-sizing: border-box;
+    margin-top: 200px;
+    margin-bottom: 300px;
+
+    h1 {
+      margin: 42px 0 42px 0;
+      font-weight: normal;
+      font-style: italic;
+      font-size: 50px;
+      position: relative;
+      color: $content-2;
+
+      &:after {
+        content: '';
+        background: mix($content-1, $bg-light-2, 40%);
+        position: absolute;
+        left: 30%;
+        width: 40%;
+        height: 2px;
+        bottom: -22px;
+      }
+    }
+
+    .message {
+      color: $content-3;
+      -webkit-font-smoothing: antialiased;
+    }
+  }
+}
