@@ -1029,6 +1029,7 @@ var PluginPage = React.createClass({
   render: function() {
     // TODO(david): Need to also scrape the link to the archive download (for
     //     the manual install mode).
+    var longDesc = this.state.long_desc;
     var installDetails = this.state.vimorg_install_details;
 
     var vimOrgUrl = this.state.vimorg_id &&
@@ -1090,17 +1091,19 @@ var PluginPage = React.createClass({
         </div>
       </div>
 
-      <div className="row-fluid long-desc-container">
-        <div className="long-desc">
-          <Markdown>{this.state.long_desc}</Markdown>
-          {!!installDetails &&
-            <div>
-              <h2>Installation</h2>
-              <Markdown>{installDetails}</Markdown>
-            </div>
-          }
+      {(longDesc || installDetails) &&
+        <div className="row-fluid long-desc-container">
+          <div className="long-desc">
+            <Markdown>{longDesc}</Markdown>
+            {!!installDetails &&
+              <div>
+                <h2>Installation</h2>
+                <Markdown>{installDetails}</Markdown>
+              </div>
+            }
+          </div>
         </div>
-      </div>
+      }
 
     </div>;
   }
