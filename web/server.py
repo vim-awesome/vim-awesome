@@ -71,27 +71,9 @@ def get_plugins():
 
     if search:
         tokens = [t.lower() for t in sorted(search.split())]
-
-        # Look for any tag meta-keywords (e.g. tag:python)
-        tag_filter = lambda t: t.startswith('tag:')
-        tag_tokens = filter(tag_filter, tokens)
-        tokens = list(itertools.ifilterfalse(tag_filter, tokens))
-
-        # ... and apply these tag filters to the results
-        if tag_tokens:
-            required_tags = set(t[len('tag:'):] for t in tag_tokens)
-            results = filter(lambda plugin:
-                    required_tags <= set(plugin['tags']), results)
-
-        # Create a regex that matches a string S iff for each keyword K in
-        # `search` there is a corresponding word in S that begins with K.
-        tokens_regex = (r'\b%s' % re.escape(t) for t in tokens)
-        search_regex = re.compile('.*'.join(tokens_regex))
-
-        # Surprisingly, regex matching like this is slightly faster than
-        # prefix-matching two sorted lists of tokens.
-        results = filter(lambda plugin:
-                search_regex.search(plugin['keywords']), results)
+        results, tokens = _apply_category_filters(results, tokens)
+        results, tokens = _apply_tag_filters(results, tokens)
+        results = _apply_keyword_filters(results, tokens)
 
     count = len(results)
     total_pages = (count + RESULTS_PER_PAGE - 1) / RESULTS_PER_PAGE  # ceil
@@ -103,6 +85,80 @@ def get_plugins():
         'plugins': results,
         'total_pages': total_pages,
     })
+
+
+# TODO(david): Consider saving categories just as special tags. Would make
+#     search implementation simpler but determining which category a plugin
+#     belongs to harder. See discussion on
+#     http://phabricator.benalpert.com/D171
+def _apply_category_filters(results, tokens):
+    """Consumes and applies category filters (e.g. "cat:other") to results.
+
+    Arguments:
+        results: List of search result plugins.
+        tokens: Remaining search text tokens that have not been consumed.
+
+    Returns:
+        (results, tokens): Results that match the given category, and tokens
+        that have not been consumed.
+    """
+    category_filter = lambda t: t.startswith('cat:')
+    category_tokens = filter(category_filter, tokens)
+    tokens = list(itertools.ifilterfalse(category_filter, tokens))
+
+    if category_tokens:
+        category_ids = set(t[len('cat:'):] for t in category_tokens)
+        results = filter(lambda plugin:
+                plugin['category'] in category_ids, results)
+
+    return results, tokens
+
+
+def _apply_tag_filters(results, tokens):
+    """Consumes and applies tag filters (e.g. "tag:python") to search results.
+
+    Arguments:
+        results: List of search result plugins.
+        tokens: Remaining search text tokens that have not been consumed.
+
+    Returns:
+        (results, tokens): Results that match the given tag, and tokens
+        that have not been consumed.
+    """
+    tag_filter = lambda t: t.startswith('tag:')
+    tag_tokens = filter(tag_filter, tokens)
+    tokens = list(itertools.ifilterfalse(tag_filter, tokens))
+
+    if tag_tokens:
+        required_tags = set(t[len('tag:'):] for t in tag_tokens)
+        results = filter(lambda plugin:
+                required_tags <= set(plugin['tags']), results)
+
+    return results, tokens
+
+
+def _apply_keyword_filters(results, tokens):
+    """Filters results that match the given keywords (tokens).
+
+    Arguments:
+        results: List of search result plugins.
+        tokens: Keywords to filter results on.
+
+    Returns:
+        List of plugins that match the given keywords.
+    """
+    if tokens:
+        # Create a regex that matches a string S iff for each keyword K in
+        # `search` there is a corresponding word in S that begins with K.
+        tokens_regex = (r'\b%s' % re.escape(t) for t in tokens)
+        search_regex = re.compile('.*'.join(tokens_regex))
+
+        # Surprisingly, regex matching like this is slightly faster than
+        # prefix-matching two sorted lists of tokens.
+        results = filter(lambda plugin:
+                search_regex.search(plugin['keywords']), results)
+
+    return results
 
 
 @app.route('/api/plugins/<slug>', methods=['GET'])
