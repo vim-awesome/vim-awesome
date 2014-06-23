@@ -577,6 +577,25 @@ var VundleInstructions = React.createClass({
   }
 });
 
+// Instructions for installing a plugin with NeoBundle (a manager based on
+// Vundle).
+var NeoBundleInstructions = React.createClass({
+  render: function() {
+    var urlPath = (this.props.github_url || "").replace(
+        /^https?:\/\/github.com\//, "");
+    var bundleUri = urlPath.replace(/^vim-scripts\//, "");
+
+    return <div>
+      <p>Place this in your <code>.vimrc:</code></p>
+      <pre>NeoBundle '{bundleUri}'</pre>
+      <p>&hellip; then run the following in Vim:</p>
+      <pre>:source %<br/>:NeoBundleInstall</pre>
+      {/* Hack to get triple-click in Chrome to not over-select. */}
+      <div>{'\u00a0' /* &nbsp; */}</div>
+    </div>;
+  }
+});
+
 // Instructions for installing a plugin with Pathogen.
 var PathogenInstructions = React.createClass({
   render: function() {
@@ -612,6 +631,20 @@ var VundleTabPopover = React.createClass({
   }
 });
 
+// Help text explaining what NeoBundle is and linking to more details.
+var NeoBundleTabPopover = React.createClass({
+  render: function() {
+    return <div>
+      NeoBundle is a Vim plugin manager based on Vundle but extended with more
+      features.
+      <br/><br/>See{' '}
+      <a href="https://github.com/Shougo/neobundle.vim" target="_blank">
+        <i className="icon-github" /> Shougo/neobundle.vim
+      </a>
+    </div>;
+  }
+});
+
 // Help text explaining what Pathogen is and linking to more details.
 var PathogenTabPopover = React.createClass({
   render: function() {
@@ -638,6 +671,7 @@ var Install = React.createClass({
   componentDidMount: function() {
     var popovers = {
       vundleTab: <VundleTabPopover />,
+      neoBundleTab: <NeoBundleTabPopover />,
       pathogenTab: <PathogenTabPopover />
     };
 
@@ -672,6 +706,11 @@ var Install = React.createClass({
               className={this.state.tabActive === "vundle" ? "active" : ""}>
             Vundle
           </li>
+          <li onClick={this.onTabClick.bind(this, "neoBundle")}
+              ref="neoBundleTab"
+              className={this.state.tabActive === "neoBundle" ? "active" : ""}>
+            NeoBundle
+          </li>
           <li onClick={this.onTabClick.bind(this, "pathogen")}
               ref="pathogenTab"
               className={this.state.tabActive === "pathogen" ? "active" : ""}>
@@ -686,6 +725,8 @@ var Install = React.createClass({
       <div className="content-column">
         {this.state.tabActive === "vundle" &&
             <VundleInstructions github_url={this.props.github_url} />}
+        {this.state.tabActive === "neoBundle" &&
+            <NeoBundleInstructions github_url={this.props.github_url} />}
         {this.state.tabActive === "pathogen" &&
             <PathogenInstructions github_url={this.props.github_url} />}
         {this.state.tabActive === "manual" && <ManualInstructions />}
