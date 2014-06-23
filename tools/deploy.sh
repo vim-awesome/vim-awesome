@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+# Updates and restarts the vim-awesome webapp on the machine.
+# Can be run either directly on the machine, or by running
+#
+# $ cat deploy.sh | ssh vim@vimawesome.com DEPLOYER=`whoami` sh
+#
+# Env Args:
+#    $DEPLOYER: `whoami`
+
 cd $HOME
 
 # Generate a new directory to clone to
@@ -51,3 +59,5 @@ for old in $(ls repos/ | head -n -2)
 do
     rm -rf repos/$old
 done
+
+PYTHONPATH=$NEW_CLONE python $NEW_CLONE/tools/notify_deploy.py $DEPLOYER
