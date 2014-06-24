@@ -236,7 +236,7 @@ code {
       padding: 10px 24px 5px 24px;
       line-height: normal;
       max-height: 160px;
-      overflow: scroll;
+      overflow-y: scroll;
 
       > li {
         list-style-type: none;

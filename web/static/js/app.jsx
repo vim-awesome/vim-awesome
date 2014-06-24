@@ -1390,7 +1390,7 @@ var SubmitPage = React.createClass({
         <div className="control-group">
           <div className="controls">
             <button type="submit">
-              Submit!
+              Submit
               <span className="right-arrow">{"\u2192"}</span>
             </button>
           </div>
