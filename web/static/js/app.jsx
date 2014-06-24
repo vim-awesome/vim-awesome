@@ -135,6 +135,15 @@ var Sidebar = React.createClass({
     fetchAllCategories(function(categories) {
       this.setState({categories: categories})
     }.bind(this));
+
+    // This event is triggered by Bootstrap's collapse widget (which creates the
+    // accordion) when a category is expanded.
+    $(this.refs.categories.getDOMNode()).on('show', this.onCategoryShow);
+  },
+
+  onCategoryShow: function(e) {
+    var category = $(e.target).data('category');
+    forceBackboneNavigate("/?q=cat:" + category, true);
   },
 
   render: function() {
@@ -156,11 +165,11 @@ var Sidebar = React.createClass({
 
         return <li className={"accordion-group category " + category.id}
             key={category.id}>
-          <a href="#" data-toggle="collapse" data-target={"." + tagsClass}
+          <a data-toggle="collapse" data-target={"." + tagsClass}
               data-parent=".categories" className="category-link">
             <i className={category.icon}></i>{category.name}
           </a>
-          <div className={"collapse " + tagsClass}>
+          <div className={"collapse " + tagsClass} data-category={category.id}>
             <ul className="category-tags">{tagElements}</ul>
           </div>
         </li>;
@@ -180,7 +189,7 @@ var Sidebar = React.createClass({
           <div className="line2">across the Universe</div>
         </div>
       </div>
-      <ul className="categories">{categoryElements}</ul>
+      <ul ref="categories" className="categories">{categoryElements}</ul>
       <a href="/submit" className="submit-plugin">
         <i className="icon-plus"></i>Submit plugin
       </a>
@@ -775,11 +784,9 @@ var Category = React.createClass({
   },
 
   onCategoryClick: function(e) {
-    e.preventDefault();
     if (this.props.editOnly) {
+      e.preventDefault();
       this.refs.editBtn.getDOMNode().click();
-    } else {
-      // TODO(david): Go to that category
     }
   },
 
@@ -802,7 +809,8 @@ var Category = React.createClass({
 
     return <div className="category-select">
       <a title={category.description} data-placement="left"
-          className={category.id + " category-link"} href="#"
+          className={category.id + " category-link"}
+          href={this.props.editOnly ? "#" : "/?q=cat:" + category.id}
           onClick={this.onCategoryClick}>
         <i className={category.icon + " category-icon"}></i> {category.name}
       </a>

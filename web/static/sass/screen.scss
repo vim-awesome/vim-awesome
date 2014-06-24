@@ -205,6 +205,8 @@ code {
         opacity: 0.8;
 
         &:hover {
+          cursor: pointer;
+
           @include transition(all 0.1s ease-out);
           background-color: rgba($content-1, 0.1);
           opacity: 1.0;
