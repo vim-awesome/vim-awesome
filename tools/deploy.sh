@@ -8,6 +8,10 @@
 # Env Args:
 #    $DEPLOYER: `whoami`
 
+# Bail on errors
+# TODO(david): Rollback properly on fail.
+set -e
+
 cd $HOME
 
 # Generate a new directory to clone to
@@ -46,7 +50,7 @@ then
     kill $(cat .gunicorn.pid)
 fi
 
-# Create any new tables and indices.
+echo "Creating any new tables and indices"
 ( cd $NEW_CLONE && make ensure_tables_and_indices )
 
 echo "Restarting gunicorn"
