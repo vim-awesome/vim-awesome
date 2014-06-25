@@ -835,6 +835,95 @@ code {
   }
 }
 
+$long-desc-bg: #FBFBFB;
+.long-desc-container {
+  margin-top: 45px;
+  padding: 40px;
+  @include box-sizing(border-box);
+  background: mix($bg-light-2, $bg-light-1, 40%);
+  @include box-shadow(0 1px 1px rgba(black, 0.1));
+  background: $long-desc-bg;
+}
+
+.long-desc {
+  $line-height: 1.7;
+
+  line-height: $line-height;
+  -webkit-font-smoothing: antialiased;
+
+  h1, h2, h3, h4, h5 {
+    line-height: normal;
+  }
+
+  h1 {
+    margin-top: 50px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    padding-top: 7px;
+    border-top: 2px solid rgba($content-1, 0.5);
+    font-weight: normal;
+
+    &:first-child {
+      margin-top: 20px;
+    }
+  }
+
+  h2 {
+    margin-top: 40px;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    margin: 30px 0 15px 0;
+  }
+
+  h4 {
+    margin: 20px 0 10px 0;
+  }
+
+  li {
+    margin-bottom: 2px;
+    line-height: $line-height;
+  }
+
+  p {
+    margin: 15px 0;
+  }
+
+  pre {
+    background-color: mix($long-desc-bg, black, 97%);
+    border-radius: 0;
+    border: none;
+    color: $content-4;
+    border-left: 6px solid mix($long-desc-bg, black, 92%);
+  }
+
+  .plain {
+    white-space: pre;
+    white-space: pre-wrap;
+
+    &.mono {
+      font-family: $monoFontFamily;
+      font-size: 13px;
+    }
+  }
+
+  blockquote {
+    border-left: 6px solid mix($long-desc-bg, black, 92%);
+
+    p {
+      font-weight: normal;
+      line-height: $line-height;
+      font-size: $baseFontSize;
+    }
+  }
+
+  hr {
+    border-top: 2px solid mix($bg-light-2, black, 92%);
+    border-bottom: none;
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Homepage
 
@@ -1295,95 +1384,6 @@ code {
   .tags-select {
     height: $install-height - $category-height - $box-margin;
   }
-
-  $long-desc-bg: #FBFBFB;
-  .long-desc-container {
-    margin-top: 45px;
-    padding: 40px;
-    @include box-sizing(border-box);
-    background: mix($bg-light-2, $bg-light-1, 40%);
-    @include box-shadow(0 1px 1px rgba(black, 0.1));
-    background: $long-desc-bg;
-  }
-
-  .long-desc {
-    $line-height: 1.7;
-
-    line-height: $line-height;
-    -webkit-font-smoothing: antialiased;
-
-    h1, h2, h3, h4, h5 {
-      line-height: normal;
-    }
-
-    h1 {
-      margin-top: 50px;
-      margin-bottom: 25px;
-      text-transform: uppercase;
-      padding-top: 7px;
-      border-top: 2px solid rgba($content-1, 0.5);
-      font-weight: normal;
-
-      &:first-child {
-        margin-top: 20px;
-      }
-    }
-
-    h2 {
-      margin-top: 40px;
-      margin-bottom: 20px;
-    }
-
-    h3 {
-      margin: 30px 0 15px 0;
-    }
-
-    h4 {
-      margin: 20px 0 10px 0;
-    }
-
-    li {
-      margin-bottom: 2px;
-      line-height: $line-height;
-    }
-
-    p {
-      margin: 15px 0;
-    }
-
-    pre {
-      background-color: mix($long-desc-bg, black, 97%);
-      border-radius: 0;
-      border: none;
-      color: $content-4;
-      border-left: 6px solid mix($long-desc-bg, black, 92%);
-    }
-
-    .plain {
-      white-space: pre;
-      white-space: pre-wrap;
-
-      &.mono {
-        font-family: $monoFontFamily;
-        font-size: 13px;
-      }
-    }
-
-    blockquote {
-      border-left: 6px solid mix($long-desc-bg, black, 92%);
-
-      p {
-        font-weight: normal;
-        line-height: $line-height;
-        font-size: $baseFontSize;
-      }
-    }
-
-    hr {
-      border-top: 2px solid mix($bg-light-2, black, 92%);
-      border-bottom: none;
-    }
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1528,5 +1528,16 @@ code {
       color: $content-3;
       -webkit-font-smoothing: antialiased;
     }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// About page
+
+.about-page {
+  .vim-cleaner-img {
+    float: right;
+    height: 300px;
+    padding-left: 50px;
   }
 }
