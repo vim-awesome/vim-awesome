@@ -38,7 +38,8 @@ echo "Linking new vim-awesome into place"
 ln -snf $NEW_CLONE vim-awesome
 
 # Kill the old gunicorn server, if it exists
-# TODO(david): Use a proper daemon.
+# TODO(david): Use a proper daemon. Also send SIGHUP instead of SIGINT:
+#     http://gunicorn-docs.readthedocs.org/en/latest/faq.html#server-stuff
 if [ -e .gunicorn.pid ]
 then
     echo "Killing gunicorn"
@@ -48,14 +49,11 @@ fi
 # Create any new tables and indices.
 ( cd $NEW_CLONE && make ensure_tables_and_indices )
 
-# TODO(david): Log files locations should be consolidated in the Python config
 echo "Restarting gunicorn"
 PYTHONPATH="/home/vim/vim-awesome" \
   FLASK_CONFIG="$HOME/vim-awesome/conf/flask_prod.py" \
   gunicorn \
-  --config vim-awesome/conf/gunicorn.py server:app \
-  --access-logfile logs/gunicorn/access-log \
-  --error-logfile logs/gunicorn/error-log
+  --config vim-awesome/conf/gunicorn.py server:app
 
 echo "Removing old vim-awesome clones"
 for old in $(ls repos/ | head -n -2)
