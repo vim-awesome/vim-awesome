@@ -2,8 +2,7 @@
 
 var $ = require("jquery");
 
-// A cache of all categories and their corresponding tags.
-var allCategories = null;
+var allCategoriesP = null;
 
 /**
  * Fetches all plugin categories from server, caching into a variable.
@@ -11,14 +10,11 @@ var allCategories = null;
  *     available.
  */
 var fetchAllCategories = function(callback) {
-  if (allCategories) {
-    callback(allCategories);
-  } else {
-    $.getJSON("/api/categories", function(data) {
-      allCategories = data;
-      callback(allCategories);
-    });
+  if (!allCategoriesP) {
+    allCategoriesP = $.getJSON("/api/categories");
+    // TODO(alpert): Handle errors?
   }
+  allCategoriesP.done(callback);
 };
 
 module.exports = fetchAllCategories;
