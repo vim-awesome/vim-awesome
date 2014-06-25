@@ -163,6 +163,7 @@ var Sidebar = React.createClass({
           <div className="line1">Awesome Vim plugins</div>
           <div className="from">from</div>
           <div className="line2">across the Universe</div>
+          <div className="from-line"></div>
         </div>
       </div>
       <ul ref="categories" className="categories">{categoryElements}</ul>

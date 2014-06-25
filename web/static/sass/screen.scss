@@ -13,8 +13,7 @@
 
 $sidebar-width: 290px;
 $topbar-height: 64px;
-$content-margin-top: 10px;
-$content-margin-left: $sidebar-width + 50px;
+$content-side-padding: 50px;
 
 // TODO(david): Upgrade Sass and refactor to use a map
 $categories: 'language', 'completion', 'code-display', 'integration',
@@ -25,6 +24,9 @@ $category-colors: $red, $yellow, $green, $cyan, $blue, $violet, $magenta,
 $box-padding: 18px;
 $box-margin: 20px;
 $box-bg-color: $bg-light-2;
+
+$large-screen: "(min-width: 1200px)";
+$not-large-screen: "(max-width: 1199px)";  // "not" does not seem to work well
 
 .tac {
   text-align: center;
@@ -44,9 +46,13 @@ $box-bg-color: $bg-light-2;
 .page-container {
   margin-left: auto;
   margin-right: auto;
-  padding-left: 30px;
-  padding-right: 30px;
+  padding-right: $content-side-padding;
   width: 1140px;
+  overflow: hidden;
+
+  @media #{$large-screen} {
+    padding-right: 0;
+  }
 }
 
 a {
@@ -99,10 +105,20 @@ code {
   $sidebar-border-width: 5px;
 
   width: $sidebar-width;
-  position: fixed;
-  top: 0;
-  bottom: 0;
   background: $bg-light-2;
+  position: fixed;
+  height: 100%;
+  top: 0;
+
+  @media #{$not-large-screen} {
+    position: static;
+    float: left;
+
+    // CSS hack to get sidebar to stretch to full page height (container needs
+    // to have "overflow: hidden").
+    padding-bottom: 8000px;
+    margin-bottom: -8000px;
+  }
 
   .title {
     font-size: 38px;
@@ -144,9 +160,9 @@ code {
     border: 2px solid $fg-color;
     display: inline-block;
     padding: 10px;
+    position: relative;
 
     .from {
-      $from-height: 22px;
       text-transform: lowercase;
       font-family: $serifFontFamily;
       font-size: 15px;
@@ -155,23 +171,22 @@ code {
       color: $fg-color;
       background-color: $bg-light-2;
       width: 60px;
-      position: relative;
       left: 50%;
       margin-left: -30px;
-      line-height: $from-height;
+      line-height: 22px;
+      position: relative;
+      z-index: 1;
+    }
 
-      &:after {
-        $line-width: 250px;
-        width: $line-width;
-        height: 2px;
-        background: $fg-color;
-        position: absolute;
-        content: ' ';
-        left: 50%;
-        margin-left: -$line-width / 2;
-        z-index: -1;
-        top: $from-height / 2;
-      }
+    .from-line {
+      $line-width: 250px;
+      width: $line-width;
+      height: 2px;
+      background: $fg-color;
+      position: absolute;
+      left: 50%;
+      margin-left: -$line-width / 2;
+      top: 50%;
     }
 
     .line2 {
@@ -262,11 +277,17 @@ code {
     color: $content-3;
     font-size: 13px;
     -webkit-font-smoothing: antialiased;
-    position: absolute;
-    bottom: 0;
     width: 100%;
     box-sizing: border-box;
     line-height: 40px;
+    position: relative;
+    display: block;
+    margin-top: 80px;
+
+    @media #{$large-screen} {
+      position: absolute;
+      bottom: 0;
+    }
 
     @include transition(all 0.1s ease-out);
     opacity: 0.6;
@@ -387,8 +408,14 @@ code {
 }
 
 .content {
-  margin-left: $content-margin-left;
-  margin-top: $content-margin-top;
+  margin-top: 10px;
+  margin-left: $sidebar-width + $content-side-padding;
+
+  .row-fluid:after, .form-horizontal .control-group:after {
+    // Bootstrap's "clear: both" causes these to drop below the floated sidebar
+    // on narrow screens
+    clear: right;
+  }
 }
 
 .tooltip, .tooltip.in {
