@@ -516,7 +516,7 @@ def get_search_index():
     """
     query = r.table('plugins')
     query = query.without(['vimorg_long_desc', 'vimorg_install_details',
-            'github_long_desc'])
+            'github_long_desc', 'github_readme'])
 
     plugins = map(to_json, query.run(r_conn()))
 
