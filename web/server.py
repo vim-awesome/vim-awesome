@@ -58,6 +58,11 @@ def get_search_index_cached():
     return db.plugins.get_search_index()
 
 
+@cache.cached(timeout=60 * 60 * 4, key_prefix='all_categories')
+def get_all_categories_cached():
+    return db.categories.get_all()
+
+
 # Catch-all route for single-page app. We specify our own `key_prefix` to
 # @cache.cached instead of using the default `request.path` because this is
 # a catch-all route for many different paths which all should have the same
@@ -235,14 +240,16 @@ def update_plugin_tags(slug):
 
 
 @app.route('/api/tags', methods=['GET'])
+@cache.cached(timeout=60 * 60)
 def get_tags():
     tags = r.table('tags').filter({}).run(r_conn())
     return json.dumps(list(tags))
 
 
 @app.route('/api/categories', methods=['GET'])
+@cache.cached(timeout=60 * 60)
 def get_categories():
-    return json.dumps(db.categories.get_all())
+    return json.dumps(get_all_categories_cached())
 
 
 @app.route('/api/plugins/<slug>/category/<category>', methods=['PUT'])
@@ -251,7 +258,7 @@ def update_plugin_category(slug, category):
     if not plugin:
         return util.api_not_found('No plugin with slug %s' % slug)
 
-    if not category in [c['id'] for c in db.categories.get_all()]:
+    if not category in [c['id'] for c in get_all_categories_cached()]:
         return util.api_bad_request('No such category %s' % category)
 
     # TODO(david): Also update search index (stale cache)

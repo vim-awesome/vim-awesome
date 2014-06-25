@@ -9,18 +9,12 @@ import db.util
 r_conn = db.util.r_conn
 
 
-categories = None
-
-
 def get_all():
-    global categories
+    filename = os.path.join(os.path.dirname(__file__), 'categories.yaml')
+    with open(filename) as f:
+        categories = yaml.safe_load(f)
 
-    if not categories:
-        filename = os.path.join(os.path.dirname(__file__), 'categories.yaml')
-        with open(filename) as f:
-            categories = yaml.safe_load(f)
-
-        _aggregate_category_tags(categories)
+    _aggregate_category_tags(categories)
 
     return categories
 
@@ -28,7 +22,7 @@ def get_all():
 def _aggregate_category_tags(categories):
     """Mutates categories with the tags that belong to each category.
 
-    For each category, we derive all the tagas that belong to that category by
+    For each category, we derive all the tags that belong to that category by
     merging the tags of all the plugins of that category.
     """
     for category in categories:
