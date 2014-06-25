@@ -2,6 +2,8 @@
 
 "use strict";
 
+var React = require("react");
+
 var fetchAllCategories = require("./fetchAllCategories.js");
 
 // TODO(david): We might want to split up this file more.

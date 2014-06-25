@@ -8,5 +8,9 @@
   "devDependencies": {
     "webpack": "~1.3.1-beta4",
     "jsx-loader": "~0.10.2"
+  },
+  "dependencies": {
+    "envify": "~1.2.1",
+    "react": "~0.10.0"
   }
 }

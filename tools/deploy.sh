@@ -24,9 +24,8 @@ sudo pip install -r $NEW_CLONE/requirements.txt
 echo "Installing Node requirements"
 npm install
 
-# TODO(alpert): Minify JS too
 echo "Precompile JSX and bundle JS files"
-( cd $NEW_CLONE && node_modules/.bin/webpack --config conf/webpack.config.js )
+( cd $NEW_CLONE && NODE_ENV=production node_modules/.bin/webpack --config conf/webpack.config.js )
 
 echo "Compass compile sass files"
 ( cd $NEW_CLONE && \
