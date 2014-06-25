@@ -55,6 +55,8 @@ PYTHONPATH="/home/vim/vim-awesome" \
   gunicorn \
   --config vim-awesome/conf/gunicorn.py server:app
 
+# TODO(david): Send some requests to warm-up caches after deploy.
+
 echo "Removing old vim-awesome clones"
 for old in $(ls repos/ | head -n -2)
 do

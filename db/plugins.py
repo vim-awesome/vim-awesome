@@ -518,6 +518,15 @@ def get_search_index():
     query = query.without(['vimorg_long_desc', 'vimorg_install_details',
             'github_long_desc', 'github_readme'])
 
+    # Don't show plugin managers because they're not technically plugins, and
+    # also our usage counts for them are not all accurate.
+    query = query.filter(r.all(
+        r.row['slug'] != 'vundle',
+        r.row['slug'] != 'neobundle-vim',
+        r.row['slug'] != 'neobundle-vim-back-to-december',
+        r.row['slug'] != 'pathogen-vim',
+    ))
+
     plugins = map(to_json, query.run(r_conn()))
 
     # We can't order_by on multiple fields with secondary indexes due to the
