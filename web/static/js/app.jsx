@@ -209,7 +209,7 @@ var Footer = React.createClass({
             dotfiles repos on GitHub.
           </div>
           <div className="credits">
-            Made with Vim by
+            Made with vim and vigor by
             {' '}<a target="_blank" href="https://twitter.com/divad12">
               David Hu
             </a>,
