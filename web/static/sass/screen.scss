@@ -284,10 +284,111 @@ code {
   }
 }
 
+.site-footer {
+  $grid-color: mix($content-1, $bg-light-2, 20%);
+  margin-top: 80px;
+  background: $bg-light-2;
+  padding: 40px 40px 40px 40px;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+
+  .section {
+    float: left;
+    height: 114px;
+    box-sizing: border-box;
+    border-right: 1px solid $grid-color;
+
+    &:last-child {
+      border-right: none;
+    }
+  }
+
+  .about-section {
+    @extend .section;
+    font-family: $serifFontFamily;
+    color: $content-2;
+    width: 68%;
+
+    .about {
+      font-size: 18px;
+      line-height: 1.4;
+      padding-right: 20px;
+      border-bottom: 1px solid $grid-color;
+      padding-bottom: 9px;
+    }
+
+    .credits {
+      margin-top: 9px;
+      font-family: $serifFontFamily;
+      font-style: italic;
+      font-size: 14px;
+      color: $content-1;
+    }
+  }
+
+  .github-section {
+    @extend .section;
+    text-align: center;
+    width: 19%;
+
+    .github-link {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+
+      @include transition(color 0.1s ease-out);
+      color: $content-2;
+
+      &:hover {
+        @include transition(color 0.1s ease-out);
+        color: $cyan;
+
+        .icon-github {
+          @include transition(color 0.1s ease-out);
+          color: $cyan;
+        }
+      }
+
+      .icon-github {
+        display: block;
+        font-size: 70px;
+        margin-top: 2px;
+        margin-bottom: 2px;
+
+        @include transition(color 0.1s ease-out);
+        color: $content-1;
+      }
+    }
+  }
+
+  .links-section {
+    @extend .section;
+    text-align: right;
+    width: 13%;
+
+    .links {
+      margin: 0;
+      list-style: none;
+      font-size: 15px;
+
+      li {
+        margin-bottom: 11px;
+      }
+
+      a {
+        color: $content-2;
+
+        &:hover {
+          color: $cyan;
+        }
+      }
+    }
+  }
+}
+
 .content {
   margin-left: $content-margin-left;
   margin-top: $content-margin-top;
-  margin-bottom: 40px;
 }
 
 .tooltip, .tooltip.in {
@@ -846,6 +947,7 @@ code {
 
 .plugins-container {
   position: relative;
+  min-height: 600px;
 
   .spinner {
     position: absolute;
@@ -1290,6 +1392,8 @@ code {
 .submit-page {
   $input-height: 40px;
   $input-width: 410px;
+
+  padding-bottom: 40px;
 
   h1 {
     margin: 40px 0 40px 0;
