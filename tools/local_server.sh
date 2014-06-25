@@ -21,6 +21,9 @@ trap clean_up SIGTERM SIGINT ERR
 echo "Starting compass watch"
 bundle exec compass watch --config conf/compass.rb &
 
+echo "Starting webpack"
+webpack --config conf/webpack.config.js --watch &
+
 echo "Starting rethinkdb"
 [ -d db/rethinkdb_data ] || rethinkdb create -d db/rethinkdb_data
 rethinkdb serve -d db/rethinkdb_data &

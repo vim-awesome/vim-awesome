@@ -19,6 +19,13 @@ $ bundle install
 $ pip install -r requirements.txt
 ```
 
+1. Install Node dependencies.
+
+```sh
+$ npm install -g webpack
+$ npm install
+```
+
 1. Start a local server serving port 5001 by invoking, in the project root
    directory,
 

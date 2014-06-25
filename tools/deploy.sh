@@ -21,8 +21,12 @@ git clone git@github.com:divad12/vim-awesome.git $NEW_CLONE > /dev/null
 echo "Installing Python requirements"
 sudo pip install -r $NEW_CLONE/requirements.txt
 
-echo "Precompile JSX"
-( cd $NEW_CLONE && jsx -x jsx web/static/js web/static/build/js )
+echo "Installing Node requirements"
+npm install
+
+# TODO(alpert): Minify JS too
+echo "Precompile JSX and bundle JS files"
+( cd $NEW_CLONE && node_modules/.bin/webpack --config conf/webpack.config.js )
 
 echo "Compass compile sass files"
 ( cd $NEW_CLONE && \

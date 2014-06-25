@@ -31,12 +31,10 @@
 
   {% if env == 'prod' %}
     <script src="/static/lib/js/react-d71736b.min.js"></script>
-    <script src="/static/build/js/app.js"></script>
   {% else %}
-    <script src="/static/lib/js/JSXTransformer-d71736b.js"></script>
     <script src="/static/lib/js/react-d71736b.js"></script>
-    <script src="/static/js/app.jsx" type="text/jsx"></script>
   {% endif %}
+  <script src="/static/build/js/app.js"></script>
 
   {% if env == 'prod' %}
     {# Google Analytics #}

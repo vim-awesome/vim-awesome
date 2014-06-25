@@ -1,8 +1,10 @@
 /** @jsx React.DOM */
-(function() {
+
 "use strict";
 
-// TODO(david): We might want to split up this file eventually.
+var fetchAllCategories = require("./fetchAllCategories.js");
+
+// TODO(david): We might want to split up this file more.
 
 var D_KEYCODE = 'D'.charCodeAt(0),
     G_KEYCODE = 'G'.charCodeAt(0),
@@ -19,9 +21,6 @@ var D_KEYCODE = 'D'.charCodeAt(0),
 
 // A cache of all tag IDs and their counts.
 var allTags = {};
-
-// A cache of all categories and their corresponding tags.
-var allCategories = [];
 
 var clamp = function(num, min, max) {
   return Math.min(Math.max(num, min), max);
@@ -91,22 +90,6 @@ var forceBackboneNavigate = function() {
   // TODO(david): Figure out a less hacky way of doing this.
   Backbone.history.fragment = "_force_backbone_navigate";
   Backbone.history.navigate.apply(Backbone.history, arguments);
-};
-
-/**
- * Fetches all plugin categories from server, caching into a variable.
- * @param {Function} callback Invoked with an array of all categories when
- *     available.
- */
-var fetchAllCategories = function(callback) {
-  if (allCategories.length) {
-    callback(allCategories);
-  } else {
-    $.getJSON("/api/categories", function(data) {
-      allCategories = data;
-      callback(allCategories);
-    });
-  }
 };
 
 /**
@@ -1655,5 +1638,3 @@ if (Backbone.history && Backbone.history._hasPushState) {
     }
   });
 }
-
-})();
