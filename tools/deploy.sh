@@ -22,7 +22,7 @@ echo "Installing Python requirements"
 sudo pip install -r $NEW_CLONE/requirements.txt
 
 echo "Installing Node requirements"
-npm install
+( cd $NEW_CLONE && npm install )
 
 echo "Precompile JSX and bundle JS files"
 ( cd $NEW_CLONE && NODE_ENV=production node_modules/.bin/webpack --config conf/webpack.config.js )
