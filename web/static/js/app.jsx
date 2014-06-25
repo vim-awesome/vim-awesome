@@ -4,12 +4,18 @@
 
 var $ = require("jquery");
 var _ = require("underscore");
-var Backbone = require("backbone");
 var React = require("react");
+var Route = require("react-nested-router").Route;
 var marked = require("marked");
 var moment = require("moment");
 var store = require("store");
+var transitionTo = require("react-nested-router").transitionTo;
+// TODO(alpert): Get a public API exposed for this
+var transitionToPath =
+  require("react-nested-router/modules/stores/URLStore").push;
 
+// For React devtools
+window.React = React;
 // Bootstrap JS depends on jQuery being set globally
 // TODO(alpert): Figure out how to load these from npm more smartly
 window.jQuery = $;
@@ -56,22 +62,6 @@ var endsWith = function(str, endStr) {
   return str.indexOf(endStr, str.length - endStr.length) !== -1;
 };
 
-// Adapted from http://stackoverflow.com/a/2880929/392426
-var getQueryParams = function() {
-  var match,
-      pl     = /\+/g,  // Regex for replacing addition symbol with a space
-      search = /([^&=]+)=?([^&]*)/g,
-      decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
-      query  = window.location.search.substring(1),
-      urlParams = {};
-
-  while ((match = search.exec(query))) {
-    urlParams[decode(match[1])] = decode(match[2]);
-  }
-
-  return urlParams;
-};
-
 /**
  * Scrolls the window so that the entirety of `domNode` is visible.
  * @param {Element} domNode The DOM node to scroll into view.
@@ -91,23 +81,6 @@ var scrollToNode = function(domNode, context) {
   } else if (elementTop - context < windowTop) {
     window.scrollTo(0, Math.max(0, elementTop - context));
   }
-};
-
-/**
- * Force Backbone's router to navigate to the given destination. By default
- * Backbone is query-parameter agnostic[1] and will not navigate to a new route
- * for which only query params differ. This is admittedly a hack to make
- * Backbone not think that the current route matches the desired route and thus
- * force a navigate.
- *
- * Arguments are the same as documentcloud.github.io/backbone/#Router-navigate
- *
- * [1]: https://github.com/jashkenas/backbone/issues/891
- */
-var forceBackboneNavigate = function() {
-  // TODO(david): Figure out a less hacky way of doing this.
-  Backbone.history.fragment = "_force_backbone_navigate";
-  Backbone.history.navigate.apply(Backbone.history, arguments);
 };
 
 /**
@@ -134,7 +107,9 @@ var Sidebar = React.createClass({
 
   componentDidMount: function() {
     fetchAllCategories(function(categories) {
-      this.setState({categories: categories});
+      if (this.isMounted()) {
+        this.setState({categories: categories});
+      }
     }.bind(this));
 
     // This event is triggered by Bootstrap's collapse widget (which creates the
@@ -144,7 +119,7 @@ var Sidebar = React.createClass({
 
   onCategoryShow: function(e) {
     var category = $(e.target).data('category');
-    forceBackboneNavigate("/?q=cat:" + category, true);
+    transitionTo("plugin-list", null, {"q": "cat:" + category});
   },
 
   render: function() {
@@ -404,7 +379,7 @@ var Plugin = React.createClass({
   },
 
   goToDetailsPage: function() {
-    Backbone.history.navigate("plugin/" + this.props.plugin.slug, true);
+    transitionTo("plugin", {slug: this.props.plugin.slug});
   },
 
   render: function() {
@@ -801,7 +776,9 @@ var Category = React.createClass({
 
   componentDidMount: function() {
     fetchAllCategories(function(categories) {
-      this.setState({categories: categories});
+      if (this.isMounted()) {
+        this.setState({categories: categories});
+      }
     }.bind(this));
     this.addBootstrapTooltips();
   },
@@ -1080,7 +1057,7 @@ var PluginPage = React.createClass({
   },
 
   fetchPlugin: function() {
-    $.getJSON("/api/plugins/" + this.props.slug, function(data) {
+    $.getJSON("/api/plugins/" + this.props.params.slug, function(data) {
       this.setState(data);
 
       // Save in localStorage that this plugin has been visited.
@@ -1128,7 +1105,8 @@ var PluginPage = React.createClass({
     this.setState({category: categoryId});
 
     $.ajax({
-      url: "/api/plugins/" + this.props.slug + "/category/" + categoryId,
+      url: "/api/plugins/" + this.props.params.slug + "/category/" +
+        categoryId,
       type: "PUT"
     });
   },
@@ -1142,7 +1120,7 @@ var PluginPage = React.createClass({
     var self = this;
     this.tagXhrQueue.done(function() {
       $.ajax({
-        url: "/api/plugins/" + self.props.slug + "/tags",
+        url: "/api/plugins/" + self.props.params.slug + "/tags",
         type: "POST",
         contentType: "application/json",
         dataType: "json",
@@ -1256,24 +1234,14 @@ var PluginListPage = React.createClass({
   // TODO(david): Update title so that user has meaningful history entries.
 
   getInitialState: function() {
-    return this.getStateFromUrl();
+    return this.getStateFromProps(this.props);
   },
 
-  componentDidMount: function() {
-    window.addEventListener("popstate", this.onUrlChange, false);
-    Backbone.history.on("route", this.onUrlChange);
-  },
-
-  componentWillUnmount: function() {
-    Backbone.history.off("route", this.onUrlChange);
-    window.removeEventListener("popstate", this.onUrlChange, false);
-  },
-
-  onUrlChange: function() {
+  componentWillReceiveProps: function(nextProps) {
     // TODO(david): pushState previous results so we don't re-fetch. Or, set up
     //     a jQuery AJAX hook to cache all GET requests!!!! That will help with
     //     so many things!!! (But make sure not to exceed a memory threshold.)
-    this.setState(this.getStateFromUrl());
+    this.setState(this.getStateFromProps(nextProps));
   },
 
   onSearchFocus: function() {
@@ -1292,8 +1260,8 @@ var PluginListPage = React.createClass({
     this.refs.pluginList.unselect();
   },
 
-  getStateFromUrl: function() {
-    var queryParams = getQueryParams();
+  getStateFromProps: function(props) {
+    var queryParams = props.query;
     var currentPage = +(queryParams.p || 1);
 
     return {
@@ -1313,15 +1281,14 @@ var PluginListPage = React.createClass({
       queryObject.q = this.state.searchQuery;
     }
 
-    var queryParams = $.param(queryObject);
-    var path = queryParams ? '?' + queryParams : '';
-
-    forceBackboneNavigate(path);
+    // TODO(alpert): Probably don't want to make a new history entry for each
+    // char when typing slowly into the search box
+    transitionTo("plugin-list", null, queryObject);
   },
 
   onPluginsFetched: function() {
     // Update the URL when the page content has been updated if necessary.
-    if (!_.isEqual(this.getStateFromUrl(), this.state)) {
+    if (!_.isEqual(this.getStateFromProps(this.props), this.state)) {
       this.updateUrlFromState();
     }
 
@@ -1583,7 +1550,7 @@ var Page = React.createClass({
     return <div className="page-container">
       <Sidebar />
       <div className="content">
-        {this.props.content}
+        {this.props.activeRoute}
         <WipNotice />
         <Footer />
       </div>
@@ -1591,67 +1558,34 @@ var Page = React.createClass({
   }
 });
 
-// TODO(alpert): Get rid of Backbone?
-// TODO(david): +1 above. Backbone's router doesn't know about query params.
-//     Consider https://github.com/rpflorence/react-nested-router
-var Router = Backbone.Router.extend({
-  routes: {
-    "(?*querystring)": "home",
-    "plugin/:slug": "plugin",
-    "submit": "submit",
-    "thanks-for-submitting": "thanksForSubmitting",
-    "about": "about"
-  },
+var routes = <Route handler={Page} location="history">
+  <Route name="plugin-list" path="/" handler={PluginListPage} />
+  <Route name="plugin" path="plugin/:slug" handler={PluginPage} />
+  <Route name="submit" handler={SubmitPage} />
+  <Route name="thanks-for-submitting" handler={ThanksForSubmittingPage} />
+  <Route name="about" handler={AboutPage} />
+</Route>;
+React.renderComponent(routes, document.body);
 
-  _showPage: function(component) {
-    React.renderComponent(<Page content={component} />, document.body);
-  },
+// Hijack internal nav links to use router to navigate between pages
+// Adapted from https://gist.github.com/tbranyen/1142129
+$(document).on("click", "a", function(evt) {
+  if (evt.which === 2 ||  // middle click
+      evt.altKey || evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+    return;
+  }
+  var href = $(this).attr("href");
+  var protocol = this.protocol;
 
-  home: function() {
-    this._showPage(<PluginListPage />);
-  },
+  // Only hijack URL to use router if it's relative (internal link) and not a
+  // hash fragment.
+  if (href && href.substr(0, protocol.length) !== protocol &&
+      href[0] !== '#') {
+    evt.preventDefault();
+    transitionToPath(this.pathname + this.search, true);
 
-  plugin: function(slug) {
-    this._showPage(<PluginPage slug={slug} />);
-  },
-
-  submit: function() {
-    this._showPage(<SubmitPage />);
-  },
-
-  thanksForSubmitting: function() {
-    this._showPage(<ThanksForSubmittingPage />);
-  },
-
-  about: function() {
-    this._showPage(<AboutPage />);
+    // Scroll to top. Chrome has this weird issue where it will retain the
+    // current scroll position, even if it's beyond the document's height.
+    window.scrollTo(0, 0);
   }
 });
-
-new Router();
-Backbone.history.start({pushState: true});
-
-// Hijack internal nav links to use Backbone router to navigate between pages
-// Adapted from https://gist.github.com/tbranyen/1142129
-if (Backbone.history && Backbone.history._hasPushState) {
-  $(document).on("click", "a", function(evt) {
-    if (evt.which === 2 ||  // middle click
-        evt.altKey || evt.ctrlKey || evt.metaKey || evt.shiftKey) {
-      return;
-    }
-    var href = $(this).attr("href");
-    var protocol = this.protocol;
-
-    // Only hijack URL to use Backbone router if it's relative (internal link)
-    // and not a hash fragment.
-    if (href && href.substr(0, protocol.length) !== protocol &&
-        href[0] !== '#') {
-      evt.preventDefault();
-      forceBackboneNavigate(href, true);
-
-      // Scroll to top. Chrome has this weird issue where it will retain the
-      // current scroll position, even if it's beyond the document's height.
-      window.scrollTo(0, 0);
-    }
-  });
-}
