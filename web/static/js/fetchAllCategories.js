@@ -1,3 +1,7 @@
+"use strict";
+
+var $ = require("jquery");
+
 // A cache of all categories and their corresponding tags.
 var allCategories = null;
 

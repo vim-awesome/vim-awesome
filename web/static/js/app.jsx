@@ -2,7 +2,23 @@
 
 "use strict";
 
+var $ = require("jquery");
+var _ = require("underscore");
+var Backbone = require("backbone");
 var React = require("react");
+var marked = require("marked");
+var moment = require("moment");
+var store = require("store");
+
+// Bootstrap JS depends on jQuery being set globally
+// TODO(alpert): Figure out how to load these from npm more smartly
+window.jQuery = $;
+require("../lib/js/bootstrap-typeahead.js");
+require("../lib/js/bootstrap-tooltip.js");
+require("../lib/js/bootstrap-popover.js");
+require("../lib/js/bootstrap-transition.js");
+require("../lib/js/bootstrap-collapse.js");
+require("../lib/js/bootstrap-dropdown.js");
 
 var fetchAllCategories = require("./fetchAllCategories.js");
 
@@ -118,7 +134,7 @@ var Sidebar = React.createClass({
 
   componentDidMount: function() {
     fetchAllCategories(function(categories) {
-      this.setState({categories: categories})
+      this.setState({categories: categories});
     }.bind(this));
 
     // This event is triggered by Bootstrap's collapse widget (which creates the
@@ -786,7 +802,7 @@ var Category = React.createClass({
 
   componentDidMount: function() {
     fetchAllCategories(function(categories) {
-      this.setState({categories: categories})
+      this.setState({categories: categories});
     }.bind(this));
     this.addBootstrapTooltips();
   },
@@ -1343,7 +1359,7 @@ var SubmitPage = React.createClass({
     return {
       tags: [],
       category: "uncategorized"
-    }
+    };
   },
 
   onTagsChange: function(tags) {
