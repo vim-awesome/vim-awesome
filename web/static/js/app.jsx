@@ -679,15 +679,6 @@ var PathogenInstructions = React.createClass({
   }
 });
 
-// Instructions for installing a plugin manually (downloading an archive).
-var ManualInstructions = React.createClass({
-  render: function() {
-    return <div>
-      TODO: How to install manually
-    </div>;
-  }
-});
-
 // Help text explaining what Vundle is and linking to more details.
 var VundleTabPopover = React.createClass({
   render: function() {
@@ -786,10 +777,6 @@ var Install = React.createClass({
               className={this.state.tabActive === "pathogen" ? "active" : ""}>
             Pathogen
           </li>
-          <li onClick={this.onTabClick.bind(this, "manual")}
-              className={this.state.tabActive === "manual" ? "active" : ""}>
-            Archive
-          </li>
         </ul>
       </div>
       <div className="content-column">
@@ -799,7 +786,6 @@ var Install = React.createClass({
             <NeoBundleInstructions github_url={this.props.github_url} />}
         {this.state.tabActive === "pathogen" &&
             <PathogenInstructions github_url={this.props.github_url} />}
-        {this.state.tabActive === "manual" && <ManualInstructions />}
       </div>
     </div>;
   }
