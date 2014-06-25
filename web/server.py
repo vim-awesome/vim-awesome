@@ -53,14 +53,19 @@ if app.config['ENV'] == 'prod':
     logging.getLogger('').addHandler(hipchat_handler)
 
 
-@cache.cached(timeout=60 * 60 * 4)
+@cache.cached(timeout=60 * 60 * 4, key_prefix='search_index')
 def get_search_index_cached():
     return db.plugins.get_search_index()
 
 
-# Catch-all route for single-page app
+# Catch-all route for single-page app. We specify our own `key_prefix` to
+# @cache.cached instead of using the default `request.path` because this is
+# a catch-all route for many different paths which all should have the same
+# response.
+# TODO(david): Alternatively serve this out of Nginx
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
+@cache.cached(timeout=60 * 60, key_prefix='index.html')
 def index(path):
     return flask.render_template('index.html', env=app.config['ENV'])
 
@@ -75,9 +80,34 @@ def crash():
     raise WhatIsTorontoError("OH NOES we've crashed!!!!!!!!!! /crash was hit")
 
 
+def _should_skip_get_plugins_cache():
+    """Whether the current request to /api/plugins should not be cached."""
+    page = int(request.args.get('page', 1))
+    search = request.args.get('query', '')
+
+    # Only cache empty searches for now.
+    # TODO(david): Also cache simple category and tag searches. May also want
+    #     to actually use a proper cache backend like Redis so we can
+    #     arbitrarily cache (right now we use an in-memory cache).
+    should_cache = search == '' and (1 <= page <= 10)
+    return not should_cache
+
+
+def _make_get_plugins_cache_key():
+    """Get a cache key for the /api/plugins route.
+
+    By default this is just request.path which ignores query params.
+    """
+    page = int(request.args.get('page', 1))
+    search = request.args.get('query', '')
+    return '%s_%s_%s' % (request.path, page, search)
+
+
 # TODO(david): Move API functions out of this file once we have too many
 # TODO(david): API functions should return content-type header JSON
 @app.route('/api/plugins', methods=['GET'])
+@cache.cached(timeout=60 * 60, key_prefix=_make_get_plugins_cache_key,
+        unless=_should_skip_get_plugins_cache)
 def get_plugins():
     RESULTS_PER_PAGE = 20
 
