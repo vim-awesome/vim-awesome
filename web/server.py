@@ -101,6 +101,8 @@ def get_plugins():
     return json.dumps({
         'plugins': results,
         'total_pages': total_pages,
+        'total_results': count,
+        'results_per_page': RESULTS_PER_PAGE,
     })
 
 

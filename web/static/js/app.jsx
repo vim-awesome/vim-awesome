@@ -570,6 +570,8 @@ var PluginList = React.createClass({
     this.setState({
       plugins: data.plugins,
       totalPages: data.total_pages,
+      totalResults: data.total_results,
+      resultsPerPage: data.results_per_page,
       isLoading: false
     });
 
@@ -604,13 +606,24 @@ var PluginList = React.createClass({
             onMouseEnter={this.onPluginMouseEnter.bind(this, index)} />;
       }, this)
       .value();
+
     var totalPages = this.state.totalPages || 0;
+    var totalResults = this.state.totalResults || 0;
+    var currentPage = this.props.currentPage;
+    var resultsPerPage = this.state.resultsPerPage;
+    var firstPlugin = (currentPage - 1) * resultsPerPage + 1;
+    var lastPlugin = firstPlugin + this.state.plugins.length - 1;
 
     return <div className={"plugins-container" + (
         this.state.isLoading ? " loading" : "")}>
       {this.state.isLoading && <Spinner />}
+      <div className="browsing-plugins">
+        {currentPage > 1 && resultsPerPage ?
+            'Plugins ' + firstPlugin + '-' + lastPlugin + ' of ' + totalResults
+            : totalResults + ' plugins'}
+      </div>
       <ul className="plugins">{plugins}</ul>
-      <Pager currentPage={this.props.currentPage}
+      <Pager currentPage={currentPage}
           totalPages={totalPages} onPageChange={this.props.onPageChange} />
     </div>;
   }

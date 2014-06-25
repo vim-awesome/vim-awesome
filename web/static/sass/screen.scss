@@ -1045,6 +1045,16 @@ $long-desc-bg: #FBFBFB;
     right: 0;
     margin: auto;
   }
+
+  .browsing-plugins {
+    position: absolute;
+    top: -30px;
+    right: 0;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: $content-2;
+    letter-spacing: 1px;
+  }
 }
 
 .plugins {
