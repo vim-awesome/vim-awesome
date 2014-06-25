@@ -10,6 +10,8 @@ function clean_up() {
   # Force kill any processes that haven't died after a while. Sometimes, but not
   # always, RethinkDB v1.11.2 refuses to be killed by SIGTERM when backgrounded
   # on OS X Mountain Lion.
+  # TODO(david): This is a terrible hack. Figure out a better way to kill
+  #     rethinkdb, or try upgrading.
   ( sleep 2; kill -9 0 ) &
 
   exit
