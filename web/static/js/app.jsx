@@ -256,7 +256,9 @@ var SearchBox = React.createClass({
     var key = e.keyCode;
     if (tag !== "INPUT" && tag !== "TEXTAREA" &&
         key === 191 /* forward slash */) {
-      this.refs.input.getDOMNode().focus();
+      var inputElement = this.refs.input.getDOMNode();
+      inputElement.focus();
+      inputElement.select();
       this.props.onFocus();
     }
   },
