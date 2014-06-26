@@ -28,12 +28,16 @@ sudo pip install -r $NEW_CLONE/requirements.txt
 echo "Installing Node requirements"
 ( cd $NEW_CLONE && npm install )
 
+echo "Installing Ruby requirements"
+( cd $NEW_CLONE && bundle install )
+
 echo "Precompile JSX and bundle JS files"
 ( cd $NEW_CLONE && NODE_ENV=production node_modules/.bin/webpack --config conf/webpack.config.js )
 
 echo "Compass compile sass files"
 ( cd $NEW_CLONE && \
-  compass compile --config conf/compass.rb --output-style compressed )
+  bundle exec compass compile --config conf/compass.rb \
+    --output-style compressed )
 
 echo "Linking in secrets.py"
 ( cd $NEW_CLONE && ln -s $HOME/secrets.py . )
