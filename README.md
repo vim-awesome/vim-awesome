@@ -68,5 +68,5 @@ repos on GitHub, it is still a useful source of relative usage data.
 1. Open the website in your browser!
 
   ```sh
-  $ open [http://localhost:5001](http://localhost:5001)
+  $ open http://localhost:5001
   ```
