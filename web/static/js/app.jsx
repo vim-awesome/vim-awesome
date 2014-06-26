@@ -1556,7 +1556,6 @@ var Page = React.createClass({
       <Sidebar />
       <div className="content">
         {this.props.activeRoute}
-        <WipNotice />
         <Footer />
       </div>
     </div>;
