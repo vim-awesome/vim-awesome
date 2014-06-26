@@ -60,6 +60,7 @@ class GithubRepos(object):
 
         db.util.ensure_index(cls._TABLE_NAME, 'owner')
         db.util.ensure_index(cls._TABLE_NAME, 'repo_id')
+        db.util.ensure_index(cls._TABLE_NAME, 'redirects_to')
         db.util.ensure_index(cls._TABLE_NAME, 'last_scraped_at')
         db.util.ensure_index(cls._TABLE_NAME, 'owner_repo',
                 lambda repo: [repo['owner'], repo['repo_name']])

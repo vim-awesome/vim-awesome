@@ -292,7 +292,7 @@ def scrape_plugin_repos(num):
             plugin_data = get_plugin_data(repo_owner, repo_name, repo_data)
 
         repo['repo_data'] = repo_data
-        repo['repo_id'] = repo_data.get('id', repo['repo_id'])
+        repo['repo_id'] = str(repo_data.get('id', repo['repo_id']))
         PluginGithubRepos.log_scrape(repo)
 
         # If this is a fork, note it and ensure we know about original repo.
@@ -316,13 +316,16 @@ def scrape_plugin_repos(num):
 
             # Insert the number of plugin manager users across all names/owners
             # of this repo.
+            # TODO(david): Try to also use repo_id for this (but not all repos
+            #     have it), or look at multiple levels of redirects.
             plugin_manager_users = repo.get('plugin_manager_users', 0)
-            same_id_repos = r.table('plugin_github_repos').get_all(
-                    repo['repo_id'], index='repo_id').run(r_conn())
-            for same_id_repo in same_id_repos:
-                if same_id_repo['id'] == repo['id']:
+            other_repos = r.table('plugin_github_repos').get_all(
+                    '%s/%s' % (repo_owner, repo_name),
+                    index='redirects_to').run(r_conn())
+            for other_repo in other_repos:
+                if other_repo['id'] == repo['id']:
                     continue
-                plugin_manager_users += same_id_repo.get(
+                plugin_manager_users += other_repo.get(
                         'plugin_manager_users', 0)
 
             plugin_data['github_bundles'] = plugin_manager_users
