@@ -264,6 +264,16 @@ def scrape_plugin_repos(num):
                     'redirects_from': ('%s/%s' % (repo_owner, repo_name)),
                 })
 
+                # And now change the GitHub repo location of the plugin that
+                # the old repo location pointed to
+                query = r.table('plugins').get_all(
+                        [repo_owner, repo_name], index='github_owner_repo')
+                db_plugin = db.util.get_first(query)
+                if db_plugin:
+                    db_plugin['github_owner'] = redirect_owner
+                    db_plugin['github_repo_name'] = redirect_repo_name
+                    db.plugins.insert(db_plugin, upsert=True)
+
                 print 'redirects to %s/%s.' % (redirect_owner,
                         redirect_repo_name)
             else:
