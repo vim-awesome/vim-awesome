@@ -21,6 +21,8 @@ def backfill_plugins():
     Populated from the corresponding rows of the plugin_github_repos table,
     joining on the key (github_owner, github_repo_name).
     """
+    r.table('plugins').update({'github_repo_id': ''}).run(r_conn())
+
     repos = r.table('plugin_github_repos').pluck(
            'repo_id', 'owner', 'repo_name').run(r_conn())
 
