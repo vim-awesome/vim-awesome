@@ -53,7 +53,7 @@ var Plugin = React.createClass({
         className={"plugin" + (hasNavFocus ? " nav-focus" : "") +
             (this.state.hasVisited ? " visited" : "")}
         onMouseEnter={this.props.onMouseEnter}>
-      <a href={"plugin/" + plugin.slug}>
+      <a href={"/plugin/" + plugin.slug}>
         <h3 className={"plugin-name " + plugin.category}>{plugin.name}</h3>
         {plugin.author && <span className="by">by</span>}
         {plugin.author &&
