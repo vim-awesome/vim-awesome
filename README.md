@@ -70,3 +70,9 @@ repos on GitHub, it is still a useful source of relative usage data.
   ```sh
   $ open http://localhost:5001
   ```
+
+## Contributing
+
+Take a look at [some of these issues](https://github.com/divad12/vim-awesome/issues?labels=easyfix&state=open) to get started.
+
+Chat with us on #vimawesome on freenode!
