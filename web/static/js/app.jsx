@@ -478,9 +478,9 @@ var VundleInstructions = React.createClass({
 
     return <div>
       <p>Place this in your <code>.vimrc:</code></p>
-      <pre>Bundle '{vundleUri}'</pre>
+      <pre>Plugin '{vundleUri}'</pre>
       <p>&hellip; then run the following in Vim:</p>
-      <pre>:source %<br/>:BundleInstall</pre>
+      <pre>:source %<br/>:PluginInstall</pre>
       {/* Hack to get triple-click in Chrome to not over-select. */}
       <div>{'\u00a0' /* &nbsp; */}</div>
     </div>;
