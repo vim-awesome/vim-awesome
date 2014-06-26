@@ -32,14 +32,6 @@ $not-large-screen: "(max-width: 1199px)";  // "not" does not seem to work well
   text-align: center;
 }
 
-// From http://stackoverflow.com/a/20320475/392426
-@mixin placeholder {
-  &::-webkit-input-placeholder {@content}
-  &:-moz-placeholder           {@content}
-  &::-moz-placeholder          {@content}
-  &:-ms-input-placeholder      {@content}
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Site chrome and theme
 
@@ -499,43 +491,31 @@ code {
     margin: 0 3px 0 0;
     display: inline-block;
 
-    -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
     animation: stretchdelay 1.2s infinite ease-in-out;
   }
 
   .rect2 {
-    -webkit-animation-delay: -1.1s;
     animation-delay: -1.1s;
   }
 
   .rect3 {
-    -webkit-animation-delay: -1.0s;
     animation-delay: -1.0s;
   }
 
   .rect4 {
-    -webkit-animation-delay: -0.9s;
     animation-delay: -0.9s;
   }
 
   .rect5 {
-    -webkit-animation-delay: -0.8s;
     animation-delay: -0.8s;
   }
-}
-
-@-webkit-keyframes stretchdelay {
-  0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
-  20% { -webkit-transform: scaleY(1.0) }
 }
 
 @keyframes stretchdelay {
   0%, 40%, 100% {
     transform: scaleY(0.4);
-    -webkit-transform: scaleY(0.4);
   }  20% {
     transform: scaleY(1.0);
-    -webkit-transform: scaleY(1.0);
   }
 }
 
@@ -750,7 +730,7 @@ code {
     line-height: 12px;
     text-align: center;
     outline: 0;
-    -webkit-backface-visibility: hidden;  // Fixes 1px wobble on Chrome
+    backface-visibility: hidden;  // Fixes 1px wobble on Chrome
 
     @include transition(all 0.2s ease-out);
     opacity: 0.5;
@@ -1128,7 +1108,7 @@ $long-desc-bg: #FBFBFB;
 
     // Fixes an issue where hovering over a non 1.0-opacity element causes
     // Chrome to wobble by a pixel: http://stackoverflow.com/a/16833496/392426
-    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 
     &:before {
       color: white;
@@ -1293,7 +1273,7 @@ $long-desc-bg: #FBFBFB;
 
       // Fixes an issue where hovering over a non 1.0-opacity element causes
       // Chrome to wobble by a pixel: http://stackoverflow.com/a/16833496/392426
-      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
 
       &.disabled {
         opacity: 0.3;
@@ -1474,7 +1454,7 @@ $long-desc-bg: #FBFBFB;
       border-bottom: 2px solid mix($content-1, $bg-light-1, 50%);
     }
 
-    @include placeholder {
+    ::placeholder {
       font-weight: 300;
       font-size: 15px;
       color: rgba($content-1, 0.8);

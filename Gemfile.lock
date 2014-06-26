@@ -1,15 +1,16 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    autoprefixer-rails (2.0.0.20140622)
+      execjs
     bootstrap-sass (2.3.1.2)
       sass (~> 3.2)
-    bundle (0.0.1)
-      bundler
     chunky_png (1.2.8)
     compass (0.12.2)
       chunky_png (~> 1.2)
       fssm (>= 0.2.7)
       sass (~> 3.1)
+    execjs (2.2.0)
     fssm (0.2.10)
     sass (3.2.9)
 
@@ -17,6 +18,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  autoprefixer-rails (~> 2.0.0.20140622)
   bootstrap-sass (~> 2.3.1.2)
-  bundle
   compass (~> 0.12.2)
