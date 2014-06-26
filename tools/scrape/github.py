@@ -198,7 +198,7 @@ def get_plugin_data(owner, repo_name, repo_data, readme_data=None):
     return {
         'created_at': util.to_timestamp(created_date),
         'updated_at': util.to_timestamp(updated_date),
-        'vimorg_id': '',
+        'vimorg_id': None,
         'github_repo_id': str(repo_data['id']),
         'github_owner': owner,
         'github_repo_name': repo_name,
