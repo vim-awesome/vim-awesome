@@ -26,6 +26,11 @@ require("../lib/js/bootstrap-transition.js");
 require("../lib/js/bootstrap-collapse.js");
 require("../lib/js/bootstrap-dropdown.js");
 
+var AboutPage = require("./AboutPage.jsx");
+var Footer = require("./Footer.jsx");
+var Plugin = require("./Plugin.jsx");
+var Spinner = require("./Spinner.jsx");
+
 var fetchAllCategories = require("./fetchAllCategories.js");
 
 // TODO(david): We might want to split up this file more.
@@ -82,21 +87,6 @@ var scrollToNode = function(domNode, context) {
     window.scrollTo(0, Math.max(0, elementTop - context));
   }
 };
-
-/**
- * A temporary notice that this site is still a work in progress!
- */
-var WipNotice = React.createClass({
-  render: function() {
-    return <div className="wip-notice">
-      Hi, you've discovered a work in progress!{' '}
-      <a href="https://docs.google.com/document/d/1hUYiWCjup9JMWirASnO_Z2k7AJJL-KPgFKZ0C7vvUMU/edit#" target="_blank">
-        See this Google Doc for more info
-      </a>
-      {' '}and to leave any feedback. Thank you. :)
-    </div>;
-  }
-});
 
 var Sidebar = React.createClass({
   getInitialState: function() {
@@ -170,55 +160,6 @@ var Sidebar = React.createClass({
       <a href="/submit" className="submit-plugin">
         <i className="icon-plus"></i>Submit plugin
       </a>
-    </div>;
-  }
-});
-
-// Site footer
-var Footer = React.createClass({
-  render: function() {
-    return <div className="site-footer">
-      <div className="first-row clearfix">
-        <div className="about-section">
-          <div className="about">
-            Vim Awesome is a directory of Vim plugins sourced from GitHub,
-            Vim.org, and user submissions. Plugin usage data is extracted from
-            dotfiles repos on GitHub.
-          </div>
-          <div className="credits">
-            Made with vim and vigor by
-            {' '}<a target="_blank" href="https://twitter.com/divad12">
-              David Hu
-            </a>,
-            {' '}<a target="_blank" href="http://benalpert.com">
-              Ben Alpert
-            </a>, and
-            {' '}<a target="_blank" href="https://github.com/xymostech">
-              Emily Eisenberg
-            </a>.
-          </div>
-        </div>
-        <div className="github-section">
-          <a href="https://github.com/divad12/vim-awesome"
-              className="github-link">
-            Contribute
-            <i className="icon-github"></i>
-            on GitHub
-          </a>
-        </div>
-        <div className="links-section">
-          <ul className="links">
-            <li><a href="/about">About</a></li>
-            <li><a href="/submit">Submit</a></li>
-            <li><a target="_blank" href="https://twitter.com/vimawesome">
-                Twitter
-            </a></li>
-            <li><a target="_blank" href="mailto:emacs@vimawesome.com">
-                Email us
-            </a></li>
-          </ul>
-        </div>
-      </div>
     </div>;
   }
 });
@@ -353,87 +294,6 @@ var Pager = React.createClass({
   }
 });
 
-var Plugin = React.createClass({
-  getInitialState: function() {
-    var pluginId = this.props.plugin.slug;
-    var pluginStore = pluginId && store.enabled &&
-        store.get("plugin-" + pluginId);
-
-    return {
-      hasVisited: pluginStore && pluginStore.hasVisited
-    };
-  },
-
-  componentDidMount: function() {
-    this.addBootstrapTooltips();
-  },
-
-  componentWillUnmount: function() {
-    $(this.getDOMNode()).find('[title]').tooltip('destroy');
-  },
-
-  componentDidUpdate: function() {
-    this.addBootstrapTooltips();
-  },
-
-  addBootstrapTooltips: function() {
-    $(this.getDOMNode()).find('[title]').tooltip({
-      animation: false,
-      container: 'body'
-    });
-  },
-
-  goToDetailsPage: function() {
-    transitionTo("plugin", {slug: this.props.plugin.slug});
-  },
-
-  render: function() {
-    // TODO(david): Animations on initial render
-    var plugin = this.props.plugin;
-    if (!plugin || !plugin.name) {
-      return <li className="plugin"></li>;
-    }
-
-    var hasNavFocus = this.props.hasNavFocus;
-    return <li
-        className={"plugin" + (hasNavFocus ? " nav-focus" : "") +
-            (this.state.hasVisited ? " visited" : "")}
-        onMouseEnter={this.props.onMouseEnter}>
-      <a href={"plugin/" + plugin.slug}>
-        <h3 className={"plugin-name " + plugin.category}>{plugin.name}</h3>
-        {plugin.author && <span className="by">by</span>}
-        {plugin.author &&
-          <span className="author">{" " + plugin.author}</span>}
-        {plugin.github_stars > 0 &&
-          <div className="github-stars"
-              title={plugin.github_stars + " stars on GitHub"}>
-            {plugin.github_stars}<i className="icon-star"></i>
-          </div>
-        }
-        {plugin.plugin_manager_users > 0 &&
-          <div className="plugin-users"
-              title={plugin.plugin_manager_users +
-              " Vundle/Pathogen/NeoBundle users on GitHub"}>
-            {plugin.plugin_manager_users}<i className="icon-user"></i>
-          </div>
-        }
-        <p className="short-desc">{plugin.short_desc}</p>
-      </a>
-    </li>;
-  }
-});
-
-var Spinner = React.createClass({
-  render: function() {
-    return <div className="spinner">
-      <div className="rect1" />
-      <div className="rect2" />
-      <div className="rect3" />
-      <div className="rect4" />
-      <div className="rect5" />
-    </div>;
-  }
-});
 
 var PluginList = React.createClass({
   getInitialState: function() {
@@ -1436,125 +1296,12 @@ var ThanksForSubmittingPage = React.createClass({
   }
 });
 
-var AboutPage = React.createClass({
-  render: function() {
-    return <div className="about-page">
-
-      <div className="long-desc-container long-desc">
-        <h1>About</h1>
-        <p>
-          Vim Awesome wants to be a comprehensive, accurate, and up-to-date
-          directory of Vim plugins.
-        </p>
-        <p>
-          Many recent Vim plugins are announced on Hacker News or specialized
-          boards, and have since become widely used. But how does a new user
-          find out about these? We wanted to solve that problem and others
-          with Vim Awesome &mdash; <strong> an open-sourced community resource
-          for discovering new and popular Vim plugins </strong>.
-        </p>
-
-        <img className="vim-cleaner-img" src="/static/img/vim-cleaner.png" />
-        <h2>Huh? Vim, the bathroom cleaner?</h2>
-        <p>
-          Yes, Vim is a cleaning product! But it's also a popular text editor
-          pre-installed on many Unix systems. Because it's highly extensible,
-          there have been thousands of plugins written for it.
-        </p>
-        <p>
-          As of 2014, it is highly recommended to install plugins with
-          a plugin manager such as
-          {' '}<a target="_blank" href="https://github.com/gmarik/vundle">
-            Vundle
-          </a>,
-          {' '}<a target="_blank" href="https://github.com/Shougo/neobundle.vim">
-            NeoBundle
-          </a>, or
-          {' '}<a target="_blank" href="https://github.com/tpope/vim-pathogen">
-            Pathogen
-          </a>.
-        </p>
-
-        <h2>Where does the data come from?</h2>
-        <p>
-          GitHub, Vim.org, and user submissions.
-        </p>
-        <p>
-          On GitHub there are more than 30 000 repos that are
-          development environment configurations, commonly called
-          {' '}<em>dotfiles</em>. From these repos we can extract{' '}
-          <a href="https://github.com/divad12/dotfiles/blob/master/.vimrc#L23"
-              target="_blank">
-            references to Vim plugins (as Git URIs)
-          </a>,
-          particularly when plugin managers are used.
-        </p>
-        <p>
-          Although there are orders of magnitude more Vim users than public
-          dotfiles repos on GitHub, it is still a useful source of relative
-          usage data.
-        </p>
-
-        <h2>Contribute?</h2>
-        <p>
-          Why, thank you! There are lots of things you can do to help out:
-          <ul>
-            <li>
-              Tackle a{' '}
-              <a href="https://github.com/divad12/vim-awesome/issues?labels=easyfix&amp;state=open">
-                starter issue on GitHub
-              </a> (or report an issue!).
-            </li>
-            <li>
-              Categorize and tag some of{' '}
-              <a href="/?q=cat:uncategorized">
-                these plugins
-              </a>.
-            </li>
-            <li>
-              <a href="/submit">
-                Submit
-              </a>{' '}
-              new plugins.
-            </li>
-            <li>
-              Share this site if you find it useful! :)
-            </li>
-          </ul>
-        </p>
-
-        <h2>Acknowledgements</h2>
-        <p>
-          Thank you Ethan Schoonover for use of the
-          {' '}<a target="_blank" href="http://ethanschoonover.com/solarized">
-            Solarized
-          </a>{' '}
-          colour scheme.
-        </p>
-        <p>
-          Much inspiration for this website, both conception and design, came
-          from <a target="_blank" href="http://unheap.com">unheap.com</a>,
-          a resource for browsing jQuery plugins.
-        </p>
-        <p>
-          Built with
-          {' '}<a target="_blank" href="http://facebook.github.io/react/">
-            React
-          </a>, a JavaScript library for building UIs, and
-          {' '}<a target="_blank" href="http://rethinkdb.com/">
-            RethinkDB
-          </a>, a document-oriented database.
-        </p>
-      </div>
-    </div>;
-  }
-});
-
 var Page = React.createClass({
   componentDidUpdate: function() {
     // Google Analytics pageview tracking for single page app
     // Thank you https://gist.github.com/daveaugustine/1771986#comment-958107
-    if (window.ga) {
+    var ga = window.ga;
+    if (ga) {
       var relativeUrl = window.location.pathname + window.location.search;
       ga("send", "pageview", relativeUrl);
     }
