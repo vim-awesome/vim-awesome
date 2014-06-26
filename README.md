@@ -1,9 +1,29 @@
-TODO(david): description of what this repo does
+# Vim Awesome
 
-<!-- TODO(david): This section should be in its own file, CONTRIBUTING.md. -->
-# Set up
+Vim Awesome wants to be a comprehensive, accurate, and up-to-date directory of
+Vim plugins.
 
-1. Install RethinkDB from http://rethinkdb.com/docs/install/.
+Many recent Vim plugins are announced on Hacker News or specialized boards, and
+have since become widely used. But how does a new user find out about these? We
+wanted to solve that problem and others with Vim Awesome — an open-sourced
+community resource for discovering new and popular Vim plugins.
+
+## Where does the data come from?
+
+GitHub, Vim.org, and user submissions.
+
+On GitHub there are more than 30 000 repos that are development environment
+configurations, commonly called dotfiles. From these repos we can extract
+[references to Vim plugins (as Git URIs)](https://github.com/divad12/dotfiles/blob/master/.vimrc#L23),
+particularly when plugin managers are used.
+
+Although there are orders of magnitude more Vim users than public dotfiles
+repos on GitHub, it is still a useful source of relative usage data.
+
+## Getting set up
+
+<!-- TODO(david): Don't hardcode version here. -->
+1. Install RethinkDB version 1.13.0-0 from http://rethinkdb.com/docs/install/.
 
 1. Install Sass and Compass, which we use to generate our CSS.
 
@@ -33,14 +53,20 @@ TODO(david): description of what this repo does
   $ make
   ```
 
-1. Seed the database with some test data:
+1. Make database table and indices:
 
   ```sh
-  $ make seed_data
+  $ make ensure_tables_and_indices
+  ```
+
+1. Seed the database with some test data. Download [this database dump](https://dl.dropboxusercontent.com/u/18795947/vim_awesome_rethinkdb_dump.tar.gz), and then run
+
+  ```sh
+  $ rethinkdb restore -i vim_awesome /path/to/vim_awesome_rethinkdb_dump.tar.gz
   ```
 
 1. Open the website in your browser!
 
   ```sh
-  $ open http://localhost:5001
+  $ open [http://localhost:5001](http://localhost:5001)
   ```

@@ -15,7 +15,11 @@ deploy:
 ensure_tables_and_indices:
 	PYTHONPATH=. python db/init_db.py
 
+# TODO(david): This probably no longer works and needs to be updated.
 seed_data:
+	@echo "*** Warning! This has not been updated in a while and is not guaranteed to work. ***"
+	@echo
+	@echo
 	@echo "Creating tables with some example data"
 	PYTHONPATH=. python db/seed.py
 	@echo "Scraping 100 plugins from vim.org."
