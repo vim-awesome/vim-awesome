@@ -129,33 +129,22 @@ def _get_vimorg_id_from_url(url):
     return None
 
 
-def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
-        scrape_fork=False):
-    """Fetch info relevant to a plugin from a GitHub repo.
+def get_plugin_data(owner, repo_name, repo_data, readme_data=None):
+    """Populate info relevant to a plugin from a GitHub repo.
 
     This should not be used to fetch info from the vim-scripts user's repos.
 
     Arguments:
         owner: The repo's owner's login, eg. "gmarik"
         repo_name: The repo name, eg. "vundle"
-        repo_data: (optional) GitHub API /repos response for this repo
+        repo_data: GitHub API /repos response for this repo
         readme_data: (optional) GitHub API /readme response for this repo
         scrape_fork: Whether to bother scraping this repo if it's a fork
 
     Returns:
-        A tuple (plugin_data, repo_data) where plugin_data is a dict of
-        properties that can be inserted as a row in the plugins table, and
-        repo_data is the API /repos response for this repo.
+        A dict of properties that can be inserted as a row in the plugins table
     """
     assert owner != 'vim-scripts'
-
-    if not repo_data:
-        res, repo_data = get_api_page('repos/%s/%s' % (owner, repo_name))
-        if res.status_code == 404:
-            return None, repo_data
-
-    if repo_data.get('fork') and not scrape_fork:
-        return None, repo_data
 
     if not readme_data:
         _, readme_data = get_api_page('repos/%s/%s/readme' % (
@@ -201,10 +190,11 @@ def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
     _, owner_data = get_api_page('users/%s' % owner_login)
     author = owner_data.get('name') or owner_data.get('login')
 
-    plugin_data = {
+    return {
         'created_at': util.to_timestamp(created_date),
         'updated_at': util.to_timestamp(updated_date),
         'vimorg_id': vimorg_id,
+        'github_repo_id': str(repo_data['id']),
         'github_owner': owner,
         'github_repo_name': repo_name,
         'github_author': author,
@@ -215,19 +205,27 @@ def fetch_plugin(owner, repo_name, repo_data=None, readme_data=None,
         'github_readme_filename': readme_filename,
     }
 
-    return (plugin_data, repo_data)
 
-
+# TODO(david): Simplify/break-up this function.
 def scrape_plugin_repos(num):
     """Scrapes the num plugin repos that have been least recently scraped."""
+    MIN_FORK_USERS = 3
+
     query = r.table('plugin_github_repos').filter({'is_blacklisted': False})
-    query = query.filter({'is_fork': False}, default=True)
+
+    # We don't want to scrape forks that not many people use.
+    query = query.filter(r.not_((r.row['is_fork'] == True) & (
+            r.row['plugin_manager_users'] < MIN_FORK_USERS)),
+            default=True)
+
+    # Only scrape repos that don't redirect to other ones (probably renamed).
+    query = query.filter(r.row['redirects_to'] == '')
 
     # We scrape vim-scripts separately using the batch /users/:user/repos call
     query = query.filter(r.row['owner'] != 'vim-scripts')
 
-    #query = query.order_by('last_scraped_at').limit(num)
-    query = query.order_by(r.desc('plugin_manager_users')).limit(num)
+    query = query.order_by('last_scraped_at').limit(num)
+
     repos = query.run(r_conn())
 
     # TODO(david): Print stats at the end: # successfully scraped, # not found,
@@ -240,14 +238,45 @@ def scrape_plugin_repos(num):
         print "    scraping %s/%s ..." % (repo_owner, repo_name),
         sys.stdout.flush()
 
-        # TODO(david): One optimization is to pass in repo['repo_data'] for
-        #     vim-scripts repos (since we already save that when discovering
-        #     vim-scripts repos in build_github_index.py). But the
-        #     implementation here should not be coupled with implemenation
-        #     details in build_github_index.py.
-        plugin_data, repo_data = fetch_plugin(repo_owner, repo_name)
+        # Attempt to fetch data about the plugin.
+        res, repo_data = get_api_page('repos/%s/%s' % (repo_owner, repo_name))
+
+        # If the API call 404s, then see if the repo has been renamed by
+        # checking for a redirect in a non-API call.
+        if res.status_code == 404:
+
+            res = requests.head('https://github.com/%s/%s' % (
+                    repo_owner, repo_name))
+
+            if res.status_code == 301:
+                location = res.headers.get('location')
+                _, redirect_owner, redirect_repo_name = location.rsplit('/', 2)
+
+                repo['redirects_to'] = '%s/%s' % (redirect_owner,
+                        redirect_repo_name)
+
+                # Make sure we insert the new location of the repo, which will
+                # be scraped in a future run.
+                PluginGithubRepos.upsert_with_owner_repo({
+                    'owner': redirect_owner,
+                    'repo_name': redirect_repo_name,
+                    'redirects_from': ('%s/%s' % (repo_owner, repo_name)),
+                })
+
+                print 'redirects to %s/%s.' % (redirect_owner,
+                        redirect_repo_name)
+            else:
+                # TODO(david): Insert some metadata in the github repo that
+                #     this is not found
+                print 'not found.'
+
+            plugin_data = None
+
+        else:
+            plugin_data = get_plugin_data(repo_owner, repo_name, repo_data)
 
         repo['repo_data'] = repo_data
+        repo['repo_id'] = repo_data.get('id', repo['repo_id'])
         PluginGithubRepos.log_scrape(repo)
 
         # If this is a fork, note it and ensure we know about original repo.
@@ -260,28 +289,30 @@ def scrape_plugin_repos(num):
 
         r.table('plugin_github_repos').insert(repo, upsert=True).run(r_conn())
 
-        # For most cases we don't care about info from forked repos and just
-        # want to scrape the original repo. We can whitelist important forked
-        # repos if the need arises, or perhaps we can allow forks w/ a minimum
-        # number of stars.
-        if repo_data.get('fork'):
+        # For most cases we don't care about forked repos, unless the forked
+        # repo is used by others.
+        if repo_data.get('fork') and (
+                repo.get('plugin_manager_users', 0) < MIN_FORK_USERS):
             print 'skipping fork of %s' % repo_data['parent']['full_name']
             continue
 
         if plugin_data:
 
-            # Insert the number of plugin manager users if present.
-            if repo.get('plugin_manager_users'):
-                plugin_data['github_bundles'] = repo['plugin_manager_users']
+            # Insert the number of plugin manager users across all names/owners
+            # of this repo.
+            plugin_manager_users = repo.get('plugin_manager_users')
+            same_id_repos = r.table('plugin_github_repos').get_all(
+                    'repo_id', index='repo_id').run(r_conn())
+            for same_id_repo in same_id_repos:
+                if same_id_repo['id'] == repo['id']:
+                    continue
+                plugin_manager_users += same_id_repo.get(
+                        'plugin_manager_users', 0)
+
+            plugin_data['github_bundles'] = plugin_manager_users
 
             db.plugins.add_scraped_data(plugin_data, repo)
-            print 'done'
-
-        else:
-            # TODO(david): Insert some metadata in the github repo that this is
-            #     not found
-            print 'not found.'
-            continue
+            print 'done.'
 
 
 def scrape_vim_scripts_repos(num):

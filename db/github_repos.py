@@ -41,6 +41,13 @@ class GithubRepos(object):
         # Number of Vundle, Pathogen, NeoBundle, etc. users
         'plugin_manager_users': 0,
 
+        # If this repo has been renamed, the "owner/repo_name" of the new
+        # location of this repo
+        'redirects_to': '',
+
+        # If another repo redirects here, the "owner/repo_name" of that repo
+        'redirects_from': '',
+
     }
 
     # Override this with URLs that should not be scraped.
