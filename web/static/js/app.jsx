@@ -210,8 +210,12 @@ var Footer = React.createClass({
           <ul className="links">
             <li><a href="/about">About</a></li>
             <li><a href="/submit">Submit</a></li>
-            <li><a href="mailto:emacs@vimawesome.com">Email us</a></li>
-            <li><a href="#">RSS feed</a></li>
+            <li><a target="_blank" href="https://twitter.com/vimawesome">
+                Twitter
+            </a></li>
+            <li><a target="_blank" href="mailto:emacs@vimawesome.com">
+                Email us
+            </a></li>
           </ul>
         </div>
       </div>
