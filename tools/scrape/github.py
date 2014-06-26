@@ -303,7 +303,7 @@ def scrape_plugin_repos(num):
             # of this repo.
             plugin_manager_users = repo.get('plugin_manager_users', 0)
             same_id_repos = r.table('plugin_github_repos').get_all(
-                    'repo_id', index='repo_id').run(r_conn())
+                    repo['repo_id'], index='repo_id').run(r_conn())
             for same_id_repo in same_id_repos:
                 if same_id_repo['id'] == repo['id']:
                     continue
