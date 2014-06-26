@@ -23,6 +23,9 @@ class GithubRepos(object):
     # extra fields for subclasses.
     _ROW_SCHEMA = {
 
+        # GitHub's repo ID. Only unique with (owner, repo_name)
+        'repo_id': '',
+
         # Last time this repo was scraped (Unix timestamp in seconds)
         'last_scraped_at': 0,
 
@@ -48,6 +51,7 @@ class GithubRepos(object):
         db.util.ensure_table(cls._TABLE_NAME)
 
         db.util.ensure_index(cls._TABLE_NAME, 'owner')
+        db.util.ensure_index(cls._TABLE_NAME, 'repo_id')
         db.util.ensure_index(cls._TABLE_NAME, 'last_scraped_at')
         db.util.ensure_index(cls._TABLE_NAME, 'owner_repo',
                 lambda repo: [repo['owner'], repo['repo_name']])

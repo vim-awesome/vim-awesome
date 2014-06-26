@@ -65,6 +65,10 @@ _ROW_SCHEMA = {
     ###########################################################################
     # Info from the author's GitHub repo (eg. github.com/scrooloose/syntastic)
 
+    # The unique identifier of a GitHub repo that's preserved on name changes
+    # or owner transfers. eg. '123567'
+    'github_repo_id': '',
+
     # eg. 'scrooloose'
     'github_owner': '',
 
@@ -140,6 +144,7 @@ def ensure_table():
     db.util.ensure_index('plugins', 'vimorg_id')
     db.util.ensure_index('plugins', 'github_stars')
     db.util.ensure_index('plugins', 'normalized_name')
+    db.util.ensure_index('plugins', 'github_repo_id')
     db.util.ensure_index('plugins', 'github_owner_repo',
             lambda p: [p['github_owner'], p['github_repo_name']])
 
