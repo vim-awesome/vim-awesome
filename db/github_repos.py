@@ -46,6 +46,7 @@ class GithubRepos(object):
         'redirects_to': '',
 
         # If another repo redirects here, the "owner/repo_name" of that repo
+        # TODO(david): This should be a list.
         'redirects_from': '',
 
     }

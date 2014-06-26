@@ -3,6 +3,7 @@
 import difflib
 import random
 import re
+import sys
 
 import rethinkdb as r
 from slugify import slugify
@@ -413,21 +414,21 @@ def _find_matching_plugins(plugin_data, repo=None):
                 index='vimorg_id')
         return list(query.run(r_conn()))
 
-    # If we have a github_repo_id, try to match it with an existing
-    # github-scraped plugin.
-    if plugin_data.get('github_repo_id'):
-        query = r.table('plugins').get_all(plugin_data['github_repo_id'],
-                index='github_repo_id')
-        matching_plugins = list(query.run(r_conn()))
-        if matching_plugins:
-            return list(matching_plugins)
-
     # If we have a (github_owner, github_repo_name) pair, try to match it with
     # an existing github-scraped plugin.
     if plugin_data.get('github_owner') and plugin_data.get('github_repo_name'):
         query = r.table('plugins').get_all(
                 [plugin_data['github_owner'], plugin_data['github_repo_name']],
                 index='github_owner_repo')
+        matching_plugins = list(query.run(r_conn()))
+        if matching_plugins:
+            return matching_plugins
+
+    # If we have a github_repo_id, try to match it with an existing
+    # github-scraped plugin.
+    if plugin_data.get('github_repo_id'):
+        query = r.table('plugins').get_all(plugin_data['github_repo_id'],
+                index='github_repo_id')
         matching_plugins = list(query.run(r_conn()))
         if matching_plugins:
             return matching_plugins
@@ -534,10 +535,12 @@ def add_scraped_data(plugin_data, repo=None):
         updated_plugin = update_plugin(plugins[0], plugin_data)
         insert(updated_plugin, upsert=True)
         plugin = updated_plugin
+
     else:
         insert(plugin_data)
         plugin = plugin_data
-        print 'Inserting new plugin %s' % plugin['slug']
+        print 'inserted new plugin %s ...' % plugin['slug'],
+        sys.stdout.flush()
 
     if repo:
         repo['plugin_slug'] = plugin['slug']

@@ -260,6 +260,7 @@ def scrape_plugin_repos(num):
                 PluginGithubRepos.upsert_with_owner_repo({
                     'owner': redirect_owner,
                     'repo_name': redirect_repo_name,
+                    # TODO(david): Should append to a list
                     'redirects_from': ('%s/%s' % (repo_owner, repo_name)),
                 })
 
@@ -300,7 +301,7 @@ def scrape_plugin_repos(num):
 
             # Insert the number of plugin manager users across all names/owners
             # of this repo.
-            plugin_manager_users = repo.get('plugin_manager_users')
+            plugin_manager_users = repo.get('plugin_manager_users', 0)
             same_id_repos = r.table('plugin_github_repos').get_all(
                     'repo_id', index='repo_id').run(r_conn())
             for same_id_repo in same_id_repos:
