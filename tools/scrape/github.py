@@ -349,8 +349,6 @@ def scrape_vim_scripts_repos(num):
                     repo_name)
             num_bundles = repo['plugin_manager_users'] if repo else 0
 
-            # TODO(david): Pass `repo` into this function call so that it can
-            #     have its `plugin_slug` updated.
             db.plugins.add_scraped_data({
                 'vimorg_id': vimorg_id,
                 'github_vim_scripts_repo_name': repo_name,

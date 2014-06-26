@@ -134,9 +134,6 @@ class PluginGithubRepos(GithubRepos):
         # IDs of vim.org scripts where this repo was mentioned
         'from_vim_scripts': [],
 
-        # Foreign key to the plugin that this repo has been matched to
-        'plugin_slug': '',
-
     })
 
     # GitHub repos that are not Vim plugins that we've manually found.

@@ -403,10 +403,6 @@ def _find_matching_plugins(plugin_data, repo=None):
         A list of plugins that are likely to be the same as the given
         plugin_data.
     """
-    # TODO(david): Figure out where we have duplicates of vimorg_id and
-    #     github_repo_id, and merge them. Probably mostly due to GitHub casing
-    #     differences.
-
     # If we have a vimorg_id, then we have a direct key to a vim.org script
     # if it's in DB.
     if plugin_data.get('vimorg_id'):
@@ -420,15 +416,6 @@ def _find_matching_plugins(plugin_data, repo=None):
         query = r.table('plugins').get_all(
                 [plugin_data['github_owner'], plugin_data['github_repo_name']],
                 index='github_owner_repo')
-        matching_plugins = list(query.run(r_conn()))
-        if matching_plugins:
-            return matching_plugins
-
-    # If we have a github_repo_id, try to match it with an existing
-    # github-scraped plugin.
-    if plugin_data.get('github_repo_id'):
-        query = r.table('plugins').get_all(plugin_data['github_repo_id'],
-                index='github_repo_id')
         matching_plugins = list(query.run(r_conn()))
         if matching_plugins:
             return matching_plugins
@@ -482,15 +469,10 @@ def _are_plugins_different(p1, p2):
             p1['vimorg_id'] != p2['vimorg_id']):
         return True
 
-    if (p1.get('github_repo_id') and p2.get('github_repo_id') and
-            p1['github_repo_id'] != p2['github_repo_id']):
-        return True
-
-    # GitHub repo locations are case-insensitive.
     if (p1.get('github_owner') and p1.get('github_repo_name') and
             p2.get('github_owner') and p2.get('github_repo_name') and
-            (p1['github_owner'].lower(), p1['github_repo_name'].lower()) !=
-            (p2['github_owner'].lower(), p2['github_repo_name'].lower())):
+            (p1['github_owner'], p1['github_repo_name']) !=
+            (p2['github_owner'], p2['github_repo_name'])):
         return True
 
     return False
@@ -510,41 +492,16 @@ def add_scraped_data(plugin_data, repo=None):
             corresponding github_repo document containing info about the GitHub
             repo.
     """
-    db_plugin = None
-
-    # If we've scraped this before, update the plugin we matched up with before
-    # TODO(david): This assumes vimorg_id is unique, but this is not true. The
-    #     non-uniqueness can happen when multiple GitHub repos have the same
-    #     vim.org homepage.
-    if repo and repo.get('plugin_slug'):
-        db_plugin = r.table('plugins').get(repo['plugin_slug']).run(r_conn())
-    elif plugin_data.get('vimorg_id'):
-        query = r.table('plugins').get_all(plugin_data['vimorg_id'],
-                index='vimorg_id')
-        db_plugin = db.util.get_first(query)
-
-    if db_plugin:
-        updated_plugin = update_plugin(db_plugin, plugin_data)
-        insert(updated_plugin, upsert=True)
-        return
-
     plugins = _find_matching_plugins(plugin_data, repo)
 
     if len(plugins) == 1 and not _are_plugins_different(
             plugins[0], plugin_data):
         updated_plugin = update_plugin(plugins[0], plugin_data)
         insert(updated_plugin, upsert=True)
-        plugin = updated_plugin
-
     else:
         insert(plugin_data)
-        plugin = plugin_data
-        print 'inserted new plugin %s ...' % plugin['slug'],
+        print 'inserted new plugin %s ...' % plugin_data['slug'],
         sys.stdout.flush()
-
-    if repo:
-        repo['plugin_slug'] = plugin['slug']
-        r.table('plugin_github_repos').insert(repo, upsert=True).run(r_conn())
 
 
 ###############################################################################
