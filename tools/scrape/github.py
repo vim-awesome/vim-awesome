@@ -154,8 +154,13 @@ def get_plugin_data(owner, repo_name, repo_data, readme_data=None):
     readme = unicode(readme_base64_decoded, 'utf-8', errors='ignore')
     readme_filename = readme_data.get('name', '')
 
+    # TODO(david): We used to extract the vim.org ID from the homepage if it
+    #     were a vim.org URL, but that became too unreliable as many different
+    #     repos would all claim to have the same vim.org homepage, when
+    #     sometimes those repos were of different plugins. But it's still
+    #     useful information in heuristic matching, just can't be used as
+    #     a key.
     homepage = repo_data['homepage']
-    vimorg_id = _get_vimorg_id_from_url(homepage)
 
     repo_created_date = dateutil.parser.parse(repo_data['created_at'])
 
@@ -193,7 +198,7 @@ def get_plugin_data(owner, repo_name, repo_data, readme_data=None):
     return {
         'created_at': util.to_timestamp(created_date),
         'updated_at': util.to_timestamp(updated_date),
-        'vimorg_id': vimorg_id,
+        'vimorg_id': '',
         'github_repo_id': str(repo_data['id']),
         'github_owner': owner,
         'github_repo_name': repo_name,
