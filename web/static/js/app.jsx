@@ -481,6 +481,10 @@ var VundleInstructions = React.createClass({
       <pre>Plugin '{vundleUri}'</pre>
       <p>&hellip; then run the following in Vim:</p>
       <pre>:source %<br/>:PluginInstall</pre>
+      <p className="old-vundle-notice">
+        For Vundle version &lt; 0.10.2, replace <code>Plugin</code> with
+        {' '}<code>Bundle</code> above.
+      </p>
       {/* Hack to get triple-click in Chrome to not over-select. */}
       <div>{'\u00a0' /* &nbsp; */}</div>
     </div>;
