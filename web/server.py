@@ -280,7 +280,7 @@ def submit_plugin():
                json.dumps(plugin_data, indent=4))  # JSON for pretty-printing
         payload = {
            'auth_token': _HIPCHAT_TOKEN,
-           'notify': 1,
+           'notify': 0,
            'color': 'green',
            'from': 'Vim Awesome',
            'room_id': _HIPCHAT_ROOM_ID,
