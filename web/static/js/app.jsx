@@ -1002,6 +1002,12 @@ var PluginPage = React.createClass({
   },
 
   render: function() {
+    if (!this.state.slug) {
+      return <div className="plugin-page">
+        <Spinner />
+      </div>;
+    }
+
     // TODO(david): Need to also scrape the link to the archive download (for
     //     the manual install mode).
     var longDesc = this.state.github_readme || this.state.vimorg_long_desc;
