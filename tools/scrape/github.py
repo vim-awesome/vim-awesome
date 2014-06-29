@@ -418,8 +418,8 @@ _VIM_DIRECTORIES = ['vim', 'config', 'home']
 # Matches eg. "Bundle 'gmarik/vundle'" or "Bundle 'taglist'"
 # [^\S\n] means whitespace except newline: stackoverflow.com/a/3469155/392426
 _BUNDLE_PLUGIN_REGEX_TEMPLATE = r'^[^\S\n]*%s[^\S\n]*[\'"]([^\'"\n\r]+)[\'"]'
-_VUNDLE_PLUGIN_REGEX = re.compile(_BUNDLE_PLUGIN_REGEX_TEMPLATE % 'Bundle',
-        re.MULTILINE)
+_VUNDLE_PLUGIN_REGEX = re.compile(_BUNDLE_PLUGIN_REGEX_TEMPLATE %
+        '(?:Bundle|Plugin)', re.MULTILINE)
 _NEOBUNDLE_PLUGIN_REGEX = re.compile(_BUNDLE_PLUGIN_REGEX_TEMPLATE %
         '(?:NeoBundle|NeoBundleFetch|NeoBundleLazy)', re.MULTILINE)
 
