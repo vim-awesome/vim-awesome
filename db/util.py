@@ -14,12 +14,22 @@ def get_first(query):
     return results[0] if results else None
 
 
+def ensure_db(db_name, *args, **kwargs):
+    """Creates a DB if it doesn't exist."""
+    conn = r.connect()
+
+    try:
+        r.db_create(db_name, *args, **kwargs).run(conn)
+    except r.RqlRuntimeError:
+        pass  # Ignore DB already created
+
+
 def ensure_table(table_name, *args, **kwargs):
     """Creates a table if it doesn't exist."""
     try:
         r.table_create(table_name, *args, **kwargs).run(r_conn())
     except r.RqlRuntimeError:
-        pass  # Ignore db already created
+        pass  # Ignore table already created
 
 
 def ensure_index(table_name, index_name, *args, **kwargs):

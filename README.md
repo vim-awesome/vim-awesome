@@ -53,10 +53,10 @@ repos on GitHub, it is still a useful source of relative usage data.
   $ make
   ```
 
-1. Make database table and indices:
+1. Initialize the database, tables, and indices:
 
   ```sh
-  $ make ensure_tables_and_indices
+  $ make init_db
   ```
 
 1. Seed the database with some test data. Download [this database dump](https://dl.dropboxusercontent.com/u/18795947/vim_awesome_rethinkdb_dump.tar.gz), and then run

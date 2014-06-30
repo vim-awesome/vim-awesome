@@ -55,7 +55,7 @@ then
 fi
 
 echo "Creating any new tables and indices"
-( cd $NEW_CLONE && make ensure_tables_and_indices )
+( cd $NEW_CLONE && make init_db )
 
 echo "Restarting gunicorn"
 PYTHONPATH="/home/vim/vim-awesome" \

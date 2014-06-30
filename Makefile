@@ -12,7 +12,7 @@ deploy:
 		cat tools/deploy.sh | ssh vim@vimawesome.com DEPLOYER=`whoami` sh; \
 	fi
 
-ensure_tables_and_indices:
+init_db:
 	PYTHONPATH=. python db/init_db.py
 
 # TODO(david): This probably no longer works and needs to be updated.

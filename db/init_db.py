@@ -13,4 +13,5 @@ def ensure_tables_and_indices():
 
 
 if __name__ == '__main__':
+    db.util.ensure_db('vim_awesome')
     ensure_tables_and_indices()
