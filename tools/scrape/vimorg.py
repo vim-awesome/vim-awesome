@@ -129,5 +129,5 @@ def _get_inner_text(html_node):
         - converts HTML entities like &nbsp; and smart quotes into their
           unicode equivalents
     """
-    return lxml.html.tostring(html_node, encoding='utf-8', method='text',
-            with_tail=False)
+    return lxml.html.tostring(html_node, encoding='utf-8',
+            method='text', with_tail=False).decode('utf-8')
