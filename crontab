@@ -45,3 +45,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/us
 13 10 * * * PYTHONPATH=$HOME/vim-awesome python $HOME/vim-awesome/tools/scrape/scrape.py -s github-plugins 1200 >> $HOME/logs/cron/github-plugins.log 2>&1
 13 11 * * * PYTHONPATH=$HOME/vim-awesome python $HOME/vim-awesome/tools/scrape/scrape.py -s github-plugins 1200 >> $HOME/logs/cron/github-plugins.log 2>&1
 13 12 * * * PYTHONPATH=$HOME/vim-awesome python $HOME/vim-awesome/tools/scrape/scrape.py -s github-plugins 1200 >> $HOME/logs/cron/github-plugins.log 2>&1
+
+# Daily DB dumps which we can back up to Tarsnap. Logrotate will delete old dumps.
+13 13 * * * ( cd $HOME/dumps && rethinkdb dump )
