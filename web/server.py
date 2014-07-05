@@ -11,6 +11,7 @@ import rethinkdb as r
 
 import db
 import util
+import api_util
 
 try:
     import secrets
@@ -133,7 +134,7 @@ def get_plugins():
     results = results[((page - 1) * RESULTS_PER_PAGE):
             (page * RESULTS_PER_PAGE)]
 
-    return json.dumps({
+    return api_util.jsonify({
         'plugins': results,
         'total_pages': total_pages,
         'total_results': count,
@@ -220,7 +221,9 @@ def get_plugin(slug):
     plugin = r.table('plugins').get(slug).run(r_conn())
 
     if plugin:
-        return json.dumps(db.plugins.to_json(plugin))
+        return api_util.jsonify(
+            db.plugins.to_json(plugin)
+        )
     else:
         return util.api_not_found('No plugin with slug %s' % slug)
 
@@ -236,20 +239,26 @@ def update_plugin_tags(slug):
         return util.api_not_found('No plugin with slug %s' % slug)
 
     db.plugins.update_tags(plugin, data['tags'])
-    return json.dumps({'tags': plugin['tags']})
+    return api_util.jsonify(
+        {'tags': plugin['tags']}
+    )
 
 
 @app.route('/api/tags', methods=['GET'])
 @cache.cached(timeout=60 * 60)
 def get_tags():
     tags = r.table('tags').filter({}).run(r_conn())
-    return json.dumps(list(tags))
+    return api_util.jsonify(
+        list(tags)
+    )
 
 
 @app.route('/api/categories', methods=['GET'])
 @cache.cached(timeout=60 * 60)
 def get_categories():
-    return json.dumps(get_all_categories_cached())
+    return api_util.jsonify(
+        get_all_categories_cached()
+    )
 
 
 @app.route('/api/plugins/<slug>/category/<category>', methods=['PUT'])
@@ -264,7 +273,9 @@ def update_plugin_category(slug, category):
     # TODO(david): Also update search index (stale cache)
     plugin['category'] = category
     r.table('plugins').update(plugin).run(r_conn())
-    return json.dumps({'category': plugin['category']})
+    return api_util.jsonify(
+        {'category': plugin['category']}
+    )
 
 
 @app.route('/api/submit', methods=['POST'])
