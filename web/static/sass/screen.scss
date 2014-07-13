@@ -271,8 +271,9 @@ code {
       }
 
       .highlighted-tag {
-        color: mix($bg-dark-1, $content-4, 80%);
-        background: mix($bg-dark-1, $bg-light-1, 30%);
+        opacity: 1.0;
+        color: mix($bg-dark-1, $content-4, 20%);
+        background-color: rgba($bg-dark-1, 0.2);
 
         .tag-count {
           color: $content-4;
