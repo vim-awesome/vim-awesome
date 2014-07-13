@@ -933,8 +933,24 @@ var PluginPage = React.createClass({
     return {};
   },
 
+  updateTitle: function() {
+    if (!this._previousTitle) {
+      this._previousTitle = document.title;
+    }
+    if (this.state.name) {
+      document.title = this.state.name + " - Vim Awesome";
+    }
+  },
+
+  resetTitle: function() {
+    if (this._previousTitle) {
+      document.title = this._previousTitle;
+    }
+  },
+
   componentDidMount: function() {
     this.fetchPlugin();
+    this.updateTitle();
     window.addEventListener("keydown", this.onWindowKeyDown, false);
 
     this.tagXhrQueue = $.Deferred();
@@ -942,7 +958,12 @@ var PluginPage = React.createClass({
   },
 
   componentWillUnmount: function() {
+    this.resetTitle();
     window.removeEventListener("keydown", this.onWindowKeyDown, false);
+  },
+
+  componentDidUpdate: function() {
+    this.updateTitle();
   },
 
   fetchPlugin: function() {
