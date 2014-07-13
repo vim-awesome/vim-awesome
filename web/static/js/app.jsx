@@ -113,14 +113,34 @@ var Sidebar = React.createClass({
   },
 
   render: function() {
+    // This block of code looks for tags in the query so we can highlight them
+    // in the sidebar
+    var selectedTagId = null;
+    var tags = [];
+    if (this.props.query && this.props.query.q) {
+      var queries = this.props.query.q.split(" ");
+      _.each(queries, function(query) {
+        if (query && startsWith(query, "tag:")) {
+          var queryTag = query.split(":")[1];
+          tags.push(queryTag);
+        }
+      });
+    }
+
     var categoryElements = _.chain(this.state.categories)
       .reject(function(category) { return category.id === "uncategorized"; })
       .map(function(category) {
         var tagsClass = category.id + "-tags";
         var tagElements = _.map(category.tags, function(tag) {
+          // TODO(Jeff): should check out classSet, in the experimental Add-ons
+          var classString = "tag-link";
+          if (_.contains(tags, tag.id)) {
+            classString += " highlighted-tag";
+          }
+
           return <li key={tag.id}>
             <a href={"/?q=tag:" + encodeURIComponent(tag.id)}
-                className="tag-link">
+                className={classString}>
               <span className="tag-id">{tag.id}</span>
               {tag.count > 1 &&
                 <span className="tag-count"> × {tag.count}</span>
@@ -1319,7 +1339,7 @@ var Page = React.createClass({
 
   render: function() {
     return <div className="page-container">
-      <Sidebar />
+      <Sidebar query={this.props.query} />
       <div className="content">
         {this.props.activeRoute}
         <Footer />

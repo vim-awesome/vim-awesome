@@ -269,6 +269,15 @@ code {
         font-size: 10px;
         color: $content-2;
       }
+
+      .highlighted-tag {
+        color: mix($bg-dark-1, $content-4, 80%);
+        background: mix($bg-dark-1, $bg-light-1, 30%);
+
+        .tag-count {
+          color: $content-4;
+        }
+      }
     }
   }
 
