@@ -782,7 +782,6 @@ code {
   }
 
   .tag-input {
-    padding: 15px 5px;
     border: none;
     border-radius: 0;
     box-shadow: none;
@@ -1432,6 +1431,10 @@ $long-desc-bg: #FBFBFB;
 
   .tags-select {
     height: $install-height - $category-height - $box-margin;
+
+    .tag-input {
+      padding: 15px 5px;
+    }
   }
 }
 
