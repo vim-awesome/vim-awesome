@@ -71,4 +71,7 @@ do
     rm -rf repos/$old
 done
 
+echo "Installing crontab"
+( cd $NEW_CLONE && crontab crontab )
+
 PYTHONPATH=$NEW_CLONE python $NEW_CLONE/tools/notify_deploy.py $DEPLOYER
