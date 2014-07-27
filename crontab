@@ -27,6 +27,14 @@
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
 
+# Make Python use UTF-8 encoding when the encoding of the output device is not
+# known. Otherwise, Python will throw a UnicodeEncodeError when a unicode
+# character output is piped. From http://stackoverflow.com/a/4027726
+PYTHONIOENCODING=utf-8
+
+# Make log output sequential and actually comprehensible.
+PYTHONUNBUFFERED=true
+
 # Data pipeline to update all of our plugins daily
 
 # 1. Scrape from all vim.org plugins
