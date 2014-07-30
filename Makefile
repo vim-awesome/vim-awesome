@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 
-.PHONY: local deploy seed_data aggregate_tags test clean
+.PHONY: local deploy seed_data aggregate_tags test review_submissions clean
 
 local:
 	tools/local_server.sh
@@ -48,6 +48,9 @@ restore:
 
 auto_categorize:
 	PYTHONPATH=. python tools/auto_categorize.py
+
+review_submissions:
+	PYTHONPATH=. python tools/review_submitted_plugins.py
 
 clean:
 	find . -name '*.pyc' -delete

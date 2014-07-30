@@ -135,6 +135,10 @@ class PluginGithubRepos(GithubRepos):
         # IDs of vim.org scripts where this repo was mentioned
         'from_vim_scripts': [],
 
+        # If this was discovered from a user submission, the submitted form
+        # data as an object.
+        'from_submission': None,
+
     })
 
     # GitHub repos that are not Vim plugins that we've manually found.
