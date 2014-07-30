@@ -76,3 +76,14 @@ repos on GitHub, it is still a useful source of relative usage data.
 Take a look at [some of these issues](https://github.com/divad12/vim-awesome/issues?labels=easyfix&state=open) to get started.
 
 Chat with us on #vimawesome on freenode!
+
+## Acknowledgements
+
+Thanks Ethan Schoonover for use of the Solarized colour scheme.
+
+Much inspiration for this website, both conception and design, came from
+[unheap.com](http://unheap.com), a resource for browsing jQuery plugins.
+
+Built with [React](http://facebook.github.io/react/), a JavaScript library for
+building UIs, and [RethinkDB](http://rethinkdb.com/), a document-oriented
+database.
