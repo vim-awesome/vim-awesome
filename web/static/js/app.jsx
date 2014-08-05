@@ -48,6 +48,9 @@ var D_KEYCODE = 'D'.charCodeAt(0),
     ENTER_KEYCODE = 13,
     ESCAPE_KEYCODE = 27;
 
+// Renderer used to change relative image URL to absolute in Markdown
+var markedRenderer = new marked.Renderer();
+
 // A cache of all tag IDs and their counts.
 var allTags = {};
 
@@ -911,8 +914,30 @@ var Tags = React.createClass({
 
 var Markdown = React.createClass({
   render: function() {
-    var html = this.props.children || '';
-    return <div dangerouslySetInnerHTML={{__html: marked(html)}} />;
+    markedRenderer.image = this.replaceRelativeUrlWithGithubImgSrc;
+    var markedHtml = marked(this.props.children || '', 
+      {renderer: markedRenderer});
+    return <div 
+      dangerouslySetInnerHTML={{__html: markedHtml}} 
+    />;
+  },
+
+  /**
+   * Replaces the relative img URL to the absolute img URL in a README.md file
+   * See docs: https://www.npmjs.org/package/marked
+   * @param {string} href The source of the image
+   * @param {string} title The title of the image
+   * @param {string} text The alt of the image
+   */
+  replaceRelativeUrlWithGithubImgSrc: function(href, title, text) {
+    // Checks if the href is not an absolute URL
+    // http://stackoverflow.com/questions/10687099/how-to-test-if-a-url-string-is-absolute-or-relative
+    if (!href.match(/^(?:[a-z]+:)?\/\//i)) {
+      return "<img src='" + this.props.githubRepoUrl + "/raw/master/" + 
+        href + "' alt='" + text + "' />"; 
+    } else {
+      return "<img src='" + href + "' alt='" + text + "' />";
+    }                                      
   }
 });
 
@@ -1127,7 +1152,11 @@ var PluginPage = React.createClass({
       {(longDesc || installDetails) &&
         <div className="row-fluid long-desc-container">
           <div className="long-desc">
-            {longDescType === "markdown" && <Markdown>{longDesc}</Markdown>}
+            {longDescType === "markdown" &&
+              <Markdown githubRepoUrl={this.state.github_url}>
+                {longDesc}
+              </Markdown>
+            }
             {longDescType === "mono" &&
                 <Plaintext className="mono">{longDesc}</Plaintext>}
             {longDescType === "plain" && <Plaintext>{longDesc}</Plaintext>}
