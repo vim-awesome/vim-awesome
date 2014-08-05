@@ -11,4 +11,4 @@ errorlog = 'logs/gunicorn/error.log'
 
 # Recommendation is 2 * NUM_CORES + 1. See
 # http://gunicorn-docs.readthedocs.org/en/latest/design.html#how-many-workers
-workers = 12
+workers = 5
