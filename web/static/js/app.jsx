@@ -915,10 +915,10 @@ var Tags = React.createClass({
 var Markdown = React.createClass({
   render: function() {
     markedRenderer.image = this.replaceRelativeUrlWithGithubImgSrc;
-    var markedHtml = marked(this.props.children || '', 
+    var markedHtml = marked(this.props.children || '',
       {renderer: markedRenderer});
-    return <div 
-      dangerouslySetInnerHTML={{__html: markedHtml}} 
+    return <div
+      dangerouslySetInnerHTML={{__html: markedHtml}}
     />;
   },
 
@@ -933,11 +933,11 @@ var Markdown = React.createClass({
     // Checks if the href is not an absolute URL
     // http://stackoverflow.com/questions/10687099/how-to-test-if-a-url-string-is-absolute-or-relative
     if (!href.match(/^(?:[a-z]+:)?\/\//i)) {
-      return "<img src='" + this.props.githubRepoUrl + "/raw/master/" + 
-        href + "' alt='" + text + "' />"; 
+      return "<img src='" + this.props.githubRepoUrl + "/raw/master/" +
+        href + "' alt='" + text + "' />";
     } else {
       return "<img src='" + href + "' alt='" + text + "' />";
-    }                                      
+    }
   }
 });
 
