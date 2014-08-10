@@ -35,6 +35,16 @@ PYTHONIOENCODING=utf-8
 # Make log output sequential and actually comprehensible.
 PYTHONUNBUFFERED=true
 
+# Restart Rethinkdb and the server.
+# TODO(david): MAJOR BANDAID HACK!! This is here because Rethinkdb has been
+#     dying every few days for some reason. I have tried updating RethinkDB's patch
+#     version, but the problem still seems to be there. There are no errors
+#     output to RethinkDB's log file when this happens. This may or may not
+#     have to do with Rethinkdb gobbling up too much memory. Experiment with
+#     changing Rethinkdb cache sizes (though it looks like Rethinkdb is already
+#     using the minimum possible memory), or just ask on #rethinkdb.
+42 5 * * * $HOME/vim-awesome/tools/restart_rethinkdb_and_server.sh
+
 # Data pipeline to update all of our plugins daily
 
 # 1. Scrape from all vim.org plugins
