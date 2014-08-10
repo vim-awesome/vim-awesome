@@ -1,0 +1,7 @@
+/home/vim/logs/cron/*.log {
+  daily
+  dateext
+  olddir archives
+  copytruncate
+  rotate 1000
+}
