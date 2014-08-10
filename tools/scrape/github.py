@@ -196,6 +196,16 @@ def get_plugin_data(owner, repo_name, repo_data, readme_data=None):
     }
 
 
+def _add_submission_data(plugin, submission):
+    """Updates a plugin with info from a user submission."""
+    if (plugin.get('category', 'uncategorized') == 'uncategorized' and
+            submission.get('category', 'uncategorized') != 'uncategorized'):
+        plugin['category'] = submission['category']
+
+    if not plugin.get('tags') and submission.get('tags'):
+        db.plugins.update_tags(plugin, submission['tags'])
+
+
 # TODO(david): Simplify/break-up this function.
 def scrape_plugin_repos(num):
     """Scrapes the num plugin repos that have been least recently scraped."""
@@ -315,8 +325,12 @@ def scrape_plugin_repos(num):
 
             plugin_data['github_bundles'] = plugin_manager_users
 
+            if repo.get('from_submission'):
+                _add_submission_data(plugin_data, repo['from_submission'])
+
             db.plugins.add_scraped_data(plugin_data, repo,
                     submission=repo.get('from_submission'))
+
             print 'done.'
 
 
