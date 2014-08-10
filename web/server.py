@@ -236,6 +236,7 @@ def update_plugin_tags(slug):
         return util.api_not_found('No plugin with slug %s' % slug)
 
     db.plugins.update_tags(plugin, data['tags'])
+    r.table('plugins').update(plugin).run(r_conn())
     return json.dumps({'tags': plugin['tags']})
 
 

@@ -274,7 +274,7 @@ def update_tags(plugin, tags):
     """Updates a plugin's tags to the given set, and updates aggregate tag
     counts.
     """
-    plugin_tags = plugin['tags']
+    plugin_tags = plugin.get('tags', [])
     added_tags = set(tags) - set(plugin_tags)
     removed_tags = set(plugin_tags) - set(tags)
 
@@ -283,7 +283,6 @@ def update_tags(plugin, tags):
     map(db.tags.remove_tag, removed_tags)
 
     plugin['tags'] = tags
-    r.table('plugins').update(plugin).run(r_conn())
 
 
 def to_json(p):
