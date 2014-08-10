@@ -53,12 +53,12 @@ if app.config['ENV'] == 'prod':
     logging.getLogger('').addHandler(hipchat_handler)
 
 
-@cache.cached(timeout=60 * 60 * 4, key_prefix='search_index')
+@cache.cached(timeout=60 * 60 * 26, key_prefix='search_index')
 def get_search_index_cached():
     return db.plugins.get_search_index()
 
 
-@cache.cached(timeout=60 * 60 * 4, key_prefix='all_categories')
+@cache.cached(timeout=60 * 60 * 27, key_prefix='all_categories')
 def get_all_categories_cached():
     return db.categories.get_all()
 
@@ -70,7 +70,7 @@ def get_all_categories_cached():
 # TODO(david): Alternatively serve this out of Nginx
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-@cache.cached(timeout=60 * 60, key_prefix='index.html')
+@cache.cached(timeout=60 * 60 * 28, key_prefix='index.html')
 def index(path):
     return flask.render_template('index.html', env=app.config['ENV'])
 
@@ -111,7 +111,7 @@ def _make_get_plugins_cache_key():
 # TODO(david): Move API functions out of this file once we have too many
 # TODO(david): API functions should return content-type header JSON
 @app.route('/api/plugins', methods=['GET'])
-@cache.cached(timeout=60 * 60, key_prefix=_make_get_plugins_cache_key,
+@cache.cached(timeout=60 * 60 * 25, key_prefix=_make_get_plugins_cache_key,
         unless=_should_skip_get_plugins_cache)
 def get_plugins():
     RESULTS_PER_PAGE = 20
