@@ -12,6 +12,7 @@ r_conn = db.util.r_conn
 def ensure_table():
     db.util.ensure_table('submitted_plugins')
     db.util.ensure_index('submitted_plugins', 'submitted_at')
+    db.util.ensure_index('submitted_plugins', 'vimorg_id')
 
 
 def insert(plugin_data):

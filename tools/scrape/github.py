@@ -114,21 +114,6 @@ def maybe_wait_until_api_limit_resets(response_headers):
 # Routines for scraping Vim plugin repos from GitHub.
 
 
-_VIMORG_ID_FROM_URL_REGEX = re.compile(
-        r'vim.org/scripts/script.php\?script_id=(\d+)')
-
-
-def _get_vimorg_id_from_url(url):
-    """Returns the vim.org script_id from a URL if it's of a vim.org script,
-    otherwise, returns None.
-    """
-    match = _VIMORG_ID_FROM_URL_REGEX.search(url or '')
-    if match:
-        return match.group(1)
-
-    return None
-
-
 def get_plugin_data(owner, repo_name, repo_data, readme_data=None):
     """Populate info relevant to a plugin from a GitHub repo.
 
@@ -209,16 +194,6 @@ def get_plugin_data(owner, repo_name, repo_data, readme_data=None):
         'github_readme': readme,
         'github_readme_filename': readme_filename,
     }
-
-
-def _add_submission_data(plugin, submission):
-    """Updates a plugin with info from a user submission."""
-    if (plugin.get('category', 'uncategorized') == 'uncategorized' and
-            submission.get('category', 'uncategorized') != 'uncategorized'):
-        plugin['category'] = submission['category']
-
-    if not plugin.get('tags') and submission.get('tags'):
-        db.plugins.update_tags(plugin, submission['tags'])
 
 
 # TODO(david): Simplify/break-up this function.
@@ -340,10 +315,8 @@ def scrape_plugin_repos(num):
 
             plugin_data['github_bundles'] = plugin_manager_users
 
-            if repo.get('from_submission'):
-                _add_submission_data(plugin_data, repo['from_submission'])
-
-            db.plugins.add_scraped_data(plugin_data, repo)
+            db.plugins.add_scraped_data(plugin_data, repo,
+                    submission=repo.get('from_submission'))
             print 'done.'
 
 
@@ -371,7 +344,7 @@ def scrape_vim_scripts_repos(num):
 
             # vimorg_id is required for associating with the corresponding
             # vim.org-scraped plugin.
-            vimorg_id = _get_vimorg_id_from_url(repo_data['homepage'])
+            vimorg_id = util.get_vimorg_id_from_url(repo_data['homepage'])
             assert vimorg_id
 
             repo_name = repo_data['name']

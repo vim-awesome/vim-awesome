@@ -477,7 +477,17 @@ def _are_plugins_different(p1, p2):
     return False
 
 
-def add_scraped_data(plugin_data, repo=None):
+def _add_submission_data(plugin, submission):
+    """Updates a plugin with info from a user submission."""
+    if (plugin.get('category', 'uncategorized') == 'uncategorized' and
+            submission.get('category', 'uncategorized') != 'uncategorized'):
+        plugin['category'] = submission['category']
+
+    if not plugin.get('tags') and submission.get('tags'):
+        update_tags(plugin, submission['tags'])
+
+
+def add_scraped_data(plugin_data, repo=None, submission=None):
     """Adds scraped plugin data from either vim.org, a github.com/vim-scripts
     repo, or an arbitrary GitHub repo.
 
@@ -490,7 +500,11 @@ def add_scraped_data(plugin_data, repo=None):
         repo: (optional) If plugin_data is scraped from GitHub, the
             corresponding github_repo document containing info about the GitHub
             repo.
+        submission: (optional) Associated user submission info for this plugin.
     """
+    if submission:
+        _add_submission_data(plugin_data, submission)
+
     plugins = _find_matching_plugins(plugin_data, repo)
 
     if len(plugins) == 1 and not _are_plugins_different(

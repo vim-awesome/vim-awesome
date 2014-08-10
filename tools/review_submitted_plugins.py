@@ -15,6 +15,7 @@ import rethinkdb as r
 
 import db.github_repos
 import db.util
+import util
 
 r_conn = db.util.r_conn
 
@@ -73,6 +74,30 @@ def delete_empty_submissions():
     print deleted
 
 
+def review_vimorg_submission(submission):
+    """Prompts whether to insert data about a plugin with a vimorg_id.
+
+    Displays info about that submission, and displays an interactive prompt
+    whether to add submitted data about it. If no, will add a field to the
+    submission that it was rejected. If yes, will make the submission data
+    searchable by adding a vimorg_id field so that data from it can be added
+    when scraping vim.org plugins.
+    """
+    print
+    print json.dumps(submission, indent=2)
+
+    if not _query_yes_no("Add info about this vim.org submission?"):
+        submission['rejected'] = True
+        r.table('submitted_plugins').insert(submission, upsert=True).run(
+                r_conn())
+        return
+
+    print "Ok, will update from this submission data on next vim.org scrape"
+    vimorg_id = util.get_vimorg_id_from_url(submission['vimorg-link'])
+    submission['vimorg_id'] = vimorg_id
+    r.table('submitted_plugins').insert(submission, upsert=True).run(r_conn())
+
+
 def review_github_submission(submission, repo_owner, repo_name):
     """Prompts whether to insert a GitHub-sourced plugin submission.
 
@@ -86,7 +111,7 @@ def review_github_submission(submission, repo_owner, repo_name):
     # It'd be nice to webbrowser.open(submission['github-link']) here, but this
     # needs to work ssh'ed
 
-    if not _query_yes_no("Add this submission?"):
+    if not _query_yes_no("Add this GitHub submission?"):
         submission['rejected'] = True
         r.table('submitted_plugins').insert(submission, upsert=True).run(
                 r_conn())
@@ -105,9 +130,10 @@ def main():
     delete_empty_submissions()
 
     rejected_plugins = []
-    known_vimorg_plugins = []
     known_github_plugins = []
     new_github_plugins = []
+    known_vimorg_plugins = []
+    new_vimorg_plugins = []
     unparseable_plugins = []
 
     submissions = r.table('submitted_plugins').run(r_conn())
@@ -117,7 +143,10 @@ def main():
             continue
 
         if submission['vimorg-link']:
-            known_vimorg_plugins.append(submission)
+            if submission.get('vimorg_id'):
+                known_vimorg_plugins.append(submission)
+            else:
+                new_vimorg_plugins.append(submission)
             continue
 
         github_link = submission['github-link']
@@ -142,6 +171,12 @@ def main():
     print '%s submissions were previously rejected' % len(rejected_plugins)
     print '%s submissions are known vim.org plugins' % len(
             known_vimorg_plugins)
+
+    # Update vim.org submissions with the vimorg_id for easy searching.
+    print '%s submissions are new vim.org plugins' % len(new_vimorg_plugins)
+    for submission in new_vimorg_plugins:
+        review_vimorg_submission(submission)
+
     print '%s submissions are known github.com plugins' % len(
             known_github_plugins)
 

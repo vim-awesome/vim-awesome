@@ -1,5 +1,10 @@
 import calendar
+import re
 import time
+
+
+_VIMORG_ID_FROM_URL_REGEX = re.compile(
+        r'vim.org/scripts/script.php\?script_id=(\d+)')
 
 
 def api_not_found(message):
@@ -12,6 +17,17 @@ def api_bad_request(message):
 
 def to_timestamp(dt):
     return calendar.timegm(dt.timetuple())
+
+
+def get_vimorg_id_from_url(url):
+    """Returns the vim.org script_id from a URL if it's of a vim.org script,
+    otherwise, returns None.
+    """
+    match = _VIMORG_ID_FROM_URL_REGEX.search(url or '')
+    if match:
+        return match.group(1)
+
+    return None
 
 
 def time_it(func):

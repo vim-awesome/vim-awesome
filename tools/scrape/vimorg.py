@@ -6,8 +6,10 @@ import sys
 import requests
 import lxml.html
 import lxml.html.html5parser
+import rethinkdb as r
 
 import db
+import db.util
 import util
 
 
@@ -63,7 +65,12 @@ def scrape_scripts(num):
                 "vimorg_downloads": int(tr[3].text),
                 "vimorg_short_desc": tr[4][0].text,
             }, **get_plugin_info(vimorg_id))
-            db.plugins.add_scraped_data(plugin)
+
+            query = r.table('submitted_plugins').get_all(vimorg_id,
+                    index='vimorg_id').filter(
+                            r.row['rejected'] != True, default=True)
+            submission = db.util.get_first(query)
+            db.plugins.add_scraped_data(plugin, submission=submission)
             print "done"
         except Exception:
             logging.exception(
