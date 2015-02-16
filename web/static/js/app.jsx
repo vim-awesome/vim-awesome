@@ -533,6 +533,24 @@ var NeoBundleInstructions = React.createClass({
   }
 });
 
+// Instructions for installing a plugin with Vim-Plug.
+var VimPlugInstructions = React.createClass({
+  render: function() {
+    var urlPath = (this.props.github_url || "").replace(
+        /^https?:\/\/github.com\//, "");
+    var bundleUri = urlPath.replace(/^vim-scripts\//, "");
+
+    return <div>
+      <p>Place this in your <code>.vimrc:</code></p>
+      <pre>Plug '{bundleUri}'</pre>
+      <p>&hellip; then run the following in Vim:</p>
+      <pre>:source %<br/>:PlugInstall</pre>
+      {/* Hack to get triple-click in Chrome to not over-select. */}
+      <div>{'\u00a0' /* &nbsp; */}</div>
+    </div>;
+  }
+});
+
 // Instructions for installing a plugin with Pathogen.
 var PathogenInstructions = React.createClass({
   render: function() {
@@ -573,6 +591,19 @@ var NeoBundleTabPopover = React.createClass({
   }
 });
 
+// Help text explaining what Vim-Plug is and linking to more details.
+var VimPlugTabPopover = React.createClass({
+  render: function() {
+    return <div>
+      Vim-Plug is a Vim plugin manager similar to NeoBundle.
+      <br/><br/>See{' '}
+      <a href="https://github.com/junegunn/vim-plug" target="_blank">
+        <i className="icon-github" /> junegunn/vim-plug
+      </a>
+    </div>;
+  }
+});
+
 // Help text explaining what Pathogen is and linking to more details.
 var PathogenTabPopover = React.createClass({
   render: function() {
@@ -600,6 +631,7 @@ var Install = React.createClass({
     var popovers = {
       vundleTab: <VundleTabPopover />,
       neoBundleTab: <NeoBundleTabPopover />,
+      vimPlugTab: <VimPlugTabPopover />,
       pathogenTab: <PathogenTabPopover />
     };
 
@@ -639,6 +671,11 @@ var Install = React.createClass({
               className={this.state.tabActive === "neoBundle" ? "active" : ""}>
             NeoBundle
           </li>
+          <li onClick={this.onTabClick.bind(this, "vimPlug")}
+              ref="vimPlugTab"
+              className={this.state.tabActive === "vimPlug" ? "active" : ""}>
+            VimPlug
+          </li>
           <li onClick={this.onTabClick.bind(this, "pathogen")}
               ref="pathogenTab"
               className={this.state.tabActive === "pathogen" ? "active" : ""}>
@@ -651,6 +688,8 @@ var Install = React.createClass({
             <VundleInstructions github_url={this.props.github_url} />}
         {this.state.tabActive === "neoBundle" &&
             <NeoBundleInstructions github_url={this.props.github_url} />}
+        {this.state.tabActive === "vimPlug" &&
+            <VimPlugInstructions github_url={this.props.github_url} />}
         {this.state.tabActive === "pathogen" &&
             <PathogenInstructions github_url={this.props.github_url} />}
       </div>
