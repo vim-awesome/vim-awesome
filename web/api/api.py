@@ -153,7 +153,7 @@ def get_plugin(slug):
     if plugin:
         return api_util.jsonify(db.plugins.to_json(plugin))
     else:
-        return util.api_not_found('No plugin with slug %s' % slug)
+        return api_util.api_not_found('No plugin with slug %s' % slug)
 
 
 # TODO(david): Make it not so easy for an attacker to completely obliterate all
@@ -164,7 +164,7 @@ def update_plugin_tags(slug):
     plugin = r.table('plugins').get(slug).run(r_conn())
 
     if not plugin:
-        return util.api_not_found('No plugin with slug %s' % slug)
+        return api_util.api_not_found('No plugin with slug %s' % slug)
 
     db.plugins.update_tags(plugin, data['tags'])
     return api_util.jsonify({
@@ -189,10 +189,10 @@ def get_categories():
 def update_plugin_category(slug, category):
     plugin = r.table('plugins').get(slug).run(r_conn())
     if not plugin:
-        return util.api_not_found('No plugin with slug %s' % slug)
+        return api_util.api_not_found('No plugin with slug %s' % slug)
 
     if not category in [c['id'] for c in get_all_categories_cached()]:
-        return util.api_bad_request('No such category %s' % category)
+        return api_util.api_bad_request('No such category %s' % category)
 
     # TODO(david): Also update search index (stale cache)
     plugin['category'] = category

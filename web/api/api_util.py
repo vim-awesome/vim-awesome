@@ -18,3 +18,11 @@ def jsonify(data):
 
     return flask.current_app.response_class(jsonified_safe,
             mimetype='application/json')
+
+
+def api_not_found(message):
+    return (message, 404)
+
+
+def api_bad_request(message):
+    return (message, 400)
