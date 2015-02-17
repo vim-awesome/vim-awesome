@@ -510,7 +510,7 @@ def add_scraped_data(plugin_data, repo=None, submission=None):
     if len(plugins) == 1 and not _are_plugins_different(
             plugins[0], plugin_data):
         updated_plugin = update_plugin(plugins[0], plugin_data)
-        insert(updated_plugin, upsert=True)
+        insert(updated_plugin, conflict='replace')
     else:
         insert(plugin_data)
         print 'inserted new plugin %s ...' % plugin_data['slug'],

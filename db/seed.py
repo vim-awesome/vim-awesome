@@ -51,7 +51,7 @@ def main():
             'homepage': 'http://valloric.github.io/YouCompleteMe/',
             'tags': ['autocomplete', 'fuzzy', 'C'],
         },
-    ], upsert=True)
+    ], conflict='replace')
 
     # TODO(david): Add other fields like friendly name, description
     r.table('tags').insert([{

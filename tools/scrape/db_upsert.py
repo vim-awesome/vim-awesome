@@ -40,7 +40,7 @@ def _update_db_plugin(db_plugin, plugin):
     """
     if db_plugin:
         updated_plugin = db.plugins.update_plugin(db_plugin, plugin)
-        db.plugins.insert(updated_plugin, upsert=True)
+        db.plugins.insert(updated_plugin, conflict='replace')
         return True
     else:
         return False

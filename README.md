@@ -23,7 +23,9 @@ repos on GitHub, it is still a useful source of relative usage data.
 ## Getting set up
 
 <!-- TODO(david): Don't hardcode version here. -->
-1. Install RethinkDB version 1.13.0-0 from http://rethinkdb.com/docs/install/.
+1. Install RethinkDB version 1.16.1 from http://rethinkdb.com/docs/install/.
+  (You may have to dig into the
+  [download archives](http://download.rethinkdb.com/).)
 
 1. Install Sass and Compass, which we use to generate our CSS.
 

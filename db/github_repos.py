@@ -112,7 +112,8 @@ class GithubRepos(object):
             db_repo.update(repo)
             # TODO(david): Figure out if there's any difference between doing
             #     table().replace(db_repo), and if so, which is preferred.
-            r.table(cls._TABLE_NAME).insert(db_repo, upsert=True).run(r_conn())
+            r.table(cls._TABLE_NAME).insert(db_repo,
+                    conflict='replace').run(r_conn())
             return False
 
     @classmethod

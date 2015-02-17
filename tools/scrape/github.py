@@ -272,7 +272,7 @@ def scrape_plugin_repos(num):
                 if db_plugin:
                     db_plugin['github_owner'] = redirect_owner
                     db_plugin['github_repo_name'] = redirect_repo_name
-                    db.plugins.insert(db_plugin, upsert=True)
+                    db.plugins.insert(db_plugin, conflict='replace')
 
                 print 'redirects to %s/%s.' % (redirect_owner,
                         redirect_repo_name)
@@ -298,7 +298,8 @@ def scrape_plugin_repos(num):
                 'repo_name': repo_data['parent']['name'],
             })
 
-        r.table('plugin_github_repos').insert(repo, upsert=True).run(r_conn())
+        r.table('plugin_github_repos').insert(repo,
+                conflict='replace').run(r_conn())
 
         # For most cases we don't care about forked repos, unless the forked
         # repo is used by others.

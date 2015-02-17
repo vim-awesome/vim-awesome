@@ -88,14 +88,15 @@ def review_vimorg_submission(submission):
 
     if not _query_yes_no("Add info about this vim.org submission?"):
         submission['rejected'] = True
-        r.table('submitted_plugins').insert(submission, upsert=True).run(
-                r_conn())
+        r.table('submitted_plugins').insert(submission,
+                conflict='replace').run(r_conn())
         return
 
     print "Ok, will update from this submission data on next vim.org scrape"
     vimorg_id = util.get_vimorg_id_from_url(submission['vimorg-link'])
     submission['vimorg_id'] = vimorg_id
-    r.table('submitted_plugins').insert(submission, upsert=True).run(r_conn())
+    r.table('submitted_plugins').insert(submission,
+            conflict='replace').run(r_conn())
 
 
 def review_github_submission(submission, repo_owner, repo_name):
@@ -113,8 +114,8 @@ def review_github_submission(submission, repo_owner, repo_name):
 
     if not _query_yes_no("Add this GitHub submission?"):
         submission['rejected'] = True
-        r.table('submitted_plugins').insert(submission, upsert=True).run(
-                r_conn())
+        r.table('submitted_plugins').insert(submission,
+                conflict='replace').run(r_conn())
         return
 
     print "Ok, inserting new GitHub-sourced plugin %s/%s" % (repo_owner,
