@@ -1,0 +1,194 @@
+[
+  {
+    "name": ".gitignore",
+    "path": "vim/.gitignore",
+    "sha": "a0e76af9bc588fa2d49b6e518db5e1fa1a1e6dfc",
+    "size": 11,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/.gitignore?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/vim/.gitignore",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/a0e76af9bc588fa2d49b6e518db5e1fa1a1e6dfc",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/vim/.gitignore",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/.gitignore?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/a0e76af9bc588fa2d49b6e518db5e1fa1a1e6dfc",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/vim/.gitignore"
+    }
+  },
+  {
+    "name": "autoload",
+    "path": "vim/autoload",
+    "sha": "1a3ba4e68546b42338ff6d4a9c35421aa564f5ae",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/autoload?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/vim/autoload",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/1a3ba4e68546b42338ff6d4a9c35421aa564f5ae",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/autoload?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/1a3ba4e68546b42338ff6d4a9c35421aa564f5ae",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/vim/autoload"
+    }
+  },
+  {
+    "name": "backupdir",
+    "path": "vim/backupdir",
+    "sha": "f3aa77a08ec6a50bb796b6454c28b7b3638a8afe",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/backupdir?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/vim/backupdir",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/f3aa77a08ec6a50bb796b6454c28b7b3638a8afe",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/backupdir?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/f3aa77a08ec6a50bb796b6454c28b7b3638a8afe",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/vim/backupdir"
+    }
+  },
+  {
+    "name": "ftplugin",
+    "path": "vim/ftplugin",
+    "sha": "1431491041cabcfffb252a66d040b5d8befeeb69",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/ftplugin?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/vim/ftplugin",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/1431491041cabcfffb252a66d040b5d8befeeb69",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/ftplugin?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/1431491041cabcfffb252a66d040b5d8befeeb69",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/vim/ftplugin"
+    }
+  },
+  {
+    "name": "install.sh",
+    "path": "vim/install.sh",
+    "sha": "f67258c98b34ab2f82571460a55f0299dc585a43",
+    "size": 176,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/install.sh?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/vim/install.sh",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/f67258c98b34ab2f82571460a55f0299dc585a43",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/vim/install.sh",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/install.sh?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/f67258c98b34ab2f82571460a55f0299dc585a43",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/vim/install.sh"
+    }
+  },
+  {
+    "name": "plug.vim",
+    "path": "vim/plug.vim",
+    "sha": "e7ca14f32589c435e2f5251120d31093345dea82",
+    "size": 3332,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/plug.vim?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/vim/plug.vim",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/e7ca14f32589c435e2f5251120d31093345dea82",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/vim/plug.vim",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/plug.vim?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/e7ca14f32589c435e2f5251120d31093345dea82",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/vim/plug.vim"
+    }
+  },
+  {
+    "name": "plugged",
+    "path": "vim/plugged",
+    "sha": "a56b966e7c26a6236f6ea8315d679ddb9d4e82d9",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/plugged?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/vim/plugged",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/a56b966e7c26a6236f6ea8315d679ddb9d4e82d9",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/plugged?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/a56b966e7c26a6236f6ea8315d679ddb9d4e82d9",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/vim/plugged"
+    }
+  },
+  {
+    "name": "scripts",
+    "path": "vim/scripts",
+    "sha": "297c9584da9def96512b9512609be48e27fb0d73",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/scripts?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/vim/scripts",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/297c9584da9def96512b9512609be48e27fb0d73",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/scripts?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/297c9584da9def96512b9512609be48e27fb0d73",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/vim/scripts"
+    }
+  },
+  {
+    "name": "spell",
+    "path": "vim/spell",
+    "sha": "603006e5125d960c795e05bdf198ff5e8c1dd401",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/spell?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/vim/spell",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/603006e5125d960c795e05bdf198ff5e8c1dd401",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/spell?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/603006e5125d960c795e05bdf198ff5e8c1dd401",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/vim/spell"
+    }
+  },
+  {
+    "name": "swapdir",
+    "path": "vim/swapdir",
+    "sha": "f3aa77a08ec6a50bb796b6454c28b7b3638a8afe",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/swapdir?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/vim/swapdir",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/f3aa77a08ec6a50bb796b6454c28b7b3638a8afe",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/swapdir?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/f3aa77a08ec6a50bb796b6454c28b7b3638a8afe",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/vim/swapdir"
+    }
+  },
+  {
+    "name": "syntax",
+    "path": "vim/syntax",
+    "sha": "52b5831d98acfc4ff99fabe21f3416c2ae357b09",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/syntax?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/vim/syntax",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/52b5831d98acfc4ff99fabe21f3416c2ae357b09",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/syntax?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/52b5831d98acfc4ff99fabe21f3416c2ae357b09",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/vim/syntax"
+    }
+  },
+  {
+    "name": "undodir",
+    "path": "vim/undodir",
+    "sha": "f3aa77a08ec6a50bb796b6454c28b7b3638a8afe",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/undodir?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/vim/undodir",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/f3aa77a08ec6a50bb796b6454c28b7b3638a8afe",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim/undodir?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/f3aa77a08ec6a50bb796b6454c28b7b3638a8afe",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/vim/undodir"
+    }
+  }
+]

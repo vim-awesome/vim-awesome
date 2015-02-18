@@ -116,6 +116,7 @@ def aggregate_repos_from_dotfiles():
         'vundle': 'vundle_repos',
         'pathogen': 'pathogen_repos',
         'neobundle': 'neobundle_repos',
+        'plug': 'vimplug_repos',
     }
 
     query = r.table('dotfiles_github_repos').pluck(managers.values())
