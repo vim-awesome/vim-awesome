@@ -13,6 +13,15 @@ import web.api.api_util as api_util
 import db
 
 
+try:
+    import secrets
+    _HIPCHAT_TOKEN = secrets.HIPCHAT_TOKEN
+    _HIPCHAT_ROOM_ID = secrets.HIPCHAT_ROOM_ID
+except ImportError:
+    _HIPCHAT_TOKEN = None
+    _HIPCHAT_ROOM_ID = None
+
+
 api = flask.Blueprint("api", __name__, url_prefix="/api")
 
 r_conn = db.util.r_conn
