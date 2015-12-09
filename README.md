@@ -1,3 +1,7 @@
+# Unmaintained
+
+This project is currently looking for a maintainer! Please email `emacs@vimawesome.com` if you are interested.
+
 # Vim Awesome
 
 Vim Awesome wants to be a comprehensive, accurate, and up-to-date directory of
