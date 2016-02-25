@@ -73,7 +73,11 @@ def get_repos_from_vimorg_descriptions():
             if field in plugin and plugin[field]:
                 repo_urls = set(_extract_github_repo_urls(plugin[field]))
                 vimorg_id = plugin['vimorg_id']
-                assert vimorg_id
+                # TODO(captbaritone) Re-enable this assertion once there is
+                # only one plugin per `vimorg_id`
+                # assert vimorg_id
+                if not vimorg_id:
+                    continue
                 for repo_url in repo_urls:
                     repo_urls_dict[repo_url].add(vimorg_id)
 
