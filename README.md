@@ -1,9 +1,3 @@
-# Unmaintained
-
-This project is currently looking for a maintainer! Please email `emacs@vimawesome.com` if you are interested.
-
-The backend scraping/data pipeline is somewhat involved. Here's a [technical report on the details](https://www.dropbox.com/s/24owxihtek7vau9/report.pdf?dl=0). This was written for a school project in April 2014, and since then, there have been some minor changes to the backend code.
-
 # Vim Awesome
 
 Vim Awesome wants to be a comprehensive, accurate, and up-to-date directory of
@@ -13,6 +7,8 @@ Many recent Vim plugins are announced on Hacker News or specialized boards, and
 have since become widely used. But how does a new user find out about these? We
 wanted to solve that problem and others with Vim Awesome — an open-sourced
 community resource for discovering new and popular Vim plugins.
+
+[Technical report on the details](https://www.dropbox.com/s/24owxihtek7vau9/report.pdf?dl=0)
 
 ## Where does the data come from?
 
