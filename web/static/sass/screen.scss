@@ -879,6 +879,7 @@ $long-desc-bg: #FBFBFB;
   background: mix($bg-light-2, $bg-light-1, 40%);
   @include box-shadow(0 1px 1px rgba(black, 0.1));
   background: $long-desc-bg;
+  display: inline-block;
 }
 
 .long-desc {
