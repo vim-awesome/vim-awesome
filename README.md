@@ -79,7 +79,7 @@ repos on GitHub, it is still a useful source of relative usage data.
 
 Take a look at [some of these issues](https://github.com/divad12/vim-awesome/issues?labels=easyfix&state=open) to get started.
 
-Chat with us on #vimawesome on freenode!
+Chat with us on [Gitter](https://gitter.im/divad12/vim-awesome)!
 
 ## Acknowledgements
 
