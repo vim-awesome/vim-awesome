@@ -98,11 +98,11 @@ class PluginsTest(unittest.TestCase):
                 {'github_owner': 'tpope', 'github_repo_name': 'bbq'},
                 {'github_owner': 'sjl', 'github_repo_name': 'bbq'}))
         self.assertTrue(diff(
-                {'vimorg_id': 1, 'github_owner': 2, 'github_repo_name': 2},
-                {'vimorg_id': 1, 'github_owner': 3, 'github_repo_name': 3}))
+                {'vimorg_id': 1, 'github_owner': 'foo', 'github_repo_name': 'foo'},
+                {'vimorg_id': 1, 'github_owner': 'bar', 'github_repo_name': 'bar'}))
         self.assertTrue(diff(
-                {'vimorg_id': 2, 'github_owner': 1, 'github_repo_name': 1},
-                {'vimorg_id': 3, 'github_owner': 1, 'github_repo_name': 1}))
+                {'vimorg_id': 2, 'github_owner': 'foo', 'github_repo_name': 'bar'},
+                {'vimorg_id': 3, 'github_owner': 'foo', 'github_repo_name': 'bar'}))
 
         self.assertFalse(diff({}, {}))
         self.assertFalse(diff({'vimorg_id': 1}, {}))
@@ -117,3 +117,6 @@ class PluginsTest(unittest.TestCase):
                 {'github_owner': 'sjl', 'github_repo_name': 'Gundo'}))
         self.assertFalse(diff({'vimorg_id': 1},
                 {'github_owner': 'sjl', 'github_repo_name': 'Gundo'}))
+        self.assertFalse(diff(
+                {'github_owner': 'VundleVim', 'github_repo_name': 'Vundle.vim'},
+                {'github_owner': 'vundlevim', 'github_repo_name': 'vundle.vim'}))

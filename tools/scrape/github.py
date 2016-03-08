@@ -298,8 +298,7 @@ def scrape_plugin_repos(num):
                 'repo_name': repo_data['parent']['name'],
             })
 
-        r.table('plugin_github_repos').insert(repo,
-                conflict='replace').run(r_conn())
+        PluginGithubRepos.upsert_with_owner_repo(repo)
 
         # For most cases we don't care about forked repos, unless the forked
         # repo is used by others.

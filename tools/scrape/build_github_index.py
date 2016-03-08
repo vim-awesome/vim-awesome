@@ -128,6 +128,8 @@ def aggregate_repos_from_dotfiles():
             manager_counter[manager] += len(plugin_repos)
 
             for owner_repo in plugin_repos:
+                # Normalize the GitHub URL fragment
+                owner_repo = owner_repo.lower()
                 repos_counter[owner_repo] += 1
 
     num_inserted = 0

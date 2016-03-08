@@ -170,6 +170,10 @@ def insert(plugins, *args, **kwargs):
         if not plugin.get('normalized_name'):
             plugin['normalized_name'] = _normalize_name(plugin)
 
+        # Normalize the GitHub URL properties
+        for key in ['github_owner', 'github_repo_name']:
+            plugin[key] = plugin[key].lower()
+
         mapped_plugins.append(dict(_ROW_SCHEMA, **plugin))
 
     return r.table('plugins').insert(mapped_plugins, *args, **kwargs).run(
@@ -197,33 +201,36 @@ def _generate_unique_slug(plugin):
     #
     # Also this is just wayyyyyyyy more awesome than appending numbers. <3
     slug_suffixes = [
-        'all-too-well',
-        'back-to-december',
-        'better-than-revenge',
-        'come-back-be-here',
-        'enchanted',
-        'everything-has-changed',
-        'fearless',
-        'forever-and-always',
-        'holy-ground',
-        'if-this-was-a-movie',
-        'long-live',
-        'love-story',
-        'mine',
-        'ours',
-        'red',
-        'sad-beautiful-tragic',
-        'safe-and-sound',
-        'shouldve-said-no',
-        'sparks-fly',
-        'speak-now',
-        'state-of-grace',
-        'superman',
-        'sweeter-than-fiction',
-        'the-lucky-one',
-        'the-story-of-us',
-        'treacherous',
-        'you-belong-with-me',
+        'say-im-great',
+        'already-like-death',
+        'he-is-going',
+        'may-fear-less',
+        'are-made-of',
+        'is-written-on',
+        'lives-by-it',
+        'tree-and-truth',
+        'today-cannot-touch',
+        'face-rejection',
+        'hard-things',
+        'please-everybody',
+        'with-ourselves',
+        'frighten-you',
+        'it-has-you',
+        'hands-off',
+        'thing-itself',
+        'the-thing-itself',
+        'impatience-and-laziness',
+        'be-who-we-are',
+        'care-of-itself',
+        'would-can-one',
+        'left-unsaid',
+        'or-are-not',
+        'is-holy',
+        'the-heights',
+        'without-it',
+        'own-character',
+        'who-speaks',
+        'looking-forward',
     ]
     random.shuffle(slug_suffixes)
 
@@ -412,8 +419,12 @@ def _find_matching_plugins(plugin_data, repo=None):
     # If we have a (github_owner, github_repo_name) pair, try to match it with
     # an existing github-scraped plugin.
     if plugin_data.get('github_owner') and plugin_data.get('github_repo_name'):
+        github_owner_repo = [
+            plugin_data['github_owner'].lower(),
+            plugin_data['github_repo_name'].lower()]
+
         query = r.table('plugins').get_all(
-                [plugin_data['github_owner'], plugin_data['github_repo_name']],
+                github_owner_repo,
                 index='github_owner_repo')
         matching_plugins = list(query.run(r_conn()))
         if matching_plugins:
@@ -470,8 +481,8 @@ def _are_plugins_different(p1, p2):
 
     if (p1.get('github_owner') and p1.get('github_repo_name') and
             p2.get('github_owner') and p2.get('github_repo_name') and
-            (p1['github_owner'], p1['github_repo_name']) !=
-            (p2['github_owner'], p2['github_repo_name'])):
+            (p1['github_owner'].lower(), p1['github_repo_name'].lower()) !=
+            (p2['github_owner'].lower(), p2['github_repo_name'].lower())):
         return True
 
     return False

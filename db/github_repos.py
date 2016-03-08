@@ -86,6 +86,10 @@ class GithubRepos(object):
         assert owner
         assert repo_name
 
+        # Normalize index values
+        owner = owner.lower()
+        repo_name = repo_name.lower()
+
         query = r.table(cls._TABLE_NAME).get_all([owner, repo_name],
                 index='owner_repo')
         return db.util.get_first(query)
@@ -98,6 +102,10 @@ class GithubRepos(object):
         """
         assert repo['owner']
         assert repo['repo_name']
+
+        # Normalize index values
+        repo['owner'] = repo['owner'].lower()
+        repo['repo_name'] = repo['repo_name'].lower()
 
         if repo.get('id'):
             db_repo = r.table(cls._TABLE_NAME).get(repo['id']).run(r_conn())
