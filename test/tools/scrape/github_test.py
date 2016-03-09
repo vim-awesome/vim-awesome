@@ -76,20 +76,20 @@ class GithubTest(unittest.TestCase):
         test('taglist', (None, 'taglist'))
         test('ervandew/supertab.git', ('ervandew', 'supertab'))
         test('git://github.com/scrooloose/nerdtree',
-                ('scrooloose', 'nerdtree'))
+            ('scrooloose', 'nerdtree'))
         test('git://github.com/kien/ctrlp.vim.git', ('kien', 'ctrlp.vim'))
         test('calendar.vim--Matsumoto', (None, 'calendar.vim--Matsumoto'))
 
         # Don't care about non-GitHub repos. They'll just 404 when we scrape.
         test('git://git.wincent.com/command-t.git',
-                ('git.wincent.com', 'command-t'))
+            ('git.wincent.com', 'command-t'))
 
         test('git@github.com:Valloric/YouCompleteMe.git',
-                ('Valloric', 'YouCompleteMe'))
+            ('Valloric', 'YouCompleteMe'))
         test('https://github.com/vim-scripts/The-NERD-tree.git',
-                ('vim-scripts', 'The-NERD-tree'))
+            ('vim-scripts', 'The-NERD-tree'))
         test('https://github.com/Raimondi/delimitMate/',
-                ('Raimondi', 'delimitMate'))
+            ('Raimondi', 'delimitMate'))
 
     def test_submodule_is_bundle_regex(self):
         s = github._SUBMODULE_IS_BUNDLE_REGEX.search
