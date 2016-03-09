@@ -1,0 +1,18 @@
+{
+  "name": ".gitmodules",
+  "path": ".gitmodules",
+  "sha": "0bacc09b3b4231887055c9d0d04c48b3906b1845",
+  "size": 531,
+  "url": "https://api.github.com/repos/jemiahlee/dotfiles/contents/.gitmodules?ref=master",
+  "html_url": "https://github.com/jemiahlee/dotfiles/blob/master/.gitmodules",
+  "git_url": "https://api.github.com/repos/jemiahlee/dotfiles/git/blobs/0bacc09b3b4231887055c9d0d04c48b3906b1845",
+  "download_url": "https://raw.githubusercontent.com/jemiahlee/dotfiles/master/.gitmodules",
+  "type": "file",
+  "content": "W3N1Ym1vZHVsZSAic3VibW9kdWxlcy92aW1fcGx1Z2lucy92aW0taGFyZHRp\nbWUiXQoJcGF0aCA9IHN1Ym1vZHVsZXMvdmltX3BsdWdpbnMvdmltLWhhcmR0\naW1lCgl1cmwgPSBnaXQ6Ly9naXRodWIuY29tL3Rha2FjL3ZpbS1oYXJkdGlt\nZQpbc3VibW9kdWxlICJzdWJtb2R1bGVzL3ZpbV9wbHVnaW5zL3B5dGhvbi1t\nb2RlIl0KCXBhdGggPSBzdWJtb2R1bGVzL3ZpbV9wbHVnaW5zL3B5dGhvbi1t\nb2RlCgl1cmwgPSBnaXQ6Ly9naXRodWIuY29tL2tsZW4vcHl0aG9uLW1vZGUK\nW3N1Ym1vZHVsZSAic3VibW9kdWxlcy92aW1fcGx1Z2lucy9hZy52aW0iXQoJ\ncGF0aCA9IHN1Ym1vZHVsZXMvdmltX3BsdWdpbnMvYWcudmltCgl1cmwgPSBn\naXQ6Ly9naXRodWIuY29tL3JraW5nL2FnLnZpbQpbc3VibW9kdWxlICJzdWJt\nb2R1bGVzL3ZpbV9wbHVnaW5zL3B5dGhvbi1zeW50YXgiXQoJcGF0aCA9IHN1\nYm1vZHVsZXMvdmltX3BsdWdpbnMvcHl0aG9uLXN5bnRheAoJdXJsID0gZ2l0\nQGdpdGh1Yi5jb206aGRpbWEvcHl0aG9uLXN5bnRheC5naXQK\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/jemiahlee/dotfiles/contents/.gitmodules?ref=master",
+    "git": "https://api.github.com/repos/jemiahlee/dotfiles/git/blobs/0bacc09b3b4231887055c9d0d04c48b3906b1845",
+    "html": "https://github.com/jemiahlee/dotfiles/blob/master/.gitmodules"
+  }
+}

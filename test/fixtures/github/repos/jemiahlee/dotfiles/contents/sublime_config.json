@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Default (OSX).sublime-keymap",
+    "path": "sublime_config/Default (OSX).sublime-keymap",
+    "sha": "84b0bf602064ce29071699de0e5e4d60c201a11e",
+    "size": 780,
+    "url": "https://api.github.com/repos/jemiahlee/dotfiles/contents/sublime_config/Default%20(OSX).sublime-keymap?ref=master",
+    "html_url": "https://github.com/jemiahlee/dotfiles/blob/master/sublime_config/Default%20(OSX).sublime-keymap",
+    "git_url": "https://api.github.com/repos/jemiahlee/dotfiles/git/blobs/84b0bf602064ce29071699de0e5e4d60c201a11e",
+    "download_url": "https://raw.githubusercontent.com/jemiahlee/dotfiles/master/sublime_config/Default%20(OSX).sublime-keymap",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/jemiahlee/dotfiles/contents/sublime_config/Default%20(OSX).sublime-keymap?ref=master",
+      "git": "https://api.github.com/repos/jemiahlee/dotfiles/git/blobs/84b0bf602064ce29071699de0e5e4d60c201a11e",
+      "html": "https://github.com/jemiahlee/dotfiles/blob/master/sublime_config/Default%20(OSX).sublime-keymap"
+    }
+  },
+  {
+    "name": "Preferences.sublime-settings",
+    "path": "sublime_config/Preferences.sublime-settings",
+    "sha": "0a467942ac3c73ada758c1cdb3916e3b61eed8a0",
+    "size": 233,
+    "url": "https://api.github.com/repos/jemiahlee/dotfiles/contents/sublime_config/Preferences.sublime-settings?ref=master",
+    "html_url": "https://github.com/jemiahlee/dotfiles/blob/master/sublime_config/Preferences.sublime-settings",
+    "git_url": "https://api.github.com/repos/jemiahlee/dotfiles/git/blobs/0a467942ac3c73ada758c1cdb3916e3b61eed8a0",
+    "download_url": "https://raw.githubusercontent.com/jemiahlee/dotfiles/master/sublime_config/Preferences.sublime-settings",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/jemiahlee/dotfiles/contents/sublime_config/Preferences.sublime-settings?ref=master",
+      "git": "https://api.github.com/repos/jemiahlee/dotfiles/git/blobs/0a467942ac3c73ada758c1cdb3916e3b61eed8a0",
+      "html": "https://github.com/jemiahlee/dotfiles/blob/master/sublime_config/Preferences.sublime-settings"
+    }
+  },
+  {
+    "name": "trailing_spaces.sublime-settings",
+    "path": "sublime_config/trailing_spaces.sublime-settings",
+    "sha": "293f727913c129802f7ad60361c87343ba59cb14",
+    "size": 87,
+    "url": "https://api.github.com/repos/jemiahlee/dotfiles/contents/sublime_config/trailing_spaces.sublime-settings?ref=master",
+    "html_url": "https://github.com/jemiahlee/dotfiles/blob/master/sublime_config/trailing_spaces.sublime-settings",
+    "git_url": "https://api.github.com/repos/jemiahlee/dotfiles/git/blobs/293f727913c129802f7ad60361c87343ba59cb14",
+    "download_url": "https://raw.githubusercontent.com/jemiahlee/dotfiles/master/sublime_config/trailing_spaces.sublime-settings",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/jemiahlee/dotfiles/contents/sublime_config/trailing_spaces.sublime-settings?ref=master",
+      "git": "https://api.github.com/repos/jemiahlee/dotfiles/git/blobs/293f727913c129802f7ad60361c87343ba59cb14",
+      "html": "https://github.com/jemiahlee/dotfiles/blob/master/sublime_config/trailing_spaces.sublime-settings"
+    }
+  }
+]

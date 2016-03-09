@@ -99,6 +99,9 @@ class GithubTest(unittest.TestCase):
         self.assertIsNotNone(s('submodule "available-bundles/unimpaired"'))
         self.assertIsNotNone(s(
             'submodule "vim/vim.symlink/bundle/vim-pathogen"'))
+        self.assertIsNotNone(s('submodule "submodules/vim_plugins/ag.vim"'))
+        self.assertIsNotNone(s(
+            'submodule "submodules/vim-plugins/python-mode"'))
 
         self.assertIsNone(s('submodule ".emacs.d/packages/groovy"'))
         self.assertIsNone(s('submodule "theme/sundown"'))
@@ -177,9 +180,8 @@ class GithubTest(unittest.TestCase):
 
         self.assertEqual(actual, expected)
 
-    @patch('tools.scrape.github._extract_pathogen_repos')
     @patch('tools.scrape.github.get_api_page')
-    def test_get_plugin_repose_from_dotfiles(self, mock_get_api_page, mock_pathogen):
+    def test_get_plugin_repose_from_dotfiles(self, mock_get_api_page):
         mock_get_api_page.side_effect = mock_api_response
 
         dotfiles = {
@@ -195,3 +197,19 @@ class GithubTest(unittest.TestCase):
             'vundle_repos_count': 0}
 
         self.assertDictEqual(actual, expected)
+
+    @patch('tools.scrape.github.get_api_page')
+    def test_extract_pathogen_repos(self, mock_get_api_page):
+        mock_get_api_page.side_effect = mock_api_response
+
+        dir_data = fixture_data('/repos/jemiahlee/dotfiles/contents')
+        actual = github._extract_pathogen_repos(dir_data)
+
+        expected = [
+            ('takac', 'vim-hardtime'),
+            ('klen', 'python-mode'),
+            ('rking', 'ag.vim'),
+            ('hdima', 'python-syntax')
+        ]
+
+        self.assertListEqual(actual, expected)

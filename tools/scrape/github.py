@@ -434,7 +434,7 @@ _BUNDLE_OWNER_REPO_REGEX = re.compile(
         r'(?:([^:\'"/]+)/)?([^\'"\n\r/]+?)(?:\.git|/)?$')
 
 # Matches a .gitmodules section heading that's likely of a Pathogen bundle.
-_SUBMODULE_IS_BUNDLE_REGEX = re.compile(r'submodule.+bundles?/.+',
+_SUBMODULE_IS_BUNDLE_REGEX = re.compile(r'submodule.+(bundles?)|(vim.plugins).+',
         re.IGNORECASE)
 
 
