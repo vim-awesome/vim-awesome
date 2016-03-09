@@ -1,0 +1,466 @@
+[
+  {
+    "name": ".gitignore",
+    "path": ".gitignore",
+    "sha": "4796890c6157bfea0fa91fed9a8af42172949789",
+    "size": 84,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/.gitignore?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/.gitignore",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/4796890c6157bfea0fa91fed9a8af42172949789",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/.gitignore",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/.gitignore?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/4796890c6157bfea0fa91fed9a8af42172949789",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/.gitignore"
+    }
+  },
+  {
+    "name": ".gitmodules",
+    "path": ".gitmodules",
+    "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/.gitmodules?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/.gitmodules",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/.gitmodules",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/.gitmodules?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/.gitmodules"
+    }
+  },
+  {
+    "name": "README.md",
+    "path": "README.md",
+    "sha": "af31de662c47b205082c7770a54c9533bf451b44",
+    "size": 2340,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/README.md?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/README.md",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/af31de662c47b205082c7770a54c9533bf451b44",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/README.md",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/README.md?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/af31de662c47b205082c7770a54c9533bf451b44",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/README.md"
+    }
+  },
+  {
+    "name": "bashrc",
+    "path": "bashrc",
+    "sha": "48d725376d120eff92c3c4afb1d6e03e60fc1c92",
+    "size": 74,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/bashrc?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/bashrc",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/48d725376d120eff92c3c4afb1d6e03e60fc1c92",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/bashrc",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/bashrc?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/48d725376d120eff92c3c4afb1d6e03e60fc1c92",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/bashrc"
+    }
+  },
+  {
+    "name": "bin",
+    "path": "bin",
+    "sha": "cd6adbd90525a2f3099246d96a75241fd8945cb2",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/bin?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/bin",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/cd6adbd90525a2f3099246d96a75241fd8945cb2",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/bin?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/cd6adbd90525a2f3099246d96a75241fd8945cb2",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/bin"
+    }
+  },
+  {
+    "name": "bootstrap.sh",
+    "path": "bootstrap.sh",
+    "sha": "e6f35de664ad0b215d0d93ac4776bd206897502b",
+    "size": 842,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/bootstrap.sh?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/bootstrap.sh",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/e6f35de664ad0b215d0d93ac4776bd206897502b",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/bootstrap.sh",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/bootstrap.sh?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/e6f35de664ad0b215d0d93ac4776bd206897502b",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/bootstrap.sh"
+    }
+  },
+  {
+    "name": "composer-packages",
+    "path": "composer-packages",
+    "sha": "cb7c834a43e3deede426ad19e3e0bbdf4f243406",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/composer-packages?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/composer-packages",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/cb7c834a43e3deede426ad19e3e0bbdf4f243406",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/composer-packages?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/cb7c834a43e3deede426ad19e3e0bbdf4f243406",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/composer-packages"
+    }
+  },
+  {
+    "name": "gitconfig",
+    "path": "gitconfig",
+    "sha": "bdad6c7cb6213725a817bad3a4521c25aedc33fb",
+    "size": 1646,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/gitconfig?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/gitconfig",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/bdad6c7cb6213725a817bad3a4521c25aedc33fb",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/gitconfig",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/gitconfig?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/bdad6c7cb6213725a817bad3a4521c25aedc33fb",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/gitconfig"
+    }
+  },
+  {
+    "name": "gitignore",
+    "path": "gitignore",
+    "sha": "f4aa9619799a896bef1f03eb43988ddde5d7b9d5",
+    "size": 372,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/gitignore?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/gitignore",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/f4aa9619799a896bef1f03eb43988ddde5d7b9d5",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/gitignore",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/gitignore?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/f4aa9619799a896bef1f03eb43988ddde5d7b9d5",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/gitignore"
+    }
+  },
+  {
+    "name": "gvim",
+    "path": "gvim",
+    "sha": "79cfe9a55dec168aaa8d834bf44c71b2fd5a01d7",
+    "size": 526,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/gvim?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/gvim",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/79cfe9a55dec168aaa8d834bf44c71b2fd5a01d7",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/gvim",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/gvim?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/79cfe9a55dec168aaa8d834bf44c71b2fd5a01d7",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/gvim"
+    }
+  },
+  {
+    "name": "hearsay",
+    "path": "hearsay",
+    "sha": "95cafdf7da335bbd74220d0e32a1769b3716d7e9",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/hearsay?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/hearsay",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/95cafdf7da335bbd74220d0e32a1769b3716d7e9",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/hearsay?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/95cafdf7da335bbd74220d0e32a1769b3716d7e9",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/hearsay"
+    }
+  },
+  {
+    "name": "init",
+    "path": "init",
+    "sha": "47be9fa12f2a0174355125b932d2c96436664b11",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/init?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/init",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/47be9fa12f2a0174355125b932d2c96436664b11",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/init?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/47be9fa12f2a0174355125b932d2c96436664b11",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/init"
+    }
+  },
+  {
+    "name": "install.sh",
+    "path": "install.sh",
+    "sha": "0741f32e6795f377dc5d89019da4bd443cb687d1",
+    "size": 1344,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/install.sh?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/install.sh",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/0741f32e6795f377dc5d89019da4bd443cb687d1",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/install.sh",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/install.sh?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/0741f32e6795f377dc5d89019da4bd443cb687d1",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/install.sh"
+    }
+  },
+  {
+    "name": "iterm",
+    "path": "iterm",
+    "sha": "281c7dbb5491f610098b42b4ff5853862ef10ab2",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/iterm?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/iterm",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/281c7dbb5491f610098b42b4ff5853862ef10ab2",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/iterm?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/281c7dbb5491f610098b42b4ff5853862ef10ab2",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/iterm"
+    }
+  },
+  {
+    "name": "mutt",
+    "path": "mutt",
+    "sha": "4bf7d45976ed3ff6b462d8b37f847a70b7860f2d",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/mutt?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/mutt",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/4bf7d45976ed3ff6b462d8b37f847a70b7860f2d",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/mutt?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/4bf7d45976ed3ff6b462d8b37f847a70b7860f2d",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/mutt"
+    }
+  },
+  {
+    "name": "npm",
+    "path": "npm",
+    "sha": "d52e4990788851f8b6c476a3b94f7378f1541d5f",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/npm?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/npm",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/d52e4990788851f8b6c476a3b94f7378f1541d5f",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/npm?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/d52e4990788851f8b6c476a3b94f7378f1541d5f",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/npm"
+    }
+  },
+  {
+    "name": "oh-my-zsh",
+    "path": "oh-my-zsh",
+    "sha": "a348d7744c5a97018691eb00ab69ec1a9520e2c4",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/oh-my-zsh?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/oh-my-zsh",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/a348d7744c5a97018691eb00ab69ec1a9520e2c4",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/oh-my-zsh?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/a348d7744c5a97018691eb00ab69ec1a9520e2c4",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/oh-my-zsh"
+    }
+  },
+  {
+    "name": "osx",
+    "path": "osx",
+    "sha": "e0d6635718d6827e6af6bb17bc39806c8c9dcfd0",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/osx?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/osx",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/e0d6635718d6827e6af6bb17bc39806c8c9dcfd0",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/osx?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/e0d6635718d6827e6af6bb17bc39806c8c9dcfd0",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/osx"
+    }
+  },
+  {
+    "name": "php",
+    "path": "php",
+    "sha": "f024e2f86c2b8124f45c425a16e81628c40c13e3",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/php?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/php",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/f024e2f86c2b8124f45c425a16e81628c40c13e3",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/php?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/f024e2f86c2b8124f45c425a16e81628c40c13e3",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/php"
+    }
+  },
+  {
+    "name": "pip",
+    "path": "pip",
+    "sha": "c338482d49d97d6acf3c09dd6925df6e42764172",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/pip?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/pip",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/c338482d49d97d6acf3c09dd6925df6e42764172",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/pip?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/c338482d49d97d6acf3c09dd6925df6e42764172",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/pip"
+    }
+  },
+  {
+    "name": "tmux.conf",
+    "path": "tmux.conf",
+    "sha": "ff91c024b98f74603eb6cda6cc707a0b23005e89",
+    "size": 3902,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/tmux.conf?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/tmux.conf",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/ff91c024b98f74603eb6cda6cc707a0b23005e89",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/tmux.conf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/tmux.conf?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/ff91c024b98f74603eb6cda6cc707a0b23005e89",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/tmux.conf"
+    }
+  },
+  {
+    "name": "ubuntu",
+    "path": "ubuntu",
+    "sha": "f3065b44bf7d33d4df3f7a02a7a5754809e452d8",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/ubuntu?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/ubuntu",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/f3065b44bf7d33d4df3f7a02a7a5754809e452d8",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/ubuntu?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/f3065b44bf7d33d4df3f7a02a7a5754809e452d8",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/ubuntu"
+    }
+  },
+  {
+    "name": "vim",
+    "path": "vim",
+    "sha": "8daff1102fa3edbf436e152788b4ceb9a0463e0c",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/vim",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/8daff1102fa3edbf436e152788b4ceb9a0463e0c",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vim?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/8daff1102fa3edbf436e152788b4ceb9a0463e0c",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/vim"
+    }
+  },
+  {
+    "name": "vimrc",
+    "path": "vimrc",
+    "sha": "16cd7ce8137777aa8aef321b4b89ce5dec25dcc2",
+    "size": 15433,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/vimrc?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/vimrc",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/16cd7ce8137777aa8aef321b4b89ce5dec25dcc2",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/vimrc",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/vimrc?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/16cd7ce8137777aa8aef321b4b89ce5dec25dcc2",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/vimrc"
+    }
+  },
+  {
+    "name": "xmobarrc",
+    "path": "xmobarrc",
+    "sha": "14dacb70a44b776aec97e5b7c2d279f3fd5b747e",
+    "size": 998,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/xmobarrc?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/xmobarrc",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/14dacb70a44b776aec97e5b7c2d279f3fd5b747e",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/xmobarrc",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/xmobarrc?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/14dacb70a44b776aec97e5b7c2d279f3fd5b747e",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/xmobarrc"
+    }
+  },
+  {
+    "name": "xmonad",
+    "path": "xmonad",
+    "sha": "05b1aee23a8af9aa459caccb5b1200e937bfe84e",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/xmonad?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/xmonad",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/05b1aee23a8af9aa459caccb5b1200e937bfe84e",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/xmonad?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/05b1aee23a8af9aa459caccb5b1200e937bfe84e",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/xmonad"
+    }
+  },
+  {
+    "name": "zsh-custom",
+    "path": "zsh-custom",
+    "sha": "3c07de77a71c969930fd31c04d80ca5cc426a3a9",
+    "size": 0,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/zsh-custom?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/tree/master/zsh-custom",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/3c07de77a71c969930fd31c04d80ca5cc426a3a9",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/zsh-custom?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/trees/3c07de77a71c969930fd31c04d80ca5cc426a3a9",
+      "html": "https://github.com/captbaritone/dotfiles/tree/master/zsh-custom"
+    }
+  },
+  {
+    "name": "zshenv",
+    "path": "zshenv",
+    "sha": "e0485150d87b45a4f939d0df5e404638dd52b685",
+    "size": 112,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/zshenv?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/zshenv",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/e0485150d87b45a4f939d0df5e404638dd52b685",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/zshenv",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/zshenv?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/e0485150d87b45a4f939d0df5e404638dd52b685",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/zshenv"
+    }
+  },
+  {
+    "name": "zshrc",
+    "path": "zshrc",
+    "sha": "e58a54c1daada3382f7773df8dd49257c3d687c8",
+    "size": 2275,
+    "url": "https://api.github.com/repos/captbaritone/dotfiles/contents/zshrc?ref=master",
+    "html_url": "https://github.com/captbaritone/dotfiles/blob/master/zshrc",
+    "git_url": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/e58a54c1daada3382f7773df8dd49257c3d687c8",
+    "download_url": "https://raw.githubusercontent.com/captbaritone/dotfiles/master/zshrc",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/captbaritone/dotfiles/contents/zshrc?ref=master",
+      "git": "https://api.github.com/repos/captbaritone/dotfiles/git/blobs/e58a54c1daada3382f7773df8dd49257c3d687c8",
+      "html": "https://github.com/captbaritone/dotfiles/blob/master/zshrc"
+    }
+  }
+]

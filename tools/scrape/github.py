@@ -38,6 +38,8 @@ if not _GITHUB_API_TOKEN:
     logging.warn(colored(_NO_GITHUB_API_TOKEN_MESSAGE, 'red'))
 
 
+ReposByManager = collections.namedtuple('ReposByManager', ['vundle', 'neobundle', 'vimplug'])
+
 ###############################################################################
 # General utilities for interacting with the GitHub API.
 
@@ -404,10 +406,10 @@ def scrape_vim_scripts_repos(num):
 #     there are too many false positives that need to be filtered out.
 _DOTFILE_REPO_NAMES = ['vimrc', 'vimfile', 'vim-file', 'vimconf',
         'vim-conf', 'dotvim', 'vim-setting', 'myvim', 'dotfile',
-        'config-files']
+        'config-files', 'plug']
 
 _VIMRC_FILENAMES = ['vimrc', 'bundle', 'vundle.vim', 'vundles.vim',
-        'vim.config', 'plugins.vim']
+        'vim.config', 'plugins.vim', 'plug.vim']
 
 _VIM_DIRECTORIES = ['vim', 'config', 'home']
 
@@ -417,11 +419,13 @@ _VIM_DIRECTORIES = ['vim', 'config', 'home']
 
 # Matches eg. "Bundle 'gmarik/vundle'" or "Bundle 'taglist'"
 # [^\S\n] means whitespace except newline: stackoverflow.com/a/3469155/392426
-_BUNDLE_PLUGIN_REGEX_TEMPLATE = r'^[^\S\n]*%s[^\S\n]*[\'"]([^\'"\n\r]+)[\'"]'
-_VUNDLE_PLUGIN_REGEX = re.compile(_BUNDLE_PLUGIN_REGEX_TEMPLATE %
+_PLUGIN_REGEX_TEMPLATE = r'^[^\S\n]*%s[^\S\n]*[\'"]([^\'"\n\r]+)[\'"]'
+_VUNDLE_PLUGIN_REGEX = re.compile(_PLUGIN_REGEX_TEMPLATE %
         '(?:Bundle|Plugin)', re.MULTILINE)
-_NEOBUNDLE_PLUGIN_REGEX = re.compile(_BUNDLE_PLUGIN_REGEX_TEMPLATE %
+_NEOBUNDLE_PLUGIN_REGEX = re.compile(_PLUGIN_REGEX_TEMPLATE %
         '(?:NeoBundle|NeoBundleFetch|NeoBundleLazy)', re.MULTILINE)
+_VIMPLUG_PLUGIN_REGEX = re.compile(_PLUGIN_REGEX_TEMPLATE %
+        '(?:Plug)', re.MULTILINE)
 
 # Extracts owner and repo name from a bundle spec -- a git repo URI, implicity
 # github.com if host not given.
@@ -464,22 +468,24 @@ def _extract_bundles_with_regex(file_contents, bundle_plugin_regex):
 
 
 def _extract_bundle_repos_from_file(file_contents):
-    """Extracts Vundle and Neobundle plugins from contents of a vimrc-like
+    """Extracts Vundle Neobundle and Plug plugins from contents of a vimrc-like
     file.
 
     Arguments:
         file_contents: A string of the contents of the file to search through.
 
     Returns:
-        A tuple (Vundle repos, NeoBundle repos). Each element is a list of
-        tuples of the form (owner, repo_name) referencing a GitHub repo.
+        A named tuple with a key for each plugin manager. Each value is a list
+        of tuples of the form (owner, repo_name) referencing a GitHub repo.
     """
     vundle_repos = _extract_bundles_with_regex(file_contents,
             _VUNDLE_PLUGIN_REGEX)
     neobundle_repos = _extract_bundles_with_regex(file_contents,
             _NEOBUNDLE_PLUGIN_REGEX)
+    vimplug_repos = _extract_bundles_with_regex(file_contents,
+            _VIMPLUG_PLUGIN_REGEX)
 
-    return vundle_repos, neobundle_repos
+    return ReposByManager(vundle_repos, neobundle_repos, vimplug_repos)
 
 
 def _extract_bundle_repos_from_dir(dir_data, depth=0):
@@ -499,7 +505,7 @@ def _extract_bundle_repos_from_dir(dir_data, depth=0):
     """
     # First, look for top-level files that are likely to contain references to
     # vim plugins.
-    files = filter(lambda f: f['type'] == 'file', dir_data)
+    files = [f for f in dir_data if f['type'] == 'file']
     for file_data in files:
         filename = file_data['name'].lower()
 
@@ -512,17 +518,17 @@ def _extract_bundle_repos_from_dir(dir_data, depth=0):
         # Ok, there could potentially be references to vim plugins here.
         _, file_contents = get_api_page(file_data['url'])
         contents_decoded = base64.b64decode(file_contents.get('content', ''))
-        bundles_tuple = _extract_bundle_repos_from_file(contents_decoded)
+        repos_by_manger = _extract_bundle_repos_from_file(contents_decoded)
 
-        if any(bundles_tuple):
-            return bundles_tuple
+        if any(repos_by_manger):
+            return repos_by_manger
 
     if depth >= 3:
-        return [], []
+        return ReposByManager([], [], [])
 
     # No plugins were found, so look in subdirectories that could potentially
     # have vim config files.
-    dirs = filter(lambda f: f['type'] == 'dir', dir_data)
+    dirs = [f for f in dir_data if f['type'] == 'dir']
     for dir_data in dirs:
         filename = dir_data['name'].lower()
         if not any((f in filename) for f in _VIM_DIRECTORIES):
@@ -530,12 +536,12 @@ def _extract_bundle_repos_from_dir(dir_data, depth=0):
 
         # Ok, there could potentially be vim config files in here.
         _, subdir_data = get_api_page(dir_data['url'])
-        bundles_tuple = _extract_bundle_repos_from_dir(subdir_data, depth + 1)
+        repos_by_manger = _extract_bundle_repos_from_dir(subdir_data, depth + 1)
 
-        if any(bundles_tuple):
-            return bundles_tuple
+        if any(repos_by_manger):
+            return repos_by_manger
 
-    return [], []
+    return ReposByManager([], [], [])
 
 
 def _extract_pathogen_repos(repo_contents):
@@ -613,8 +619,11 @@ def _get_plugin_repos_from_dotfiles(repo_data, search_keyword):
         print "contents not found"
         return
 
-    vundle_repos, neobundle_repos = _extract_bundle_repos_from_dir(
-            contents_data)
+    repos_by_manager = _extract_bundle_repos_from_dir(contents_data)
+    vundle_repos = repos_by_manager.vundle
+    neobundle_repos = repos_by_manager.neobundle
+    vimplug_repos = repos_by_manager.vimplug
+
     pathogen_repos = _extract_pathogen_repos(contents_data)
 
     owner, repo_name = owner_repo.split('/')
@@ -631,18 +640,21 @@ def _get_plugin_repos_from_dotfiles(repo_data, search_keyword):
         'search_keyword': search_keyword,
         'vundle_repos': map(stringify_repo, vundle_repos),
         'neobundle_repos': map(stringify_repo, neobundle_repos),
+        'vimplug_repos': map(stringify_repo, vimplug_repos),
         'pathogen_repos': map(stringify_repo, pathogen_repos),
     })
 
     DotfilesGithubRepos.log_scrape(repo)
     DotfilesGithubRepos.upsert_with_owner_repo(repo)
 
-    print 'found %s Vundles, %s NeoBundles, %s Pathogens' % (
-            len(vundle_repos), len(neobundle_repos), len(pathogen_repos))
+    print 'found %s Vundles, %s NeoBundles, %s VimPlugs, %s Pathogens' % (
+            len(vundle_repos), len(neobundle_repos),
+            len(vimplug_repos), len(pathogen_repos))
 
     return {
         'vundle_repos_count': len(vundle_repos),
         'neobundle_repos_count': len(neobundle_repos),
+        'vimplug_repos_count': len(vimplug_repos),
         'pathogen_repos_count': len(pathogen_repos),
     }
 

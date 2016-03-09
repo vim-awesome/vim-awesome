@@ -1,5 +1,7 @@
 import unittest
 
+from mock import patch
+from test.utils import fixture_data, mock_api_response
 from tools.scrape import github
 
 
@@ -101,3 +103,95 @@ class GithubTest(unittest.TestCase):
         self.assertIsNone(s('submodule ".emacs.d/packages/groovy"'))
         self.assertIsNone(s('submodule "theme/sundown"'))
         self.assertIsNone(s('submodule "jedi"'))
+
+    def test_extract_bundle_repos_from_file(self):
+        file_contents = """
+        Plug 'tpope/fugitive.vim'
+        Plug 'https://github.com/Valoric/YouCompleteMe'
+
+        Bundle 'ownerName/repository'
+        NeoBundle 'anotherOwner/anotherRepo'
+        """
+
+        actual = github._extract_bundle_repos_from_file(file_contents)
+
+        expected = github.ReposByManager(
+            [('ownerName', 'repository')],
+            [('anotherOwner', 'anotherRepo')],
+            [('tpope', 'fugitive.vim'), ('Valoric', 'YouCompleteMe')])
+
+        self.assertEqual(actual, expected)
+
+    @patch('tools.scrape.github.get_api_page')
+    def test_extract_vimplug_bundle_repos_from_dir(self, mock_get_api_page):
+        mock_get_api_page.side_effect = mock_api_response
+
+        dir_data = fixture_data('/repos/captbaritone/dotfiles/contents')
+        actual = github._extract_bundle_repos_from_dir(dir_data).vimplug
+
+        expected = [
+            ('captbaritone', 'molokai'),
+            ('chriskempson', 'vim-tomorrow-theme'),
+            ('altercation', 'vim-colors-solarized'),
+            ('fxn', 'vim-monochrome'),
+            ('chriskempson', 'base16-vim'),
+            ('NLKNguyen', 'papercolor-theme'),
+            ('tpope', 'vim-git'),
+            ('cakebaker', 'scss-syntax.vim'),
+            ('xsbeats', 'vim-blade'),
+            ('qrps', 'lilypond-vim'),
+            ('plasticboy', 'vim-markdown'),
+            ('mattn', 'emmet-vim'),
+            ('edsono', 'vim-matchit'),
+            ('ervandew', 'supertab'),
+            ('scrooloose', 'syntastic'),
+            ('tpope', 'vim-unimpaired'),
+            ('bling', 'vim-airline'),
+            ('ctrlpvim', 'ctrlp.vim'),
+            ('rking', 'ag.vim'),
+            ('tpope', 'vim-eunuch'),
+            ('tpope', 'vim-commentary'),
+            ('tpope', 'vim-sleuth'),
+            ('bkad', 'CamelCaseMotion'),
+            ('AndrewRadev', 'splitjoin.vim'),
+            ('gcmt', 'taboo.vim'),
+            ('christoomey', 'vim-tmux-navigator'),
+            ('tpope', 'vim-surround'),
+            ('tpope', 'vim-repeat'),
+            ('michaeljsmith', 'vim-indent-object'),
+            ('bkad', 'CamelCaseMotion'),
+            ('vim-scripts', 'argtextobj.vim'),
+            ('tpope', 'vim-fugitive'),
+            ('airblade', 'vim-gitgutter'),
+            ('projects', 'vim-vigilant'),
+            ('benmills', 'vimux'),
+            ('davidhalter', 'jedi-vim'),
+            ('vimwiki', 'vimwiki'),
+            ('vim-scripts', 'pythonhelper'),
+            ('pangloss', 'vim-javascript'),
+            ('reedes', 'vim-pencil'),
+            ('mbbill', 'undotree'),
+            ('parkr', 'vim-jekyll'),
+            ('mattn', 'webapi-vim'),
+            ('mattn', 'gist-vim')]
+
+        self.assertEqual(actual, expected)
+
+    @patch('tools.scrape.github._extract_pathogen_repos')
+    @patch('tools.scrape.github.get_api_page')
+    def test_get_plugin_repose_from_dotfiles(self, mock_get_api_page, mock_pathogen):
+        mock_get_api_page.side_effect = mock_api_response
+
+        dotfiles = {
+            'full_name': 'captbaritone/dotfiles',
+            'pushed_at': '2015'}
+
+        actual = github._get_plugin_repos_from_dotfiles(dotfiles, 'search')
+
+        expected = {
+            'neobundle_repos_count': 0,
+            'pathogen_repos_count': 0,
+            'vimplug_repos_count': 44,
+            'vundle_repos_count': 0}
+
+        self.assertDictEqual(actual, expected)

@@ -197,6 +197,7 @@ class DotfilesGithubRepos(GithubRepos):
         'vundle_repos': [],
         'neobundle_repos': [],
         'pathogen_repos': [],
+        'vimplug_repos': [],
 
     })
 
