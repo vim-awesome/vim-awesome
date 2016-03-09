@@ -180,9 +180,15 @@ class GithubTest(unittest.TestCase):
 
         self.assertEqual(actual, expected)
 
+    @patch('db.github_repos.DotfilesGithubRepos.get_with_owner_repo')
+    @patch('db.github_repos.DotfilesGithubRepos.upsert_with_owner_repo')
     @patch('tools.scrape.github.get_api_page')
-    def test_get_plugin_repose_from_dotfiles(self, mock_get_api_page):
+    def test_get_plugin_repose_from_dotfiles(self, mock_get_api_page,
+            mock_get_dotfiles, mock_upsert_dotfiles):
+
         mock_get_api_page.side_effect = mock_api_response
+        mock_get_dotfiles.return_value = {}
+        mock_upsert_dotfiles.return_value = {}
 
         dotfiles = {
             'full_name': 'captbaritone/dotfiles',
