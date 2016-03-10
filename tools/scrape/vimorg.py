@@ -68,7 +68,7 @@ def scrape_scripts(num):
 
             query = r.table('submitted_plugins').get_all(vimorg_id,
                     index='vimorg_id').filter(
-                            r.row['rejected'] != True, default=True)
+                            r.row['rejected'] != True, default=True)  # NOQA
             submission = db.util.get_first(query)
             db.plugins.add_scraped_data(plugin, submission=submission)
             print "done"

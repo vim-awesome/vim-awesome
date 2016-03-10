@@ -45,7 +45,7 @@ def main():
     zero_categories_count = 0
     multiple_categories_count = 0
     categorized_count = 0
-    tag_category_map = {v:k for k in _CATEGORY_TAGS_MAP
+    tag_category_map = {v: k for k in _CATEGORY_TAGS_MAP
             for v in _CATEGORY_TAGS_MAP[k]}
 
     for plugin in query.run(r_conn()):
