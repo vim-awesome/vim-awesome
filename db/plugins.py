@@ -333,9 +333,6 @@ def to_json(p):
 ###############################################################################
 # Routines for merging in data from scraped sources.
 # TODO(david): Write a Craig-esque comment about how all this works.
-# TODO(david): Make most of these functions private once we get rid of
-#     db_upsert.py.
-
 
 def update_plugin(old_plugin, new_plugin):
     """Merges properties of new_plugin onto old_plugin, much like a dict
