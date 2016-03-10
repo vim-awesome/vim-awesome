@@ -157,6 +157,7 @@ class PluginGithubRepos(GithubRepos):
     # TODO(david): Make it easy to post-blacklist a plugin that we discover on
     #     the live site.
     _BLACKLISTED_GITHUB_REPOS = set([
+        'behat/behat',
         'github/gitignore',
         'kablamo/dotfiles',
         'aemoncannon/ensime',
