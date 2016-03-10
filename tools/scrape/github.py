@@ -216,7 +216,7 @@ def scrape_plugin_repos(num):
     query = r.table('plugin_github_repos').filter({'is_blacklisted': False})
 
     # We don't want to scrape forks that not many people use.
-    query = query.filter(r.not_((r.row['is_fork'] == True) & (
+    query = query.filter(r.not_((r.row['is_fork'] == True) & (  # NOQA
             r.row['plugin_manager_users'] < MIN_FORK_USERS)),
             default=True)
 

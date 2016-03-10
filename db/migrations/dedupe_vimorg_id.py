@@ -1,7 +1,5 @@
 """De-duplicate the vimorg_id column in the plugins table."""
 
-import re
-
 import rethinkdb as r
 
 import db.plugins

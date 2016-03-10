@@ -2,10 +2,8 @@ import logging
 
 import flask
 from cache import cache
-import rethinkdb as r
 
 import db
-import util
 import web.api.api as api
 
 

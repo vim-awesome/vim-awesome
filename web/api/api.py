@@ -200,7 +200,7 @@ def update_plugin_category(slug, category):
     if not plugin:
         return api_util.api_not_found('No plugin with slug %s' % slug)
 
-    if not category in [c['id'] for c in get_all_categories_cached()]:
+    if category not in {c['id'] for c in get_all_categories_cached()}:
         return api_util.api_bad_request('No such category %s' % category)
 
     # TODO(david): Also update search index (stale cache)

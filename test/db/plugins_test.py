@@ -81,7 +81,7 @@ class PluginsTest(unittest.TestCase):
         self.assertTrue(similar('jlanzarotta', 'jeff lanzarotta'))
 
         # Unfortunately, the following will cause some assertions below to fail
-        #self.assertTrue(similar('Shougo', 'Shougo Matsushita'))
+        # self.assertTrue(similar('Shougo', 'Shougo Matsushita'))
 
         self.assertFalse(similar('Bob', 'Joe'))
         self.assertFalse(similar('Paul Graham', 'Paul Bucheit'))
