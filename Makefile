@@ -37,6 +37,7 @@ build_github_index:
 
 test:
 	tox
+	npm run lint
 
 upgrade_deps:
 	pip-compile --upgrade requirements.in --output-file requirements.txt
