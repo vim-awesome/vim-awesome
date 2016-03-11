@@ -41,6 +41,9 @@ test:
 lint:
 	PYTHONPATH=. flake8 --ignore=E128,E121,E126,E501,E127,E122,E131,E731 .
 
+upgrade_deps:
+	pip-compile --upgrade requirements.in --output-file requirements.txt
+
 dump:
 	rethinkdb dump -e vim_awesome -f rethinkdb_dump.tar.gz
 
