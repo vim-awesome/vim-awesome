@@ -1,0 +1,23 @@
+rethinkdb==1.14.0-0
+Flask==0.9
+requests>=1.2.3,<2.0.0
+lxml>=3.2.1,<4.0.0
+html5lib==1.0b1
+termcolor>=1.1.0,<2.0.0
+python-dateutil>=2.1,<3.0.0
+Flask-Cache==0.12
+PyYAML>=3.11,<4.0.0
+
+# For parsing .gitmodules from dotfiles repos (to extract Pathogen plugins).
+# configobj does not support comments beginning with semicolon,
+# and the ConfigParser modules that comes with Python 2.7 is ancient and sucky.
+# This is the backported version from Python 3.
+configparser==3.5.0b2
+
+# For generating human-friendly and URL-friendly slugs
+python-slugify==0.0.6
+
+# Dev tools. Consider splitting this out to a separate file if there get to be
+# too may
+flake8==2.5.0
+nose==1.1.2
