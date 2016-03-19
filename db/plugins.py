@@ -172,7 +172,9 @@ def insert(plugins, *args, **kwargs):
 
         # Normalize the GitHub URL properties
         for key in ['github_owner', 'github_repo_name']:
-            plugin[key] = plugin[key].lower()
+            # Vim.org plugins don't have GitHub info
+            if key in plugin:
+                plugin[key] = plugin[key].lower()
 
         mapped_plugins.append(dict(_ROW_SCHEMA, **plugin))
 
