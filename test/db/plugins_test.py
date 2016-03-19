@@ -26,6 +26,34 @@ class PluginsTest(unittest.TestCase):
         assert_update({}, {'created_at': 5}, {'created_at': 5})
         assert_update({'created_at': 1}, {'created_at': 5}, {'created_at': 1})
 
+    def test_normalize_fixes_github_case(self):
+        actual_plugin = {
+            'vimorg_name': 'A Plugin',
+            'github_owner': 'TPope',
+            'github_repo_name': 'FUgiTive'}
+
+        db.plugins._normalize(actual_plugin)
+
+        expected = {
+            'github_owner': 'tpope',
+            'github_repo_name': 'fugitive',
+            'vimorg_name': 'A Plugin',
+            'normalized_name': 'aplugin',
+            'slug': 'a-plugin'}
+
+        self.assertEquals(actual_plugin, expected)
+
+    def test_normalize_without_github_repo(self):
+        actual_plugin = {'vimorg_name': 'A Plugin'}
+        db.plugins._normalize(actual_plugin)
+
+        expected = {
+            'vimorg_name': 'A Plugin',
+            'normalized_name': 'aplugin',
+            'slug': 'a-plugin'}
+
+        self.assertEquals(actual_plugin, expected)
+
     def test_merge_dict_except_none(self):
         merge = db.plugins._merge_dict_except_none
 

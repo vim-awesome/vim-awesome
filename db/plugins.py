@@ -164,22 +164,26 @@ def insert(plugins, *args, **kwargs):
 
     mapped_plugins = []
     for plugin in plugins:
-        if not plugin.get('slug'):
-            plugin['slug'] = _generate_unique_slug(plugin)
-
-        if not plugin.get('normalized_name'):
-            plugin['normalized_name'] = _normalize_name(plugin)
-
-        # Normalize the GitHub URL properties
-        for key in ['github_owner', 'github_repo_name']:
-            # Vim.org plugins don't have GitHub info
-            if key in plugin:
-                plugin[key] = plugin[key].lower()
+        _normalize(plugin)
 
         mapped_plugins.append(dict(_ROW_SCHEMA, **plugin))
 
     return r.table('plugins').insert(mapped_plugins, *args, **kwargs).run(
             r_conn())
+
+
+def _normalize(plugin):
+    if not plugin.get('slug'):
+        plugin['slug'] = _generate_unique_slug(plugin)
+
+    if not plugin.get('normalized_name'):
+        plugin['normalized_name'] = _normalize_name(plugin)
+
+    # Normalize the GitHub URL properties
+    for key in ['github_owner', 'github_repo_name']:
+        # Vim.org plugins don't have GitHub info
+        if key in plugin:
+            plugin[key] = plugin[key].lower()
 
 
 def _generate_unique_slug(plugin):
