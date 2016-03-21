@@ -40,7 +40,7 @@ def scrape_scripts(num):
         link = tr[0][0].attrib['href']
 
         vimorg_id = re.search("script_id=(\d+)", link).group(1)
-        name = tr[0][0].text
+        name = tr[0][0].text.encode('utf-8')
 
         # Print w/o newline.
         print "    scraping %s (vimorg_id=%s) ..." % (name, vimorg_id),
