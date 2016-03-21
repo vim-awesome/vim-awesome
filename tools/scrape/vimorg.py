@@ -50,10 +50,6 @@ def scrape_scripts(num):
         #     be scraped in total. Maybe return a tuple with error status.
         # TODO(david): Fix error scraping vimcat (id=4325) (something about
         #     only unicode and ascii allowed, no null bytes or control chars)
-        # TODO(david): Fix error scraping
-        #     http://www.vim.org/scripts/script.php?script_id=4099 (unicode
-        #     chars in plugin name) due to invalid escape sequence \\xe0 in the
-        #     Rql regex match in db_upsert._find_by_similar_name.
         try:
             # Merge the data we get here with extra data from the details page.
             plugin = dict({
