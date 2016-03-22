@@ -315,6 +315,12 @@ code {
   }
 }
 
+.not-found{
+  min-height: 200px;
+  margin-top: 80px;
+  text-align: center;
+}
+
 .site-footer {
   $grid-color: mix($content-1, $bg-light-2, 20%);
   margin-top: 80px;
