@@ -1,4 +1,5 @@
 *.py[co]
+.tox/
 .sass-cache/
 db/rethinkdb_data/
 node_modules/

@@ -5,17 +5,14 @@
 #    pip-compile requirements.in
 #
 configparser==3.5.0b2
-flake8==2.5.0
 Flask-Cache==0.12
 Flask==0.9                # via flask-cache
 html5lib==1.0b1
 Jinja2==2.8               # via flask
 lxml==3.5.0
 MarkupSafe==0.23          # via jinja2
-mccabe==0.3.1             # via flake8
-nose==1.1.2
-pep8==1.7.0               # via flake8
-pyflakes==1.0.0           # via flake8
+pluggy==0.3.1             # via tox
+py==1.4.31                # via tox
 python-dateutil==2.5.0
 python-slugify==0.0.6
 PyYAML==3.11
@@ -23,5 +20,7 @@ requests==1.2.3
 rethinkdb==1.14.0-0
 six==1.10.0               # via html5lib, python-dateutil
 termcolor==1.1.0
+tox==2.3.1
 Unidecode==0.4.19         # via python-slugify
+virtualenv==15.0.1        # via tox
 Werkzeug==0.11.4          # via flask
