@@ -36,10 +36,7 @@ build_github_index:
 	PYTHONPATH=. python tools/scrape/build_github_index.py
 
 test:
-	PYTHONPATH=. nosetests -v
-
-lint:
-	PYTHONPATH=. flake8 --ignore=E128,E121,E126,E501,E127,E122,E131,E731 .
+	tox
 
 upgrade_deps:
 	pip-compile --upgrade requirements.in --output-file requirements.txt

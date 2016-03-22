@@ -17,7 +17,5 @@ configparser==3.5.0b2
 # For generating human-friendly and URL-friendly slugs
 python-slugify==0.0.6
 
-# Dev tools. Consider splitting this out to a separate file if there get to be
-# too may
-flake8==2.5.0
-nose==1.1.2
+# Dev and testing. TODO: split these out into their own requirements files.
+tox
