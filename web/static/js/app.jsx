@@ -27,6 +27,7 @@ require("../lib/js/bootstrap-collapse.js");
 require("../lib/js/bootstrap-dropdown.js");
 
 var AboutPage = require("./AboutPage.jsx");
+var NotFound = require("./NotFound.jsx");
 var Footer = require("./Footer.jsx");
 var Plugin = require("./Plugin.jsx");
 var Spinner = require("./Spinner.jsx");
@@ -1443,6 +1444,7 @@ var routes = <Route handler={Page} location="history">
   <Route name="submit" handler={SubmitPage} />
   <Route name="thanks-for-submitting" handler={ThanksForSubmittingPage} />
   <Route name="about" handler={AboutPage} />
+  <Route path="*" handler={NotFound} />
 </Route>;
 React.renderComponent(routes, document.body);
 
