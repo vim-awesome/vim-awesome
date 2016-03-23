@@ -1,0 +1,79 @@
+{
+    "plugins": [
+        "react"
+    ],
+    "env": {
+        "browser": true,
+        "commonjs": true
+    },
+    "settings": {
+        "react": {
+            "version": "0.10.0"
+        }
+    },
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        }
+    },
+    "rules": {
+        "comma-dangle": "error",
+        "constructor-super": "error",
+        "no-case-declarations": "error",
+        "no-class-assign": "error",
+        "no-cond-assign": "error",
+        "no-console": "error",
+        "no-const-assign": "error",
+        "no-constant-condition": "error",
+        "no-control-regex": "error",
+        "no-debugger": "error",
+        "no-delete-var": "error",
+        "no-dupe-args": "error",
+        "no-dupe-class-members": "error",
+        "no-dupe-keys": "error",
+        "no-duplicate-case": "error",
+        "no-empty": "error",
+        "no-empty-character-class": "error",
+        "no-empty-pattern": "error",
+        "no-ex-assign": "error",
+        "no-extra-boolean-cast": "error",
+        "no-extra-semi": "error",
+        "no-fallthrough": "error",
+        "no-func-assign": "error",
+        "no-inner-declarations": "error",
+        "no-invalid-regexp": "error",
+        "no-irregular-whitespace": "error",
+        "no-mixed-spaces-and-tabs": "error",
+        "no-negated-in-lhs": "error",
+        "no-new-symbol": "error",
+        "no-obj-calls": "error",
+        "no-octal": "error",
+        "no-redeclare": "error",
+        "no-regex-spaces": "error",
+        "no-self-assign": "error",
+        "no-sparse-arrays": "error",
+        "no-this-before-super": "error",
+        "no-undef": "error",
+        "no-unexpected-multiline": "error",
+        "no-unreachable": "error",
+        "no-unused-labels": "error",
+        "no-unused-vars": "error",
+        "use-isnan": "error",
+        "valid-typeof": "error",
+        "react/display-name": "error",
+        "react/jsx-no-duplicate-props": "error",
+        "react/jsx-no-undef": "error",
+        "react/jsx-uses-react": "error",
+        "react/jsx-uses-vars": "error",
+        "react/no-danger": "error",
+        "react/no-deprecated": "error",
+        "react/no-did-mount-set-state": ["error", "allow-in-func"],
+        "react/no-did-update-set-state": ["error", "allow-in-func"],
+        "react/no-direct-mutation-state": "error",
+        "react/no-unknown-property": "error",
+        "react/react-in-jsx-scope": "error",
+        // TODO(captbaritone): Enable these rules
+        "react/no-is-mounted": "off",
+        "react/prop-types": "off"
+    }
+}
