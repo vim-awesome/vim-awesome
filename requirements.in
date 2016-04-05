@@ -1,3 +1,4 @@
+raven[flask]
 rethinkdb==1.14.0-0
 Flask==0.9
 requests>=1.2.3,<2.0.0
