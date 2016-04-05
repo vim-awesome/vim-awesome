@@ -2,7 +2,6 @@ import logging
 
 import flask
 from cache import cache
-from raven.contrib.flask import Sentry
 
 import db
 import web.api.api as api
@@ -12,11 +11,9 @@ try:
     import secrets
     _HIPCHAT_TOKEN = secrets.HIPCHAT_TOKEN
     _HIPCHAT_ROOM_ID = secrets.HIPCHAT_ROOM_ID
-    _SENTRY_DSN = secrets.SENTRY_DSN
 except ImportError:
     _HIPCHAT_TOKEN = None
     _HIPCHAT_ROOM_ID = None
-    _SENTRY_DSN = None
 
 r_conn = db.util.r_conn
 
@@ -25,8 +22,6 @@ app = flask.Flask(__name__)
 app.config.from_envvar('FLASK_CONFIG')
 app.register_blueprint(api.api)
 cache.init_app(app)
-# Initialize the Sentry plugin
-Sentry(app, dsn=_SENTRY_DSN)
 
 
 # Add logging handlers on the production server.

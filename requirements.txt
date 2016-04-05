@@ -4,11 +4,9 @@
 #
 #    pip-compile requirements.in
 #
-blinker==1.4              # via raven
 configparser==3.5.0b2
-contextlib2==0.5.1        # via raven
 Flask-Cache==0.12
-Flask==0.9                # via flask-cache, raven
+Flask==0.9                # via flask-cache
 html5lib==1.0b1
 Jinja2==2.8               # via flask
 lxml==3.5.0
@@ -18,7 +16,6 @@ py==1.4.31                # via tox
 python-dateutil==2.5.0
 python-slugify==0.0.6
 PyYAML==3.11
-raven[flask]==5.12.0
 requests==1.2.3
 rethinkdb==1.14.0-0
 six==1.10.0               # via html5lib, python-dateutil
