@@ -21,6 +21,6 @@
     "underscore": "~1.8.3"
   },
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint --ext js,jsx ."
   }
 }

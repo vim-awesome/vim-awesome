@@ -39,10 +39,8 @@ var fetchAllCategories = require("./fetchAllCategories.js");
 
 var D_KEYCODE = 'D'.charCodeAt(0),
     G_KEYCODE = 'G'.charCodeAt(0),
-    H_KEYCODE = 'H'.charCodeAt(0),
     J_KEYCODE = 'J'.charCodeAt(0),
     K_KEYCODE = 'K'.charCodeAt(0),
-    L_KEYCODE = 'L'.charCodeAt(0),
     N_KEYCODE = 'N'.charCodeAt(0),
     O_KEYCODE = 'O'.charCodeAt(0),
     P_KEYCODE = 'P'.charCodeAt(0),
@@ -66,10 +64,6 @@ var capitalizeFirstLetter = function(str) {
 
 var startsWith = function(str, startStr) {
   return str.indexOf(startStr) === 0;
-};
-
-var endsWith = function(str, endStr) {
-  return str.indexOf(endStr, str.length - endStr.length) !== -1;
 };
 
 /**
@@ -201,7 +195,7 @@ var SearchBox = React.createClass({
     }
   },
 
-  onChange: function(e) {
+  onChange: function() {
     this.props.onChange(this.refs.input.getDOMNode().value);
   },
 
@@ -387,7 +381,7 @@ var PluginList = React.createClass({
     }
   },
 
-  onPluginMouseEnter: function(index, e) {
+  onPluginMouseEnter: function(index) {
     // TODO(david): This is not as quick/snappy as CSS :hover ...
     if (this.state.hoverDisabled) {
       return;
@@ -868,7 +862,7 @@ var Tags = React.createClass({
     this.setState({isEditing: false});
   },
 
-  onRemoveBtnClick: function(tag, e) {
+  onRemoveBtnClick: function(tag) {
     this.props.onTagsChange(_.without(this.props.tags, tag));
   },
 
