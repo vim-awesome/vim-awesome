@@ -31,6 +31,7 @@ var NotFound = require("./NotFound.jsx");
 var Footer = require("./Footer.jsx");
 var Plugin = require("./Plugin.jsx");
 var Spinner = require("./Spinner.jsx");
+var SidebarCategory = require("./SidebarCategory.jsx");
 
 var fetchAllCategories = require("./fetchAllCategories.js");
 
@@ -116,55 +117,30 @@ var Sidebar = React.createClass({
     transitionTo("plugin-list", null, {"q": "cat:" + category});
   },
 
-  render: function() {
-    // This block of code looks for tags in the query so we can highlight them
-    // in the sidebar
-    var selectedTagId = null;
-    var tags = [];
-    if (this.props.query && this.props.query.q) {
-      var queries = this.props.query.q.split(" ");
-      _.each(queries, function(query) {
-        if (query && startsWith(query, "tag:")) {
-          var queryTag = query.split(":")[1];
-          tags.push(queryTag);
-        }
-      });
+  tagsFromQuery: function(queryString) {
+    function isTag(query) {
+      return query && startsWith(query, "tag:");
     }
 
-    var categoryElements = _.chain(this.state.categories)
-      .reject(function(category) { return category.id === "uncategorized"; })
-      .map(function(category) {
-        var tagsClass = category.id + "-tags";
-        var tagElements = _.map(category.tags, function(tag) {
-          // TODO(Jeff): should check out classSet, in the experimental Add-ons
-          var classString = "tag-link";
-          if (_.contains(tags, tag.id)) {
-            classString += " highlighted-tag";
-          }
+    function getTag(query) {
+      return query.split(":")[1];
+    }
 
-          return <li key={tag.id}>
-            <a href={"/?q=tag:" + encodeURIComponent(tag.id)}
-                className={classString}>
-              <span className="tag-id">{tag.id}</span>
-              {tag.count > 1 &&
-                <span className="tag-count"> × {tag.count}</span>
-              }
-            </a>
-          </li>;
-        });
+    var queries = queryString.split(" ");
+    return _.chain(queries)
+            .filter(isTag)
+            .map(getTag)
+            .value();
+  },
 
-        return <li className={"accordion-group category " + category.id}
-            key={category.id}>
-          <a data-toggle="collapse" data-target={"." + tagsClass}
-              data-parent=".categories" className="category-link">
-            <i className={category.icon}></i>{category.name}
-          </a>
-          <div className={"collapse " + tagsClass} data-category={category.id}>
-            <ul className="category-tags">{tagElements}</ul>
-          </div>
-        </li>;
-      })
-      .value();
+  render: function() {
+    var selectedTags = [];
+    // Use _.get when it's ready (or when we switch to lodash)
+    if(this.props.query && this.props.query.q) {
+      selectedTags = this.tagsFromQuery(this.props.query.q);
+    }
+
+    var categories = _.reject(this.state.categories, {id: "uncategorized"});
 
     return <div className="sidebar">
       <h1 className="title">
@@ -180,7 +156,15 @@ var Sidebar = React.createClass({
           <div className="from-line"></div>
         </div>
       </div>
-      <ul ref="categories" className="categories">{categoryElements}</ul>
+      <ul ref="categories" className="categories">{
+        categories.map(function(category) {
+          return <SidebarCategory
+            key={category.id}
+            category={category}
+            selectedTags={selectedTags}
+          />
+        })
+      }</ul>
       <a href="/submit" className="submit-plugin">
         <i className="icon-plus"></i>Submit plugin
       </a>
