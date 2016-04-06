@@ -19,6 +19,12 @@
   <link rel="stylesheet" href="/static/css/font-awesome.min.css"/>
 </head>
 <body>
+  <script src="https://cdn.ravenjs.com/2.3.0/raven.min.js"></script>
+  <script>
+    // Setup sentry reporting
+    Raven.config('https://fd20ee7ca8f7421fb4cddbd489117f22@app.getsentry.com/73224').install()
+  </script>
+
   <script src="/static/build/js/app.js"></script>
 
   {% if env == 'prod' %}
