@@ -54,6 +54,7 @@
         "no-self-assign": "error",
         "no-sparse-arrays": "error",
         "no-this-before-super": "error",
+        "no-throw-literal": "error",
         "no-undef": "error",
         "no-unexpected-multiline": "error",
         "no-unreachable": "error",
