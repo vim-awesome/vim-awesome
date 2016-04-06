@@ -1143,13 +1143,13 @@ var PluginPage = React.createClass({
             <div className="span6">
               <h3 className="date-label">Created</h3>
               <div className="date-value">
-                {moment(this.state.created_at * 1000).fromNow()}
+                {moment.unix(this.state.created_at).fromNow()}
               </div>
             </div>
             <div className="span6">
               <h3 className="date-label">Updated</h3>
               <div className="date-value">
-                {moment(this.state.updated_at * 1000).fromNow()}
+                {moment.moment(this.state.updated_at).fromNow()}
               </div>
             </div>
           </div>
