@@ -19,6 +19,7 @@
     "rules": {
         "comma-dangle": "error",
         "constructor-super": "error",
+        "keyword-spacing": "error",
         "no-case-declarations": "error",
         "no-class-assign": "error",
         "no-cond-assign": "error",

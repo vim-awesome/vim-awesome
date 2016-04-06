@@ -30,8 +30,8 @@ var AboutPage = require("./AboutPage.jsx");
 var NotFound = require("./NotFound.jsx");
 var Footer = require("./Footer.jsx");
 var Plugin = require("./Plugin.jsx");
-var Spinner = require("./Spinner.jsx");
 var SidebarCategory = require("./SidebarCategory.jsx");
+var Spinner = require("./Spinner.jsx");
 
 var fetchAllCategories = require("./fetchAllCategories.js");
 
@@ -136,7 +136,7 @@ var Sidebar = React.createClass({
   render: function() {
     var selectedTags = [];
     // Use _.get when it's ready (or when we switch to lodash)
-    if(this.props.query && this.props.query.q) {
+    if (this.props.query && this.props.query.q) {
       selectedTags = this.tagsFromQuery(this.props.query.q);
     }
 
