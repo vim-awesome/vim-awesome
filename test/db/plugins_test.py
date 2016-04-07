@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import mock
 import unittest
 
 import db.plugins
@@ -26,7 +27,10 @@ class PluginsTest(unittest.TestCase):
         assert_update({}, {'created_at': 5}, {'created_at': 5})
         assert_update({'created_at': 1}, {'created_at': 5}, {'created_at': 1})
 
-    def test_normalize_fixes_github_case(self):
+    @mock.patch('db.plugins._slug_taken')
+    def test_normalize_fixes_github_case(self, mock_slug_taken):
+        mock_slug_taken.return_value = False
+
         actual_plugin = {
             'vimorg_name': 'A Plugin',
             'github_owner': 'TPope',
@@ -43,7 +47,10 @@ class PluginsTest(unittest.TestCase):
 
         self.assertEquals(actual_plugin, expected)
 
-    def test_normalize_without_github_repo(self):
+    @mock.patch('db.plugins._slug_taken')
+    def test_normalize_without_github_repo(self, mock_slug_taken):
+        mock_slug_taken.return_value = False
+
         actual_plugin = {'vimorg_name': 'A Plugin'}
         db.plugins._normalize(actual_plugin)
 
