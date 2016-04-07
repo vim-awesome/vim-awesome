@@ -37,6 +37,7 @@ build_github_index:
 
 test:
 	tox
+	npm run test
 	npm run lint
 
 upgrade_deps:
