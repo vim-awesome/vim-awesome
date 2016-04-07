@@ -1,3 +1,5 @@
+"use strict"
+
 var webpack = require("webpack");
 
 var env = process.env.NODE_ENV;

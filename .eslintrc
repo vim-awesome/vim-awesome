@@ -73,6 +73,7 @@
         "react/no-direct-mutation-state": "error",
         "react/no-unknown-property": "error",
         "react/react-in-jsx-scope": "error",
+        "strict": "error",
         // TODO(captbaritone): Enable these rules
         "react/no-is-mounted": "off",
         "react/prop-types": "off"
