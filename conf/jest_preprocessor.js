@@ -9,5 +9,5 @@ module.exports = {
       return src;
     }
     return src;
-  },
+  }
 };

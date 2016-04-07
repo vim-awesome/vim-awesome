@@ -14,13 +14,13 @@ var TEST_CATEGORY = {
   "tags": [
     {
       "count": 15,
-      "id": "color-scheme",
+      "id": "color-scheme"
     },
     {
       "count": 5,
-      "id": "dark",
-    },
-  ],
+      "id": "dark"
+    }
+  ]
 };
 
 describe('SidebarCategory', function() {
