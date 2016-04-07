@@ -26,7 +26,7 @@ echo "Installing Python requirements"
 sudo pip install -r $NEW_CLONE/requirements.txt
 
 echo "Installing Node requirements"
-( cd $NEW_CLONE && npm install )
+( cd $NEW_CLONE && npm install --only=production)
 
 echo "Installing Ruby requirements"
 ( cd $NEW_CLONE && bundle install )
