@@ -35,18 +35,9 @@ var Spinner = require("./Spinner.jsx");
 
 var fetchAllCategories = require("./fetchAllCategories.js");
 
-// TODO(david): We might want to split up this file more.
+var KEYCODES = require("./constants/keycodes.js");
 
-var D_KEYCODE = 'D'.charCodeAt(0),
-    G_KEYCODE = 'G'.charCodeAt(0),
-    J_KEYCODE = 'J'.charCodeAt(0),
-    K_KEYCODE = 'K'.charCodeAt(0),
-    N_KEYCODE = 'N'.charCodeAt(0),
-    O_KEYCODE = 'O'.charCodeAt(0),
-    P_KEYCODE = 'P'.charCodeAt(0),
-    U_KEYCODE = 'U'.charCodeAt(0),
-    ENTER_KEYCODE = 13,
-    ESCAPE_KEYCODE = 27;
+// TODO(david): We might want to split up this file more.
 
 // Renderer used to change relative image URL to absolute in Markdown
 var markedRenderer = new marked.Renderer();
@@ -179,7 +170,7 @@ var SearchBox = React.createClass({
     var tag = e.target.tagName;
     var key = e.keyCode;
     if (tag !== "INPUT" && tag !== "TEXTAREA" &&
-        key === 191 /* forward slash */) {
+        key === KEYCODES.FORWARD_SLASH) {
       var inputElement = this.refs.input.getDOMNode();
       inputElement.focus();
       inputElement.select();
@@ -189,7 +180,7 @@ var SearchBox = React.createClass({
 
   handleKeyUp: function(e) {
     var key = e.nativeEvent.keyCode;
-    if (key === ESCAPE_KEYCODE || key === ENTER_KEYCODE) {
+    if (key === KEYCODES.ESCAPE || key === KEYCODES.ENTER) {
       this.refs.input.getDOMNode().blur();
       this.props.onBlur();
     }
@@ -228,9 +219,9 @@ var Pager = React.createClass({
     var key = e.keyCode;
 
     if (tag !== "INPUT" && tag !== "TEXTAREA") {
-      if (key === P_KEYCODE) {
+      if (key === KEYCODES.P) {
         this.goToPrevPage();
-      } else if (key === N_KEYCODE) {
+      } else if (key === KEYCODES.N) {
         this.goToNextPage();
       }
     }
@@ -350,9 +341,9 @@ var PluginList = React.createClass({
     var key = e.keyCode;
 
     if (tag !== "INPUT" && tag !== "TEXTAREA") {
-      if (key === J_KEYCODE || key === K_KEYCODE) {
+      if (key === KEYCODES.J || key === KEYCODES.K) {
         // Go to next or previous plugin
-        var direction = (key === J_KEYCODE ? 1 : -1);
+        var direction = (key === KEYCODES.J ? 1 : -1);
         var maxIndex = this.state.plugins.length - 1;
         var newIndex = clamp(
           this.state.selectedIndex + direction,
@@ -373,7 +364,7 @@ var PluginList = React.createClass({
         if (this.refs && this.refs.navFocus) {
           scrollToNode(this.refs.navFocus.getDOMNode(), 105 /* context */);
         }
-      } else if ((key === ENTER_KEYCODE || key === O_KEYCODE) &&
+      } else if ((key === KEYCODES.ENTER || key === KEYCODES.O) &&
           this.refs && this.refs.navFocus) {
         e.preventDefault();
         this.refs.navFocus.goToDetailsPage();
@@ -868,8 +859,8 @@ var Tags = React.createClass({
 
   onKeyUp: function(e) {
     var key = e.keyCode;
-    if (key === 13 /* enter */ || key === 9 /* tab */ ||
-        key === 188 /* comma */) {
+    if (key === KEYCODES.ENTER || key === KEYCODES.TAB ||
+        key === KEYCODES.COMMA) {
       var $input = $(this.refs.tagInput.getDOMNode());
       // TODO(david): This needs to use autocomplete
       var tagId = $input.val().replace(/,$/, "").toLowerCase();
@@ -883,7 +874,7 @@ var Tags = React.createClass({
 
   onKeyDown: function(e) {
     var key = e.keyCode;
-    if (key === 13 /* enter */) {
+    if (key === KEYCODES.ENTER) {
       e.preventDefault();  // Prevent unintended form submission
     }
   },
@@ -1031,18 +1022,18 @@ var PluginPage = React.createClass({
 
     var key = e.keyCode;
     var direction;
-    var gPressed = (key === G_KEYCODE && !e.altKey && !e.ctrlKey &&
+    var gPressed = (key === KEYCODES.G && !e.altKey && !e.ctrlKey &&
         !e.shiftKey && !e.metaKey);
 
-    if (key === J_KEYCODE || key === K_KEYCODE) {
+    if (key === KEYCODES.J || key === KEYCODES.K) {
       // Scroll page in small increments with j/k.
-      direction = (key === J_KEYCODE ? 1 : -1);
+      direction = (key === KEYCODES.J ? 1 : -1);
       window.scrollBy(0, direction * 100);
-    } else if (key === U_KEYCODE || key === D_KEYCODE) {
+    } else if (key === KEYCODES.U || key === KEYCODES.D) {
       // Scroll page in large increments with u/d.
-      direction = (key === D_KEYCODE ? 1 : -1);
+      direction = (key === KEYCODES.D ? 1 : -1);
       window.scrollBy(0, direction * 400);
-    } else if (key === G_KEYCODE && e.shiftKey) {
+    } else if (key === KEYCODES.G && e.shiftKey) {
       // Scroll to bottom of page with shift+G.
       window.scrollTo(0, $(document).height());
     } else if (this.gLastPressed && gPressed) {
