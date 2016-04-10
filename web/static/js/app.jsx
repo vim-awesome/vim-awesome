@@ -726,7 +726,7 @@ var Category = React.createClass({
 
   render: function() {
     var categoryElements = _.chain(this.state.categories)
-      .reject(function(category) { return category.id === "uncategorized"; })
+      .reject({id: "uncategorized"})
       .map(function(category) {
         return <li key={category.id}>
           <a title={category.description} data-placement="left" href="#"
@@ -846,10 +846,7 @@ var Tags = React.createClass({
     }
 
     $.getJSON("/api/tags", function(data) {
-      allTags = {};
-      _.each(data, function(tag) {
-        allTags[tag.id] = tag;
-      });
+      allTags = _.indexBy(data, 'id');
       this.setState({allTags: allTags});
     }.bind(this));
   },
