@@ -33,6 +33,8 @@ var Plugin = require("./Plugin.jsx");
 var SidebarCategory = require("./SidebarCategory.jsx");
 var Spinner = require("./Spinner.jsx");
 
+var utils = require("./utils.js");
+
 var fetchAllCategories = require("./fetchAllCategories.js");
 
 // TODO(david): We might want to split up this file more.
@@ -111,27 +113,11 @@ var Sidebar = React.createClass({
     transitionTo("plugin-list", null, {"q": "cat:" + category});
   },
 
-  tagsFromQuery: function(queryString) {
-    function isTag(query) {
-      return query && startsWith(query, "tag:");
-    }
-
-    function getTag(query) {
-      return query.split(":")[1];
-    }
-
-    var queries = queryString.split(" ");
-    return _.chain(queries)
-            .filter(isTag)
-            .map(getTag)
-            .value();
-  },
-
   render: function() {
     var selectedTags = [];
     // Use _.get when it's ready (or when we switch to lodash)
     if (this.props.query && this.props.query.q) {
-      selectedTags = this.tagsFromQuery(this.props.query.q);
+      selectedTags = utils.getQueriesWithPrefix(this.props.query.q, 'tag');
     }
 
     var categories = _.reject(this.state.categories, {id: "uncategorized"});
