@@ -30,10 +30,9 @@ var AboutPage = require("./AboutPage.jsx");
 var NotFound = require("./NotFound.jsx");
 var Footer = require("./Footer.jsx");
 var Plugin = require("./Plugin.jsx");
-var SidebarCategory = require("./SidebarCategory.jsx");
 var Spinner = require("./Spinner.jsx");
+var Sidebar = require("./Sidebar.jsx");
 
-var utils = require("./utils.js");
 
 var fetchAllCategories = require("./fetchAllCategories.js");
 
@@ -88,69 +87,6 @@ var scrollToNode = function(domNode, context) {
     window.scrollTo(0, Math.max(0, elementTop - context));
   }
 };
-
-var Sidebar = React.createClass({
-  getInitialState: function() {
-    return {
-      categories: []
-    };
-  },
-
-  componentDidMount: function() {
-    fetchAllCategories(function(categories) {
-      if (this.isMounted()) {
-        this.setState({categories: categories});
-      }
-    }.bind(this));
-
-    // This event is triggered by Bootstrap's collapse widget (which creates the
-    // accordion) when a category is expanded.
-    $(this.refs.categories.getDOMNode()).on('show', this.onCategoryShow);
-  },
-
-  onCategoryShow: function(e) {
-    var category = $(e.target).data('category');
-    transitionTo("plugin-list", null, {"q": "cat:" + category});
-  },
-
-  render: function() {
-    var selectedTags = [];
-    // Use _.get when it's ready (or when we switch to lodash)
-    if (this.props.query && this.props.query.q) {
-      selectedTags = utils.getQueriesWithPrefix(this.props.query.q, 'tag');
-    }
-
-    var categories = _.reject(this.state.categories, {id: "uncategorized"});
-
-    return <div className="sidebar">
-      <h1 className="title">
-        <a href="/">
-          <span className="vim">Vim</span>Awesome
-        </a>
-      </h1>
-      <div className="tac">
-        <div className="subtitle">
-          <div className="line1">Awesome Vim plugins</div>
-          <div className="from">from</div>
-          <div className="line2">across the Universe</div>
-          <div className="from-line"></div>
-        </div>
-      </div>
-      <ul ref="categories" className="categories">{
-        categories.map(function(category) {
-          return <SidebarCategory
-            key={category.id}
-            category={category}
-            selectedTags={selectedTags}
-          />
-        })
-      }</ul>
-      <a href="/submit" className="submit-plugin">
-        <i className="icon-plus"></i>Submit plugin
-      </a>
-    </div>;
-  }
-});
 
 var SearchBox = React.createClass({
   componentDidMount: function() {
