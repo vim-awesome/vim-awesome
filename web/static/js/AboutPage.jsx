@@ -69,7 +69,7 @@ var AboutPage = React.createClass({
           <ul>
             <li>
               Tackle a{' '}
-              <a href="https://github.com/divad12/vim-awesome/issues?labels=easyfix&amp;state=open">
+              <a href="https://github.com/vim-awesome/vim-awesome/issues?labels=easyfix&amp;state=open">
                 starter issue on GitHub
               </a> (or report an issue!).
             </li>
