@@ -28,7 +28,7 @@ var Footer = React.createClass({
           </div>
         </div>
         <div className="github-section">
-          <a href="https://github.com/divad12/vim-awesome"
+          <a href="https://github.com/vim-awesome/vim-awesome"
               className="github-link">
             Contribute
             <i className="icon-github"></i>

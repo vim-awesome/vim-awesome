@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/divad12/vim-awesome.git"
+    "url": "git://github.com/vim-awesome/vim-awesome.git"
   },
   "devDependencies": {
     "eslint": "^2.4.0",

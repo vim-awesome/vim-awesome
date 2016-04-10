@@ -63,7 +63,7 @@ repos on GitHub, it is still a useful source of relative usage data.
   $ make init_db
   ```
 
-1. Seed the database with some test data. Download [this database dump](https://github.com/divad12/vim-awesome/releases/download/v1.1/rethinkdb_dump_2016-03-08.tar.gz), and then run
+1. Seed the database with some test data. Download [this database dump](https://github.com/vim-awesome/vim-awesome/releases/download/v1.1/rethinkdb_dump_2016-03-08.tar.gz), and then run
 
 
   ```sh
@@ -78,9 +78,9 @@ repos on GitHub, it is still a useful source of relative usage data.
 
 ## Contributing
 
-Take a look at [some of these issues](https://github.com/divad12/vim-awesome/issues?labels=easyfix&state=open) to get started.
+Take a look at [some of these issues](https://github.com/vim-awesome/vim-awesome/issues?labels=easyfix&state=open) to get started.
 
-Chat with us on [Gitter](https://gitter.im/divad12/vim-awesome)!
+Chat with us on [Gitter](https://gitter.im/vim-awesome/vim-awesome)!
 
 ## Acknowledgements
 
