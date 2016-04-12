@@ -30,6 +30,7 @@ var AboutPage = require("./AboutPage.jsx");
 var NotFound = require("./NotFound.jsx");
 var Footer = require("./Footer.jsx");
 var Plugin = require("./Plugin.jsx");
+var SearchBox = require("./SearchBox.jsx");
 var Spinner = require("./Spinner.jsx");
 var Sidebar = require("./Sidebar.jsx");
 
@@ -78,49 +79,6 @@ var scrollToNode = function(domNode, context) {
     window.scrollTo(0, Math.max(0, elementTop - context));
   }
 };
-
-var SearchBox = React.createClass({
-  componentDidMount: function() {
-    window.addEventListener("keyup", this.windowKeyUp, false);
-  },
-
-  componentWillUnmount: function() {
-    window.removeEventListener("keyup", this.windowKeyUp, false);
-  },
-
-  windowKeyUp: function(e) {
-    var tag = e.target.tagName;
-    var key = e.keyCode;
-    if (tag !== "INPUT" && tag !== "TEXTAREA" &&
-        key === KEYCODES.FORWARD_SLASH) {
-      var inputElement = this.refs.input.getDOMNode();
-      inputElement.focus();
-      inputElement.select();
-      this.props.onFocus();
-    }
-  },
-
-  handleKeyUp: function(e) {
-    var key = e.nativeEvent.keyCode;
-    if (key === KEYCODES.ESCAPE || key === KEYCODES.ENTER) {
-      this.refs.input.getDOMNode().blur();
-      this.props.onBlur();
-    }
-  },
-
-  onChange: function() {
-    this.props.onChange(this.refs.input.getDOMNode().value);
-  },
-
-  render: function() {
-    return <div className="search-container">
-      <i className="icon-search"></i>
-      <input type="text" className="search" placeholder="Search" ref="input"
-          value={this.props.searchQuery} onChange={this.onChange}
-          onKeyUp={this.handleKeyUp} />
-    </div>;
-  }
-});
 
 var Pager = React.createClass({
   propTypes: {
