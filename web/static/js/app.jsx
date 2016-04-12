@@ -428,17 +428,15 @@ var PluginList = React.createClass({
     // TODO(david): We should not update the page number and other
     // search-params UI until new data has arrived to keep things consistent.
 
-    var plugins = _.chain(this.state.plugins)
-      .map(function(plugin, index) {
-        var hasNavFocus = (index === this.state.selectedIndex);
-        return <Plugin
-            ref={hasNavFocus ? "navFocus" : ""}
-            key={plugin.slug}
-            hasNavFocus={hasNavFocus}
-            plugin={plugin}
-            onMouseEnter={this.onPluginMouseEnter.bind(this, index)} />;
-      }, this)
-      .value();
+    var plugins = _.map(this.state.plugins, function(plugin, index) {
+      var hasNavFocus = (index === this.state.selectedIndex);
+      return <Plugin
+        ref={hasNavFocus ? "navFocus" : ""}
+        key={plugin.slug}
+        hasNavFocus={hasNavFocus}
+        plugin={plugin}
+        onMouseEnter={this.onPluginMouseEnter.bind(this, index)} />;
+    }, this);
 
     var totalPages = this.state.totalPages || 0;
     var totalResults = this.state.totalResults || 0;
