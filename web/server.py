@@ -1,7 +1,7 @@
 import logging
 
 import flask
-from cache import cache
+from web.cache import cache
 from raven.contrib.flask import Sentry
 
 import db
