@@ -63,7 +63,7 @@ repos on GitHub, it is still a useful source of relative usage data.
   $ make init_db
   ```
 
-1. Seed the database with some test data. Download [this database dump](https://github.com/vim-awesome/vim-awesome/releases/download/v1.1/rethinkdb_dump_2016-03-08.tar.gz), and then run
+1. Seed the database with some test data. Download [this database dump](https://github.com/vim-awesome/vim-awesome/releases/download/v1.2/rethinkdb_dump_2016-04-14.tar.gz), and then run
 
 
   ```sh
