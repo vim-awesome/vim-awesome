@@ -5,7 +5,7 @@ import re
 
 import flask
 from flask import request
-from cache import cache
+from web.cache import cache
 import requests
 import rethinkdb as r
 
