@@ -1,6 +1,6 @@
 raven[flask]
 rethinkdb==2.2.0.post6
-Flask==0.9
+Flask
 requests>=2.9.1,<3.0.0
 lxml>=3.2.1,<4.0.0
 html5lib==1.0b1
