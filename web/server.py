@@ -7,19 +7,13 @@ from raven.contrib.flask import Sentry
 import db
 import web.api.api as api
 
-
 try:
     import secrets
-    _HIPCHAT_TOKEN = secrets.HIPCHAT_TOKEN
-    _HIPCHAT_ROOM_ID = secrets.HIPCHAT_ROOM_ID
-    _SENTRY_DSN = secrets.SENTRY_DSN
+    _SENTRY_DSN = getattr(secrets, 'SENTRY_DSN', None)
 except ImportError:
-    _HIPCHAT_TOKEN = None
-    _HIPCHAT_ROOM_ID = None
     _SENTRY_DSN = None
 
 r_conn = db.util.r_conn
-
 
 app = flask.Flask(__name__)
 app.config.from_envvar('FLASK_CONFIG')
@@ -45,13 +39,13 @@ if app.config['ENV'] == 'prod':
     app.logger.addHandler(file_handler)
     logging.getLogger('').addHandler(file_handler)  # Root handler
 
-    # Log all errors to HipChat as well.
-    from web.hipchat_log_handler import HipChatHandler
-    hipchat_handler = HipChatHandler(_HIPCHAT_TOKEN,
-            _HIPCHAT_ROOM_ID, notify=True, color='red', sender='Flask')
-    hipchat_handler.setLevel(logging.ERROR)
-    hipchat_handler.setFormatter(formatter)
-    logging.getLogger('').addHandler(hipchat_handler)
+    # Log all errors to Gitter as well.
+    from web.gitter_log_handler import GitterHandler
+    gitter_handler = GitterHandler()
+    gitter_handler.setLevel(logging.ERROR)
+    gitter_handler.setFormatter(formatter)
+    app.logger.addHandler(gitter_handler)
+    logging.getLogger('').addHandler(gitter_handler)
 
 
 # Catch-all route for single-page app. We specify our own `key_prefix` to
