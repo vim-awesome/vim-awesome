@@ -19,11 +19,13 @@
   <link rel="stylesheet" href="/static/css/font-awesome.min.css"/>
 </head>
 <body>
-  <script src="https://cdn.ravenjs.com/2.3.0/raven.min.js"></script>
-  <script>
-    // Setup sentry reporting
-    Raven.config('https://fd20ee7ca8f7421fb4cddbd489117f22@app.getsentry.com/73224').install()
-  </script>
+  {% if env == 'prod' %}
+    <script src="https://cdn.ravenjs.com/2.3.0/raven.min.js"></script>
+    <script>
+        // Setup sentry reporting
+        Raven.config('https://2d1b3953fb8d4febb32dca48553f0da8@app.getsentry.com/72975').install()
+    </script>
+  {% endif %}
 
   <script src="/static/build/js/app.js"></script>
 
