@@ -1,25 +1,15 @@
 import itertools
 import json
-import logging
 import re
 
 import flask
 from flask import request
 from web.cache import cache
-import requests
 import rethinkdb as r
 
 import web.api.api_util as api_util
 import db
-
-
-try:
-    import secrets
-    _HIPCHAT_TOKEN = secrets.HIPCHAT_TOKEN
-    _HIPCHAT_ROOM_ID = secrets.HIPCHAT_ROOM_ID
-except ImportError:
-    _HIPCHAT_TOKEN = None
-    _HIPCHAT_ROOM_ID = None
+import util
 
 
 api = flask.Blueprint("api", __name__, url_prefix="/api")
@@ -218,26 +208,9 @@ def submit_plugin():
     plugin_data['tags'] = json.loads(plugin_data['tags'])
     db.submitted_plugins.insert(plugin_data)
 
-    # Notify HipChat of this submission.
-    # TODO(david): Also have email notifications.
-    if _HIPCHAT_TOKEN and _HIPCHAT_ROOM_ID:
-        message = "Someone just submitted a plugin!\n%s" % (
-               json.dumps(plugin_data, indent=4))  # JSON for pretty-printing
-        payload = {
-           'auth_token': _HIPCHAT_TOKEN,
-           'notify': 0,
-           'color': 'green',
-           'from': 'Vim Awesome',
-           'room_id': _HIPCHAT_ROOM_ID,
-           'message': message,
-           'message_format': 'text',
-        }
+    plugin_markdown = "```\n%s\n```" % json.dumps(plugin_data, indent=4)
 
-        try:
-            requests.post('https://api.hipchat.com/v1/rooms/message',
-                    data=payload, timeout=10)
-        except Exception:
-            logging.exception('Failed to notify HipChat of plugin submisson')
+    util.log_to_gitter("Someone just submitted a plugin!\n%s" % plugin_markdown)
 
     return flask.redirect('/thanks-for-submitting')
 
