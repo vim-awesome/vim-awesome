@@ -39,14 +39,6 @@ if app.config['ENV'] == 'prod':
     app.logger.addHandler(file_handler)
     logging.getLogger('').addHandler(file_handler)  # Root handler
 
-    # Log all errors to Gitter as well.
-    from web.gitter_log_handler import GitterHandler
-    gitter_handler = GitterHandler()
-    gitter_handler.setLevel(logging.ERROR)
-    gitter_handler.setFormatter(formatter)
-    app.logger.addHandler(gitter_handler)
-    logging.getLogger('').addHandler(gitter_handler)
-
 
 # Catch-all route for single-page app. We specify our own `key_prefix` to
 # @cache.cached instead of using the default `request.path` because this is
