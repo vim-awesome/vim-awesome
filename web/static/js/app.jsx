@@ -703,8 +703,9 @@ var Tags = React.createClass({
       },
 
       updater: function(item) {
-        return capitalizeFirstLetter(item);
-      }
+        this.addTag(item);
+        return "";
+      }.bind(this)
     });
   },
 
@@ -732,18 +733,20 @@ var Tags = React.createClass({
     this.props.onTagsChange(_.without(this.props.tags, tag));
   },
 
+  addTag: function(tag) {
+    var tagId = tag.replace(/,$/, "").toLowerCase();
+    if (tagId) {
+      this.props.onTagsChange(this.props.tags.concat(tagId));
+    }
+  },
+
   onKeyUp: function(e) {
     var key = e.keyCode;
     if (key === KEYCODES.ENTER || key === KEYCODES.TAB ||
         key === KEYCODES.COMMA) {
       var $input = $(this.refs.tagInput.getDOMNode());
-      // TODO(david): This needs to use autocomplete
-      var tagId = $input.val().replace(/,$/, "").toLowerCase();
-      if (!tagId) {
-        return;
-      }
+      this.addTag($input.val());
       $input.val("");
-      this.props.onTagsChange(this.props.tags.concat(tagId));
     }
   },
 
