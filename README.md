@@ -8,7 +8,7 @@ have since become widely used. But how does a new user find out about these? We
 wanted to solve that problem and others with Vim Awesome — an open-sourced
 community resource for discovering new and popular Vim plugins.
 
-[Technical report on the details](raw/master/docs/report.pdf)
+[Technical report on the details](https://github.com/vim-awesome/vim-awesome/raw/master/docs/report.pdf)
 
 ## Where does the data come from?
 
