@@ -556,6 +556,7 @@ def get_search_index():
     # Don't show plugin managers because they're not technically plugins, and
     # also our usage counts for them are not all accurate.
     plugin_manager_slugs = [
+        'vim-plug',
         'vundle',
         'neobundle-vim',
         'neobundle-vim-back-to-december',
