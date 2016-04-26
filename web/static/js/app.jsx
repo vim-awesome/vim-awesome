@@ -27,12 +27,13 @@ require("../lib/js/bootstrap-collapse.js");
 require("../lib/js/bootstrap-dropdown.js");
 
 var AboutPage = require("./AboutPage.jsx");
-var NotFound = require("./NotFound.jsx");
 var Footer = require("./Footer.jsx");
+var NotFound = require("./NotFound.jsx");
 var Plugin = require("./Plugin.jsx");
 var SearchBox = require("./SearchBox.jsx");
-var Spinner = require("./Spinner.jsx");
 var Sidebar = require("./Sidebar.jsx");
+var Spinner = require("./Spinner.jsx");
+var ThanksForSubmittingPage = require("./ThanksForSubmittingPage.jsx");
 
 
 var fetchAllCategories = require("./fetchAllCategories.js");
@@ -1246,19 +1247,6 @@ var SubmitPage = React.createClass({
         <input type="hidden" name="tags"
             value={JSON.stringify(this.state.tags)} />
       </form>
-    </div>;
-  }
-});
-
-var ThanksForSubmittingPage = React.createClass({
-  render: function() {
-    return <div className="thanks-for-submitting-page">
-      <div className="thanks-box">
-        <h1>Thanks!</h1>
-        <p className="message">
-          Thank you for submitting a plugin! It will be reviewed shortly.
-        </p>
-      </div>
     </div>;
   }
 });
