@@ -21,7 +21,7 @@ python-slugify==0.0.6
 PyYAML==3.11
 raven[flask]==5.12.0
 requests==2.9.1
-rethinkdb==2.2.0.post6
+rethinkdb==2.3.0.post1
 six==1.10.0               # via html5lib, python-dateutil
 termcolor==1.1.0
 tox==2.3.1
