@@ -27,11 +27,10 @@ require("../lib/js/bootstrap-collapse.js");
 require("../lib/js/bootstrap-dropdown.js");
 
 var AboutPage = require("./AboutPage.jsx");
-var Footer = require("./Footer.jsx");
 var NotFound = require("./NotFound.jsx");
+var Page = require("./Page.jsx");
 var Plugin = require("./Plugin.jsx");
 var SearchBox = require("./SearchBox.jsx");
-var Sidebar = require("./Sidebar.jsx");
 var Spinner = require("./Spinner.jsx");
 var ThanksForSubmittingPage = require("./ThanksForSubmittingPage.jsx");
 
@@ -1247,28 +1246,6 @@ var SubmitPage = React.createClass({
         <input type="hidden" name="tags"
             value={JSON.stringify(this.state.tags)} />
       </form>
-    </div>;
-  }
-});
-
-var Page = React.createClass({
-  componentDidUpdate: function() {
-    // Google Analytics pageview tracking for single page app
-    // Thank you https://gist.github.com/daveaugustine/1771986#comment-958107
-    var ga = window.ga;
-    if (ga) {
-      var relativeUrl = window.location.pathname + window.location.search;
-      ga("send", "pageview", relativeUrl);
-    }
-  },
-
-  render: function() {
-    return <div className="page-container">
-      <Sidebar query={this.props.query} />
-      <div className="content">
-        {this.props.activeRoute}
-        <Footer />
-      </div>
     </div>;
   }
 });
