@@ -13,8 +13,11 @@ var Tags = require("./Tags.jsx");
 var SubmitPage = React.createClass({
   getInitialState: function() {
     return {
+      name: '',
+      author: '',
       tags: [],
-      category: "uncategorized"
+      category: "uncategorized",
+      submitting: false
     };
   },
 
@@ -26,15 +29,46 @@ var SubmitPage = React.createClass({
     this.setState({category: category});
   },
 
+  nameIsValid: function() {
+    return this.state.name !== '';
+  },
+
+  authorIsValid: function() {
+    return this.state.author !== '';
+  },
+
+  onNameChange: function(e) {
+    return this.setState({name: e.target.value});
+  },
+
+  onAuthorChange: function(e) {
+    return this.setState({author: e.target.value});
+  },
+
+  // TODO(captbaritone): Submit the form via API
+  onSubmit: function() {
+    // Enable validation errors
+    this.setState({submitting: true});
+    // Should the for actually sumit?
+    return _.every([
+        this.nameIsValid(),
+        this.authorIsValid()
+    ]);
+  },
+
   render: function() {
+    var submitting = this.state.submitting;
     return <div className="submit-page">
       <h1>Submit plugin</h1>
-      <form className="form-horizontal" action="/api/submit" method="POST">
+      <form className="form-horizontal" action="/api/submit"
+          method="POST" onSubmit={this.onSubmit} >
         <div className="control-group">
           <label className="control-label" htmlFor="name-input">Name</label>
           <div className="controls">
             <input type="text" name="name" id="name-input"
-                placeholder="e.g. Fugitive" />
+                className={submitting && !this.nameIsValid() ? 'error' : ''}
+                placeholder="e.g. Fugitive" value={this.state.name}
+                onChange={this.onNameChange} />
           </div>
         </div>
         <div className="control-group">
@@ -43,7 +77,9 @@ var SubmitPage = React.createClass({
           </label>
           <div className="controls">
             <input type="text" name="author" id="author-input"
-                placeholder="e.g. Tim Pope" />
+                className={submitting && !this.authorIsValid() ? 'error' : ''}
+                placeholder="e.g. Tim Pope" value={this.state.author}
+                onChange={this.onAuthorChange} />
           </div>
         </div>
         <div className="control-group">
