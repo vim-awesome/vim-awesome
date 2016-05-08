@@ -1502,6 +1502,11 @@ $long-desc-bg: #FBFBFB;
       border-bottom: 2px solid mix($content-1, $bg-light-1, 50%);
     }
 
+    &.error {
+      @include transition(all 0.1s ease-out);
+      background-color: $errorBackground;
+    }
+
     @include placeholder {
       font-weight: 300;
       font-size: 15px;
