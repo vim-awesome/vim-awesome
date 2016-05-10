@@ -28,6 +28,7 @@ module.exports = {
     path: "./web/static/build/js",
     filename: "app.js"
   },
+  devtool: 'source-map',
   module: {
     loaders: [
       { test: /\.jsx$/, loader: "jsx-loader?harmony" }
