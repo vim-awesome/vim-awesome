@@ -6,7 +6,7 @@
     "url": "git://github.com/vim-awesome/vim-awesome.git"
   },
   "devDependencies": {
-    "eslint": "^2.4.0",
+    "eslint": "^2.10.2",
     "eslint-plugin-react": "^5.1.1",
     "jest-cli": "^12.0.2",
     "react-tools": "^0.10.0"
