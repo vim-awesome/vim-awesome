@@ -20,7 +20,7 @@ import util
 r_conn = db.util.r_conn
 
 
-_GITHUB_LINK_REGEX = re.compile(r'github.com/(.*?)/([^/?#]*)')
+_GITHUB_LINK_REGEX = re.compile(r'github.com/(.*?)/([^/?#]+)')
 
 
 # From http://stackoverflow.com/a/3041990
