@@ -3,7 +3,7 @@
 "use strict";
 
 var $ = require("jquery");
-var _ = require("underscore");
+var _ = require("lodash");
 var React = require("react");
 var transitionTo = require("react-nested-router").transitionTo;
 
@@ -38,8 +38,7 @@ var Sidebar = React.createClass({
 
   render: function() {
     var selectedTags = [];
-    // Use _.get when it's ready (or when we switch to lodash)
-    if (this.props.query && this.props.query.q) {
+    if (_.get(this.props, 'query.q')) {
       selectedTags = utils.getQueriesWithPrefix(this.props.query.q, 'tag');
     }
 

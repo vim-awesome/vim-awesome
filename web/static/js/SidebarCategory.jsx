@@ -2,7 +2,7 @@
 
 "use strict"
 
-var _ = require("underscore");
+var _ = require("lodash");
 var React = require("react");
 
 var SidebarCategoryTag = React.createClass({
@@ -42,7 +42,7 @@ var SidebarCategory = React.createClass({
             return <SidebarCategoryTag
               key={tag.id}
               tag={tag}
-              selected={_.contains(selectedTags, tag.id)}
+              selected={_.includes(selectedTags, tag.id)}
             />
           })
         }</ul>

@@ -3,7 +3,7 @@
 "use strict";
 
 var $ = require("jquery");
-var _ = require("underscore");
+var _ = require("lodash");
 var React = require("react");
 var Route = require("react-nested-router").Route;
 var marked = require("marked");
@@ -305,7 +305,7 @@ var PluginList = React.createClass({
         hasNavFocus={hasNavFocus}
         plugin={plugin}
         onMouseEnter={this.onPluginMouseEnter.bind(this, index)} />;
-    }, this);
+    }.bind(this));
 
     var totalPages = this.state.totalPages || 0;
     var totalResults = this.state.totalResults || 0;
@@ -705,7 +705,7 @@ var PluginPage = React.createClass({
     var readmeFilename = (
         this.state.github_readme_filename || '').toLowerCase();
     var longDescType = "plain";
-    if (_.contains(["md", "markdown", "mkd", "mkdn"],
+    if (_.includes(["md", "markdown", "mkd", "mkdn"],
         readmeFilename.split(".").pop())) {
       longDescType = "markdown";
     } else if (readmeFilename === "readme") {
