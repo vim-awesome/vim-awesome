@@ -68,7 +68,7 @@ var Category = React.createClass({
             {category.name}
           </a>
         </li>;
-      }.bind(this));
+      }.bind(this)).value();
 
     var category = _.findWhere(this.state.categories,
         {id: this.props.category}) || {};
