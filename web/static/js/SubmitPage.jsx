@@ -8,6 +8,8 @@ var React = require("react");
 var Category = require("./Category.jsx");
 var Tags = require("./Tags.jsx");
 
+var GITHUB_REGEX = new RegExp('github.com/(.*?)/([^/?#]+)');
+
 // TODO(david): Form validation on submit! Not done right now because we
 //     currently just save this raw data to be manually reviewed.
 var SubmitPage = React.createClass({
@@ -15,6 +17,7 @@ var SubmitPage = React.createClass({
     return {
       name: '',
       author: '',
+      github: '',
       tags: [],
       category: "uncategorized",
       submitting: false
@@ -37,6 +40,10 @@ var SubmitPage = React.createClass({
     return this.state.author !== '';
   },
 
+  githubIsValid: function() {
+    return this.state.github === '' || GITHUB_REGEX.test(this.state.github);
+  },
+
   onNameChange: function(e) {
     return this.setState({name: e.target.value});
   },
@@ -45,10 +52,15 @@ var SubmitPage = React.createClass({
     return this.setState({author: e.target.value});
   },
 
+  onGithubChange: function(e) {
+    return this.setState({github: e.target.value});
+  },
+
   formIsValid: function() {
     return _.every([
         this.nameIsValid(),
-        this.authorIsValid()
+        this.authorIsValid(),
+        this.githubIsValid()
     ]);
   },
 
@@ -93,7 +105,9 @@ var SubmitPage = React.createClass({
           </label>
           <div className="controls">
             <input type="text" name="github-link" id="github-input"
-                placeholder="e.g. https://github.com/tpope/vim-fugitive" />
+                className={submitting && !this.githubIsValid() ? 'error' : ''}
+                placeholder="e.g. https://github.com/tpope/vim-fugitive"
+                value={this.state.github} onChange={this.onGithubChange} />
           </div>
         </div>
         <div className="control-group">
