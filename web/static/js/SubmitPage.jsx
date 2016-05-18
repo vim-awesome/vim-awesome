@@ -9,6 +9,7 @@ var Category = require("./Category.jsx");
 var Tags = require("./Tags.jsx");
 
 var GITHUB_REGEX = new RegExp('github.com/(.*?)/([^/?#]+)');
+var VIMORG_REGEX = new RegExp('vim.org/scripts/script.php\\?script_id=\\d+');
 
 // TODO(david): Form validation on submit! Not done right now because we
 //     currently just save this raw data to be manually reviewed.
@@ -18,6 +19,7 @@ var SubmitPage = React.createClass({
       name: '',
       author: '',
       github: '',
+      vimorg: '',
       tags: [],
       category: "uncategorized",
       submitting: false
@@ -44,6 +46,10 @@ var SubmitPage = React.createClass({
     return this.state.github === '' || GITHUB_REGEX.test(this.state.github);
   },
 
+  vimorgIsValid: function() {
+    return this.state.vimorg === '' || VIMORG_REGEX.test(this.state.vimorg);
+  },
+
   onNameChange: function(e) {
     return this.setState({name: e.target.value});
   },
@@ -56,11 +62,16 @@ var SubmitPage = React.createClass({
     return this.setState({github: e.target.value});
   },
 
+  onVimorgChange: function(e) {
+    return this.setState({vimorg: e.target.value});
+  },
+
   formIsValid: function() {
     return _.every([
         this.nameIsValid(),
         this.authorIsValid(),
-        this.githubIsValid()
+        this.githubIsValid(),
+        this.vimorgIsValid()
     ]);
   },
 
@@ -117,7 +128,9 @@ var SubmitPage = React.createClass({
           <div className="controls">
             <input type="text" name="vimorg-link" id="vimorg-input"
                 placeholder={"e.g. " +
-                    "http://www.vim.org/scripts/script.php?script_id=2975"} />
+                    "http://www.vim.org/scripts/script.php?script_id=2975"}
+                className={submitting && !this.vimorgIsValid() ? 'error' : ''}
+                value={this.state.vimorg} onChange={this.onVimorgChange} />
           </div>
         </div>
         <div className="control-group">
