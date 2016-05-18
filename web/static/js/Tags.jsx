@@ -3,7 +3,7 @@
 "use strict";
 
 var $ = require("jquery");
-var _ = require("underscore");
+var _ = require("lodash");
 var React = require("react");
 
 var KEYCODES = require("./constants/keycodes.js");
@@ -101,7 +101,7 @@ var Tags = React.createClass({
     }
 
     $.getJSON("/api/tags", function(data) {
-      allTags = _.indexBy(data, 'id');
+      allTags = _.keyBy(data, 'id');
       this.setState({allTags: allTags});
     }.bind(this));
   },

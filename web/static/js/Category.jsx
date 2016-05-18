@@ -3,7 +3,7 @@
 "use strict";
 
 var $ = require("jquery");
-var _ = require("underscore");
+var _ = require("lodash");
 var React = require("react");
 
 var fetchAllCategories = require("./fetchAllCategories.js");
@@ -57,20 +57,19 @@ var Category = React.createClass({
   },
 
   render: function() {
-    var categoryElements = _.chain(this.state.categories)
-      .reject({id: "uncategorized"})
-      .map(function(category) {
-        return <li key={category.id}>
-          <a title={category.description} data-placement="left" href="#"
-              className="category-item"
-              onClick={this.onCategoryOptionClick.bind(this, category.id)}>
-            <i className={"category-icon " + category.icon}></i>
-            {category.name}
-          </a>
-        </li>;
-      }.bind(this)).value();
+    var categories = _.reject(this.state.categories, {id: "uncategorized"});
+    var categoryElements = _.map(categories, function(category) {
+      return <li key={category.id}>
+        <a title={category.description} data-placement="left" href="#"
+            className="category-item"
+            onClick={this.onCategoryOptionClick.bind(this, category.id)}>
+          <i className={"category-icon " + category.icon}></i>
+          {category.name}
+        </a>
+      </li>;
+    }.bind(this));
 
-    var category = _.findWhere(this.state.categories,
+    var category = _.find(this.state.categories,
         {id: this.props.category}) || {};
 
     return <div className="category-select">

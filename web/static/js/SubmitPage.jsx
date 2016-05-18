@@ -2,7 +2,7 @@
 
 "use strict";
 
-var _ = require("underscore");
+var _ = require("lodash");
 var React = require("react");
 
 var Category = require("./Category.jsx");

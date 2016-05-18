@@ -1,6 +1,6 @@
 "use strict";
 
-var _ = require("underscore");
+var _ = require("lodash");
 
 // Given a search string, find the values that have a given prefix.
 function getQueriesWithPrefix(queryString, prefix) {
@@ -14,10 +14,8 @@ function getQueriesWithPrefix(queryString, prefix) {
   }
 
   var queries = queryString.split(" ");
-  return _.chain(queries)
-          .filter(hasPrefix)
-          .map(getValue)
-          .value();
+  var queriesWithPrefix = _.filter(queries, hasPrefix);
+  return _.map(queriesWithPrefix, getValue);
 }
 
 module.exports = {
