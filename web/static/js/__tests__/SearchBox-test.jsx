@@ -1,5 +1,7 @@
 "use strict"
 
+jest.unmock('../SearchBox.jsx');
+
 var React = require('react');
 var TestUtils = require('react-addons-test-utils');
 
