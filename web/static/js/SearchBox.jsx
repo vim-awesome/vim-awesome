@@ -1,3 +1,5 @@
+/** @jsx React.DOM */
+
 "use strict";
 
 var React = require("react");
@@ -18,7 +20,7 @@ var SearchBox = React.createClass({
     var key = e.keyCode;
     if (tag !== "INPUT" && tag !== "TEXTAREA" &&
         key === KEYCODES.FORWARD_SLASH) {
-      var inputElement = this.refs.input;
+      var inputElement = this.refs.input.getDOMNode();
       inputElement.focus();
       inputElement.select();
       this.props.onFocus();
@@ -28,13 +30,13 @@ var SearchBox = React.createClass({
   handleKeyUp: function(e) {
     var key = e.nativeEvent.keyCode;
     if (key === KEYCODES.ESCAPE || key === KEYCODES.ENTER) {
-      this.refs.input.blur();
+      this.refs.input.getDOMNode().blur();
       this.props.onBlur();
     }
   },
 
   onChange: function() {
-    this.props.onChange(this.refs.input.value);
+    this.props.onChange(this.refs.input.getDOMNode().value);
   },
 
   render: function() {

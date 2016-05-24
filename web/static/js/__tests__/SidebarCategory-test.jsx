@@ -1,7 +1,8 @@
+/** @jsx React.DOM */
+
 "use strict"
 
 var React = require('react');
-var TestUtils = require('react-addons-test-utils');
 
 var SidebarCategory = require('../SidebarCategory.jsx');
 
@@ -24,8 +25,10 @@ var TEST_CATEGORY = {
 
 describe('SidebarCategory', function() {
   it('renders without throwing', function() {
-    TestUtils.renderIntoDocument(
-      <SidebarCategory category={TEST_CATEGORY} selectedTags={[]} />
+    var container = document.createElement('div');
+    React.renderComponent(
+      <SidebarCategory category={TEST_CATEGORY} selectedTags={[]} />,
+      container
     );
   });
 });

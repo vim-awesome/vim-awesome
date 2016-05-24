@@ -1,14 +1,17 @@
+/** @jsx React.DOM */
+
 "use strict"
 
 var React = require('react');
-var TestUtils = require('react-addons-test-utils');
 
 var SearchBox = require('../SearchBox.jsx');
 
 describe('SearchBox', function() {
   it('renders without throwing', function() {
-    TestUtils.renderIntoDocument(
-      <SearchBox />
+    var container = document.createElement('div');
+    React.renderComponent(
+      <SearchBox />,
+      container
     );
   });
 });

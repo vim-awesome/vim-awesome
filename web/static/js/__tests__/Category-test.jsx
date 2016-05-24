@@ -1,14 +1,17 @@
+/** @jsx React.DOM */
+
 "use strict"
 
 var React = require('react');
-var TestUtils = require('react-addons-test-utils');
 
 var Category = require('../Category.jsx');
 
 describe('Category', function() {
   it('renders without throwing', function() {
-    TestUtils.renderIntoDocument(
-      <Category />
+    var container = document.createElement('div');
+    React.renderComponent(
+      <Category />,
+      container
     );
   });
 });
