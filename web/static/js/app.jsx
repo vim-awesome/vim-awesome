@@ -1,30 +1,31 @@
-/** @jsx React.DOM */
-
 "use strict";
 
 var $ = require("jquery");
 var _ = require("lodash");
 var React = require("react");
-var Route = require("react-nested-router").Route;
+var render = require("react-dom").render;
+var Router = require("react-router").Router;
+var browserHistory = require("react-router").browserHistory;
+var Route = require("react-router").Route;
+var IndexRoute = require("react-router").IndexRoute;
 var marked = require("marked");
 var moment = require("moment");
 var store = require("store");
-var transitionTo = require("react-nested-router").transitionTo;
-// TODO(alpert): Get a public API exposed for this
-var transitionToPath =
-  require("react-nested-router/modules/stores/URLStore").push;
+var transitionTo = require("react-router").transitionTo;
 
 // For React devtools
 window.React = React;
 // Bootstrap JS depends on jQuery being set globally
-// TODO(alpert): Figure out how to load these from npm more smartly
+// TODO(captbaritone): Switch all of these to their react-bootstrap equivalents
 window.jQuery = $;
 require("../lib/js/bootstrap-typeahead.js");
 require("../lib/js/bootstrap-tooltip.js");
-require("../lib/js/bootstrap-popover.js");
 require("../lib/js/bootstrap-transition.js");
 require("../lib/js/bootstrap-collapse.js");
 require("../lib/js/bootstrap-dropdown.js");
+
+var Popover = require("react-bootstrap/lib/Popover");
+var OverlayTrigger = require("react-bootstrap/lib/OverlayTrigger");
 
 var AboutPage = require("./AboutPage.jsx");
 var Category = require("./Category.jsx");
@@ -231,7 +232,7 @@ var PluginList = React.createClass({
 
         // Scroll to the navigated plugin if available.
         if (this.refs && this.refs.navFocus) {
-          scrollToNode(this.refs.navFocus.getDOMNode(), 105 /* context */);
+          scrollToNode(this.refs.navFocus, 105 /* context */);
         }
       } else if ((key === KEYCODES.ENTER || key === KEYCODES.O) &&
           this.refs && this.refs.navFocus) {
@@ -455,6 +456,22 @@ var PathogenTabPopover = React.createClass({
   }
 });
 
+var InstallTab = React.createClass({
+  // TODO(captbaritone): Keep popover visible when moving mouse into the
+  // popover: https://github.com/react-bootstrap/react-bootstrap/issues/1622
+  // https://github.com/react-bootstrap/react-bootstrap/issues/850
+  render: function() {
+    return <OverlayTrigger trigger={["focus", "hover"]} placement="left"
+      overlay={<Popover id={this.props.popoverId}>{this.props.popover}</Popover>}
+      animation={false}>
+      <li onClick={this.props.onTabClick}
+        className={this.props.active ? "active" : ""}>
+        {this.props.dispalyName}
+      </li>
+    </OverlayTrigger>
+  }
+});
+
 // The installation instructions (via Vundle, etc.) widget on the details page.
 var Install = React.createClass({
   getInitialState: function() {
@@ -462,29 +479,6 @@ var Install = React.createClass({
     return {
       tabActive: tabActive
     };
-  },
-
-  componentDidMount: function() {
-    var popovers = {
-      vundleTab: <VundleTabPopover />,
-      neoBundleTab: <NeoBundleTabPopover />,
-      vimPlugTab: <VimPlugTabPopover />,
-      pathogenTab: <PathogenTabPopover />
-    };
-
-    var self = this;
-    _.each(popovers, function(component, ref) {
-      var markup = React.renderComponentToString(component);
-      var $tabElem = $(self.refs[ref].getDOMNode());
-      $tabElem.popover({
-        html: true,
-        content: markup,
-        placement: "left",
-        animation: false,
-        trigger: "hover",
-        container: $tabElem
-      });
-    });
   },
 
   onTabClick: function(installMethod) {
@@ -499,25 +493,30 @@ var Install = React.createClass({
       <div className="tabs-column">
         <h3 className="install-label">Install from</h3>
         <ul className="install-tabs">
-          <li onClick={this.onTabClick.bind(this, "vundle")} ref="vundleTab"
-              className={this.state.tabActive === "vundle" ? "active" : ""}>
-            Vundle
-          </li>
-          <li onClick={this.onTabClick.bind(this, "neoBundle")}
-              ref="neoBundleTab"
-              className={this.state.tabActive === "neoBundle" ? "active" : ""}>
-            NeoBundle
-          </li>
-          <li onClick={this.onTabClick.bind(this, "vimPlug")}
-              ref="vimPlugTab"
-              className={this.state.tabActive === "vimPlug" ? "active" : ""}>
-            VimPlug
-          </li>
-          <li onClick={this.onTabClick.bind(this, "pathogen")}
-              ref="pathogenTab"
-              className={this.state.tabActive === "pathogen" ? "active" : ""}>
-            Pathogen
-          </li>
+          <InstallTab onTabClick={this.onTabClick.bind(this, "vundle")}
+            active={this.state.tabActive === "vundle"}
+            popover={<VundleTabPopover />}
+            popoverId="vundlePop"
+            dispalyName="Vundle"
+          />
+          <InstallTab onTabClick={this.onTabClick.bind(this, "neoBundle")}
+            active={this.state.tabActive === "neoBundle"}
+            popover={<NeoBundleTabPopover />}
+            popoverId="neoBundlePop"
+            dispalyName="NeoBundle"
+          />
+          <InstallTab onTabClick={this.onTabClick.bind(this, "vimPlug")}
+            active={this.state.tabActive === "vimPlug"}
+            popover={<VimPlugTabPopover />}
+            popoverId="vimPlugPop"
+            dispalyName="VimPlug"
+          />
+          <InstallTab onTabClick={this.onTabClick.bind(this, "pathogen")}
+            active={this.state.tabActive === "pathogen"}
+            popover={<PathogenTabPopover />}
+            popoverId="pathogenPop"
+            dispalyName="Pathogen"
+          />
         </ul>
       </div>
       <div className="content-column">
@@ -828,7 +827,7 @@ var PluginListPage = React.createClass({
   },
 
   getStateFromProps: function(props) {
-    var queryParams = props.query;
+    var queryParams = props.location.query;
     var currentPage = +(queryParams.p || 1);
 
     return {
@@ -885,18 +884,22 @@ var PluginListPage = React.createClass({
   }
 });
 
-var routes = <Route handler={Page} location="history">
-  <Route name="plugin-list" path="/" handler={PluginListPage} />
-  <Route name="plugin" path="plugin/:slug" handler={PluginPage} />
-  <Route name="submit" handler={SubmitPage} />
-  <Route name="thanks-for-submitting" handler={ThanksForSubmittingPage} />
-  <Route name="about" handler={AboutPage} />
-  <Route path="*" handler={NotFound} />
-</Route>;
-React.renderComponent(routes, document.body);
+render(
+  <Router history={browserHistory}>
+    <Route path="/" component={Page}>
+      <IndexRoute component={PluginListPage} />
+      <Route path="plugin/:slug" component={PluginPage} />
+      <Route path="submit" component={SubmitPage} />
+      <Route path="thanks-for-submitting" component={ThanksForSubmittingPage} />
+      <Route path="about" component={AboutPage} />
+      <Route path="*" component={NotFound} />
+    </Route>
+  </Router>, document.getElementById('app'));
 
 // Hijack internal nav links to use router to navigate between pages
 // Adapted from https://gist.github.com/tbranyen/1142129
+// TODO(captbaritone): It may be possible to remove this hack by moving to
+// react-router Link
 $(document).on("click", "a", function(evt) {
   if (evt.which === 2 ||  // middle click
       evt.altKey || evt.ctrlKey || evt.metaKey || evt.shiftKey) {
@@ -910,7 +913,7 @@ $(document).on("click", "a", function(evt) {
   if (href && href.substr(0, protocol.length) !== protocol &&
       href[0] !== '#') {
     evt.preventDefault();
-    transitionToPath(this.pathname + this.search, true);
+    browserHistory.push(this.pathname + this.search);
 
     // Scroll to top. Chrome has this weird issue where it will retain the
     // current scroll position, even if it's beyond the document's height.
