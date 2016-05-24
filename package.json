@@ -33,7 +33,13 @@
     "test": "jest"
   },
   "jest": {
-    "automock": false,
+    "unmockedModulePathPatterns": [
+      "node_modules/lodash/",
+      "node_modules/jquery/",
+      "node_modules/react-addons-test-utils/",
+      "node_modules/react-dom/",
+      "node_modules/react/"
+    ],
     "rootDir": "web/static/js",
     "testFileExtensions": [
       "js",

@@ -1,5 +1,7 @@
 "use strict"
 
+jest.unmock('../utils.js');
+
 var utils = require('../utils.js');
 
 describe('getQueriesWithPrefix', function() {
