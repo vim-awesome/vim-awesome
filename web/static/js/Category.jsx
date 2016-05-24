@@ -1,9 +1,10 @@
+/** @jsx React.DOM */
+
 "use strict";
 
 var $ = require("jquery");
 var _ = require("lodash");
 var React = require("react");
-var findDOMNode = require("react-dom").findDOMNode;
 
 var fetchAllCategories = require("./fetchAllCategories.js");
 
@@ -25,7 +26,7 @@ var Category = React.createClass({
   },
 
   componentWillUnmount: function() {
-    $(findDOMNode(this)).find('[title]').tooltip('destroy');
+    $(this.getDOMNode()).find('[title]').tooltip('destroy');
   },
 
   componentDidUpdate: function() {
@@ -34,7 +35,7 @@ var Category = React.createClass({
 
   addBootstrapTooltips: function() {
     _.delay(function() {
-      $(findDOMNode(this)).find('[title]')
+      $(this.getDOMNode()).find('[title]')
         .tooltip('destroy')
         .tooltip({
           animation: false,
@@ -51,7 +52,7 @@ var Category = React.createClass({
   onCategoryClick: function(e) {
     if (this.props.editOnly) {
       e.preventDefault();
-      this.refs.editBtn.click();
+      this.refs.editBtn.getDOMNode().click();
     }
   },
 

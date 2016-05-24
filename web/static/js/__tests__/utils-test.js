@@ -1,3 +1,5 @@
+/** @jsx React.DOM */
+
 "use strict"
 
 var utils = require('../utils.js');

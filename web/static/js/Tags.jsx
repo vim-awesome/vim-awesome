@@ -1,3 +1,5 @@
+/** @jsx React.DOM */
+
 "use strict";
 
 var $ = require("jquery");
@@ -32,7 +34,7 @@ var Tags = React.createClass({
 
   componentDidUpdate: function() {
     if (this.refs && this.refs.tagInput) {
-      var $input = $(this.refs.tagInput);
+      var $input = $(this.refs.tagInput.getDOMNode());
       if (!this.props.editOnly) {
         $input.focus();
       }
@@ -127,7 +129,7 @@ var Tags = React.createClass({
     var key = e.keyCode;
     if (key === KEYCODES.ENTER || key === KEYCODES.TAB ||
         key === KEYCODES.COMMA) {
-      var $input = $(this.refs.tagInput);
+      var $input = $(this.refs.tagInput.getDOMNode());
       this.addTag($input.val());
       $input.val("");
     }
