@@ -6,19 +6,25 @@
     "url": "git://github.com/vim-awesome/vim-awesome.git"
   },
   "devDependencies": {
+    "babel-jest": "^12.0.2",
+    "babel-preset-jest": "^12.0.2",
     "eslint": "^2.4.0",
     "eslint-plugin-react": "^5.1.1",
     "jest-cli": "^12.0.2",
-    "react-tools": "^0.10.0"
+    "react-addons-test-utils": "~15.1.0"
   },
   "dependencies": {
+    "babel-core": "^6.8.0",
+    "babel-loader": "^6.2.4",
+    "babel-preset-react": "^6.5.0",
     "jquery": "~2.2.3",
-    "jsx-loader": "~0.10.2",
     "lodash": "^4.12.0",
     "marked": "~0.3.2",
     "moment": "~2.13.0",
-    "react": "~0.10.0",
-    "react-nested-router": "~0.2.0",
+    "react": "~15.1.0",
+    "react-bootstrap": "^0.29.4",
+    "react-dom": "^15.1.0",
+    "react-router": "^2.4.1",
     "store": "~1.3.16",
     "webpack": "~1.13.0"
   },
@@ -29,7 +35,6 @@
   "jest": {
     "automock": false,
     "rootDir": "web/static/js",
-    "scriptPreprocessor": "../../../conf/jest_preprocessor.js",
     "testFileExtensions": [
       "js",
       "jsx"

@@ -1,17 +1,15 @@
-/** @jsx React.DOM */
-
 "use strict"
 
 var React = require('react');
+var TestUtils = require('react-addons-test-utils');
 
 var Page = require('../Page.jsx');
 
 describe('Page', function() {
   it('renders without throwing', function() {
-    var container = document.createElement('div');
-    React.renderComponent(
-      <Page />,
-      container
+    TestUtils.renderIntoDocument(
+      // Normally react-routes adds a location. For tests we do it ourselves.
+      <Page location={{query: ''}} />
     );
   });
 });
