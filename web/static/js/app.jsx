@@ -11,7 +11,6 @@ var IndexRoute = require("react-router").IndexRoute;
 var marked = require("marked");
 var moment = require("moment");
 var store = require("store");
-var transitionTo = require("react-router").transitionTo;
 
 // For React devtools
 window.React = React;
@@ -849,7 +848,7 @@ var PluginListPage = React.createClass({
 
     // TODO(alpert): Probably don't want to make a new history entry for each
     // char when typing slowly into the search box
-    transitionTo("plugin-list", null, queryObject);
+    browserHistory.push({query: queryObject});
   },
 
   onPluginsFetched: function() {
