@@ -42,10 +42,6 @@ var KEYCODES = require("./constants/keycodes.js");
 // Renderer used to change relative image URL to absolute in Markdown
 var markedRenderer = new marked.Renderer();
 
-var clamp = function(num, min, max) {
-  return Math.min(Math.max(num, min), max);
-};
-
 /**
  * Scrolls the window so that the entirety of `domNode` is visible.
  * @param {Element} domNode The DOM node to scroll into view.
@@ -95,7 +91,7 @@ var Pager = React.createClass({
   },
 
   goToPage: function(page) {
-    var newPage = clamp(page, 1, this.props.totalPages);
+    var newPage = _.clamp(page, 1, this.props.totalPages);
     this.props.onPageChange(newPage);
   },
 
@@ -212,7 +208,7 @@ var PluginList = React.createClass({
         // Go to next or previous plugin
         var direction = (key === KEYCODES.J ? 1 : -1);
         var maxIndex = this.state.plugins.length - 1;
-        var newIndex = clamp(
+        var newIndex = _.clamp(
           this.state.selectedIndex + direction,
           0, maxIndex);
 
