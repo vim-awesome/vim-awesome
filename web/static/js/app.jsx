@@ -4,6 +4,7 @@ var $ = require("jquery");
 var _ = require("lodash");
 var React = require("react");
 var render = require("react-dom").render;
+var findDOMNode = require("react-dom").findDOMNode;
 var Router = require("react-router").Router;
 var browserHistory = require("react-router").browserHistory;
 var Route = require("react-router").Route;
@@ -229,7 +230,7 @@ var PluginList = React.createClass({
 
         // Scroll to the navigated plugin if available.
         if (this.refs && this.refs.navFocus) {
-          scrollToNode(this.refs.navFocus, 105 /* context */);
+          scrollToNode(findDOMNode(this.refs.navFocus), 105 /* context */);
         }
       } else if ((key === KEYCODES.ENTER || key === KEYCODES.O) &&
           this.refs && this.refs.navFocus) {
