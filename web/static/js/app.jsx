@@ -9,7 +9,6 @@ var Router = require("react-router").Router;
 var browserHistory = require("react-router").browserHistory;
 var Route = require("react-router").Route;
 var IndexRoute = require("react-router").IndexRoute;
-var marked = require("marked");
 var moment = require("moment");
 var store = require("store");
 
@@ -27,6 +26,7 @@ require("../lib/js/bootstrap-dropdown.js");
 var AboutPage = require("./AboutPage.jsx");
 var Category = require("./Category.jsx");
 var Install = require("./Install.jsx");
+var Markdown = require("./Markdown.jsx");
 var NotFound = require("./NotFound.jsx");
 var Page = require("./Page.jsx");
 var Plugin = require("./Plugin.jsx");
@@ -39,9 +39,6 @@ var ThanksForSubmittingPage = require("./ThanksForSubmittingPage.jsx");
 var KEYCODES = require("./constants/keycodes.js");
 
 // TODO(david): We might want to split up this file more.
-
-// Renderer used to change relative image URL to absolute in Markdown
-var markedRenderer = new marked.Renderer();
 
 /**
  * Scrolls the window so that the entirety of `domNode` is visible.
@@ -321,35 +318,6 @@ var PluginList = React.createClass({
       <Pager currentPage={currentPage}
           totalPages={totalPages} onPageChange={this.props.onPageChange} />
     </div>;
-  }
-});
-
-var Markdown = React.createClass({
-  render: function() {
-    markedRenderer.image = this.replaceRelativeUrlWithGithubImgSrc;
-    var markedHtml = marked(this.props.children || '',
-      {renderer: markedRenderer});
-    return <div
-      dangerouslySetInnerHTML={{__html: markedHtml}}
-    />;
-  },
-
-  /**
-   * Replaces the relative img URL to the absolute img URL in a README.md file
-   * See docs: https://www.npmjs.org/package/marked
-   * @param {string} href The source of the image
-   * @param {string} title The title of the image
-   * @param {string} text The alt of the image
-   */
-  replaceRelativeUrlWithGithubImgSrc: function(href, title, text) {
-    // Checks if the href is not an absolute URL
-    // http://stackoverflow.com/questions/10687099/how-to-test-if-a-url-string-is-absolute-or-relative
-    if (!href.match(/^(?:[a-z]+:)?\/\//i)) {
-      return "<img src='" + this.props.githubRepoUrl + "/raw/master/" +
-        href + "' alt='" + text + "' />";
-    } else {
-      return "<img src='" + href + "' alt='" + text + "' />";
-    }
   }
 });
 
