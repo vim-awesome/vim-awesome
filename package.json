@@ -8,6 +8,7 @@
   "devDependencies": {
     "babel-jest": "^12.0.2",
     "babel-preset-jest": "^12.0.2",
+    "enzyme": "^2.3.0",
     "eslint": "^2.4.0",
     "eslint-plugin-react": "^5.1.1",
     "jest-cli": "^12.0.2",
@@ -34,6 +35,7 @@
   },
   "jest": {
     "unmockedModulePathPatterns": [
+      "node_modules/enzyme/",
       "node_modules/jquery/",
       "node_modules/lodash/",
       "node_modules/react-addons-test-utils/",
