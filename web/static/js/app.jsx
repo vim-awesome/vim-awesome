@@ -29,6 +29,7 @@ var Install = require("./Install.jsx");
 var Markdown = require("./Markdown.jsx");
 var NotFound = require("./NotFound.jsx");
 var Page = require("./Page.jsx");
+var Plaintext = require("./Plaintext.jsx");
 var Plugin = require("./Plugin.jsx");
 var SearchBox = require("./SearchBox.jsx");
 var Spinner = require("./Spinner.jsx");
@@ -317,17 +318,6 @@ var PluginList = React.createClass({
       <ul className="plugins">{plugins}</ul>
       <Pager currentPage={currentPage}
           totalPages={totalPages} onPageChange={this.props.onPageChange} />
-    </div>;
-  }
-});
-
-var Plaintext = React.createClass({
-  render: function() {
-    // TODO(david): Linkify <a> tags
-    // TODO(david): Linkify "vimscript #2136" references (e.g. surround-vim'
-    //     vim.org long description)
-    return <div className={"plain " + (this.props.className || '')}>
-      {this.props.children}
     </div>;
   }
 });
