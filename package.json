@@ -23,7 +23,7 @@
     "moment": "~2.13.0",
     "react": "~15.1.0",
     "react-bootstrap": "^0.29.4",
-    "react-dom": "^15.1.0",
+    "react-dom": "~15.1.0",
     "react-router": "^2.4.1",
     "store": "~1.3.16",
     "webpack": "~1.13.0"
