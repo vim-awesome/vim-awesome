@@ -252,6 +252,12 @@ def scrape_plugin_repos(num):
 
             if res.status_code == 301:
                 location = res.headers.get('location')
+
+                valid_repo_url = re.compile("^https://github.com/[^/]+/[^/]+")
+                if not valid_repo_url.match(location):
+                    print 'redirects to invalid GitHub repo URL: %s' % location
+                    continue
+
                 _, redirect_owner, redirect_repo_name = location.rsplit('/', 2)
 
                 repo['redirects_to'] = '%s/%s' % (redirect_owner,
