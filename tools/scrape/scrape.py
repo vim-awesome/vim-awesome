@@ -1,7 +1,17 @@
 import argparse
 import logging
 
+from raven import Client
+
 from tools.scrape import vimorg, github
+
+try:
+    import secrets
+    _SENTRY_DSN = getattr(secrets, 'SENTRY_DSN', None)
+except ImportError:
+    _SENTRY_DSN = None
+
+client = Client(_SENTRY_DSN)
 
 
 def scrape_github_plugins(num):
@@ -54,3 +64,4 @@ if __name__ == "__main__":
             scrape_fn(args.number)
         except Exception:
             logging.exception("scrape.py: error in %s " % (scrape_fn))
+            client.captureException()

@@ -5,11 +5,19 @@ import collections
 import logging
 import re
 
+from raven import Client
 import rethinkdb as r
 
 import db.util
 from db.github_repos import PluginGithubRepos
 
+try:
+    import secrets
+    _SENTRY_DSN = getattr(secrets, 'SENTRY_DSN', None)
+except ImportError:
+    _SENTRY_DSN = None
+
+client = Client(_SENTRY_DSN)
 r_conn = db.util.r_conn
 
 
@@ -177,3 +185,4 @@ if __name__ == '__main__':
         except Exception:
             logging.exception("build_github_index.py: error in %s " % (
                     extract_fn))
+            client.captureException()
