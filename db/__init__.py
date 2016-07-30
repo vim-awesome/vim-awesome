@@ -1,4 +1,4 @@
-import categories  # nopep8
-import plugins  # nopep8
-import submitted_plugins  # nopep8
-import tags  # nopep8
+import categories  # NOQA: F401
+import plugins  # NOQA: F401
+import submitted_plugins  # NOQA: F401
+import tags  # NOQA: F401
