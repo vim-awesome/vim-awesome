@@ -61,5 +61,6 @@ def main():
 
     tags.aggregate_tags()
 
+
 if __name__ == '__main__':
     main()

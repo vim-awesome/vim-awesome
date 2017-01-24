@@ -37,8 +37,9 @@ def merge_plugins(plugins):
 
     return reduce(reducer, plugins)
 
+
 if __name__ == '__main__':
-    print 'Removing duplicate rows in plugins. Logging to: %s' % LOG_FILE
+    print('Removing duplicate rows in plugins. Logging to: %s' % LOG_FILE)
 
     updated = 0
     deleted = 0
@@ -56,13 +57,13 @@ if __name__ == '__main__':
 
     for owner_repo, plugins in grouped_plugins.iteritems():
 
-        print '\nPlugin with GitHub path %s occurs %s times' % (
-                owner_repo,
-                len(plugins))
+        print('\nPlugin with GitHub path %s occurs %s times' % (
+            owner_repo,
+            len(plugins)))
 
         canonical = merge_plugins(plugins)
 
-        print "Using %s as canonical" % canonical['slug']
+        print("Using %s as canonical" % canonical['slug'])
 
         # db.plugins.insert normalizes the ower/repo to lower case
         db.plugins.insert(canonical, conflict='replace')
@@ -73,12 +74,12 @@ if __name__ == '__main__':
             dupe_slugs = [dupe['slug'] for dupe in dupes]
             # Store deleted slugs for logging
             slug_map[canonical['slug']] = dupe_slugs
-            print 'Deleting duplicates rows: %s' % ', '.join(dupe_slugs)
+            print('Deleting duplicates rows: %s' % ', '.join(dupe_slugs))
             r.table('plugins').get_all(r.args(dupe_slugs)).delete().run(r_conn())
             deleted += len(dupes)
 
     with open(LOG_FILE, 'w') as log:
-        print 'Writing deleted slug names to %s' % LOG_FILE
+        print('Writing deleted slug names to %s' % LOG_FILE)
         log.writelines(dupe_log_line(c, d) for c, d in slug_map.iteritems())
 
-    print "Updated %d rows and deleted %d" % (updated, deleted)
+    print("Updated %d rows and deleted %d" % (updated, deleted))
