@@ -11,7 +11,7 @@
     "enzyme": "^2.3.0",
     "eslint": "^3.19.0",
     "eslint-plugin-react": "^5.1.1",
-    "jest-cli": "^17.0.0",
+    "jest-cli": "^19.0.2",
     "react-addons-test-utils": "^15.2.1"
   },
   "dependencies": {
@@ -43,10 +43,6 @@
       "node_modules/react-dom/",
       "node_modules/react/"
     ],
-    "rootDir": "web/static/js",
-    "testFileExtensions": [
-      "js",
-      "jsx"
-    ]
+    "rootDir": "web/static/js"
   }
 }
