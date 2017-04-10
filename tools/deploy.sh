@@ -75,6 +75,6 @@ echo "Installing crontab"
 ( cd $NEW_CLONE && crontab crontab )
 
 echo "Installing logrotate config"
-sudo ln -sfnv $NEW_CLONE/conf/etc/logrotate.d/vim-awesome-cron /etc/logrotate.d
+sudo ln -sfnv $HOME/$NEW_CLONE/conf/etc/logrotate.d/vim-awesome-cron /etc/logrotate.d
 
 PYTHONPATH=$NEW_CLONE python $NEW_CLONE/tools/notify_deploy.py $DEPLOYER
