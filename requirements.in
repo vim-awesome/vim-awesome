@@ -20,3 +20,6 @@ python-slugify==0.0.6
 
 # Dev and testing. TODO: split these out into their own requirements files.
 tox
+
+# For deleting old database dumps.
+rotate-backups

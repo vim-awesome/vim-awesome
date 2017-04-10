@@ -64,5 +64,9 @@ PYTHONUNBUFFERED=true
 13 11 * * * PYTHONPATH=$HOME/vim-awesome python $HOME/vim-awesome/tools/scrape/scrape.py -s github-plugins 1200 >> $HOME/logs/cron/github-plugins.log 2>&1
 13 12 * * * PYTHONPATH=$HOME/vim-awesome python $HOME/vim-awesome/tools/scrape/scrape.py -s github-plugins 1200 >> $HOME/logs/cron/github-plugins.log 2>&1
 
-# Daily DB dumps which we can back up to Tarsnap. Logrotate will delete old dumps.
+# Daily DB dumps which we can back up to Tarsnap. rotate-backups (below) will delete old dumps.
 13 13 * * * ( cd $HOME/dumps && rethinkdb dump )
+
+# Rotate/delete old DB dumps, keeping one each for the last: 7 days, 4 weeks, 12 months & every year.
+# Currently running in "dry-run" mode to ensure we understand exactly what it's going to do.
+13 12 * * * rotate-backups --dry-run --verbose --daily=7 --weekly=4 --monthly=12 --yearly=always $HOME/dumps/ >> $HOME/logs/cron/rotate-backup.log 2>&1
