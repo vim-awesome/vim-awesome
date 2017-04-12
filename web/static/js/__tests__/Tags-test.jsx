@@ -3,7 +3,7 @@
 jest.unmock('../Tags.jsx');
 
 var React = require('react');
-var TestUtils = require('react-addons-test-utils');
+var TestUtils = require('react-dom/test-utils');
 
 var Tags = require('../Tags.jsx');
 
