@@ -50,9 +50,8 @@ var NeoBundleInstructions = React.createClass({
 // Instructions for installing a plugin with Vim-Plug.
 var VimPlugInstructions = React.createClass({
   render: function() {
-    var urlPath = (this.props.github_url || "").replace(
+    var bundleUri = (this.props.github_url || "").replace(
         /^https?:\/\/github.com\//, "");
-    var bundleUri = urlPath.replace(/^vim-scripts\//, "");
 
     return <div>
       <p>Place this in your <code>.vimrc:</code></p>
