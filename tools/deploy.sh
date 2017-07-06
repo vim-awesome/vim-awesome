@@ -51,7 +51,10 @@ ln -snf $NEW_CLONE vim-awesome
 if [ -e .gunicorn.pid ]
 then
     echo "Killing gunicorn"
-    kill $(cat .gunicorn.pid)
+    PID=$(cat .gunicorn.pid)
+    if ! kill $PID > /dev/null 2>&1; then
+      echo "Warning: Unable to find Gunicorn running as PID: $PID" >&2
+    fi
 fi
 
 echo "Creating any new tables and indices"
