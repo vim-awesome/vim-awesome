@@ -275,16 +275,20 @@ var PluginPage = React.createClass({
   },
 
   fetchPlugin: function() {
-    $.getJSON("/api/plugins/" + this.props.params.slug, function(data) {
-      this.setState(data);
+    $.ajax({
+      dataType: "json",
+      url: "/api/plugins/" + this.props.params.slug,
+      success: function(data) {
+        this.setState(data);
 
-      // Save in localStorage that this plugin has been visited.
-      if (store.enabled) {
-        var pluginStore = store.get("plugin-" + data.slug) || {};
-        pluginStore.hasVisited = true;
-        store.set("plugin-" + data.slug, pluginStore);
-      }
-    }.bind(this));
+        // Save in localStorage that this plugin has been visited.
+        if (store.enabled) {
+          var pluginStore = store.get("plugin-" + data.slug) || {};
+          pluginStore.hasVisited = true;
+          store.set("plugin-" + data.slug, pluginStore);
+        }
+      }.bind(this)
+    });
   },
 
   // TODO(david): Maybe use keypress?
