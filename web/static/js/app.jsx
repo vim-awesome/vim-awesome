@@ -279,6 +279,7 @@ var PluginPage = React.createClass({
       dataType: "json",
       url: "/api/plugins/" + this.props.params.slug,
       success: function(data) {
+        this.setState({error: false});
         this.setState(data);
 
         // Save in localStorage that this plugin has been visited.
@@ -287,6 +288,14 @@ var PluginPage = React.createClass({
           pluginStore.hasVisited = true;
           store.set("plugin-" + data.slug, pluginStore);
         }
+      }.bind(this),
+      error: function(jqXHR, textStatus, errorThrown) {
+        this.setState({
+          error: {
+            textStatus: textStatus,
+            errorThrown: errorThrown
+          }
+        });
       }.bind(this)
     });
   },
@@ -355,6 +364,11 @@ var PluginPage = React.createClass({
   },
 
   render: function() {
+    if (this.state.error && this.state.error.errorThrown &&
+        this.state.error.errorThrown.toLowerCase() === 'not found') {
+      return <NotFound />;
+    }
+
     if (!this.state.slug) {
       return <div className="plugin-page">
         <Spinner />
