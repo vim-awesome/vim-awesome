@@ -292,6 +292,7 @@ var PluginPage = React.createClass({
       error: function(jqXHR, textStatus, errorThrown) {
         this.setState({
           error: {
+            httpStatusCode: jqXHR.status,
             textStatus: textStatus,
             errorThrown: errorThrown
           }
@@ -364,8 +365,7 @@ var PluginPage = React.createClass({
   },
 
   render: function() {
-    if (this.state.error && this.state.error.errorThrown &&
-        this.state.error.errorThrown.toLowerCase() === 'not found') {
+    if (this.state.error && this.state.error.httpStatusCode == 404) {
       return <NotFound />;
     }
 
