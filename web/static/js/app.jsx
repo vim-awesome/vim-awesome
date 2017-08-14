@@ -275,16 +275,30 @@ var PluginPage = React.createClass({
   },
 
   fetchPlugin: function() {
-    $.getJSON("/api/plugins/" + this.props.params.slug, function(data) {
-      this.setState(data);
+    $.ajax({
+      dataType: "json",
+      url: "/api/plugins/" + this.props.params.slug,
+      success: function(data) {
+        this.setState({error: false});
+        this.setState(data);
 
-      // Save in localStorage that this plugin has been visited.
-      if (store.enabled) {
-        var pluginStore = store.get("plugin-" + data.slug) || {};
-        pluginStore.hasVisited = true;
-        store.set("plugin-" + data.slug, pluginStore);
-      }
-    }.bind(this));
+        // Save in localStorage that this plugin has been visited.
+        if (store.enabled) {
+          var pluginStore = store.get("plugin-" + data.slug) || {};
+          pluginStore.hasVisited = true;
+          store.set("plugin-" + data.slug, pluginStore);
+        }
+      }.bind(this),
+      error: function(jqXHR, textStatus, errorThrown) {
+        this.setState({
+          error: {
+            httpStatusCode: jqXHR.status,
+            textStatus: textStatus,
+            errorThrown: errorThrown
+          }
+        });
+      }.bind(this)
+    });
   },
 
   // TODO(david): Maybe use keypress?
@@ -351,6 +365,10 @@ var PluginPage = React.createClass({
   },
 
   render: function() {
+    if (this.state.error && this.state.error.httpStatusCode == 404) {
+      return <NotFound />;
+    }
+
     if (!this.state.slug) {
       return <div className="plugin-page">
         <Spinner />
