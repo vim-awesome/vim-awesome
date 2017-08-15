@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-HOST="http://vimawesome.com"
+HOST="https://vimawesome.com"
 
 echo "Restarting RethinkDB"
 sudo service rethinkdb restart
