@@ -17,8 +17,8 @@ var Footer = React.createClass({
             {' '}<a target="_blank" href="https://twitter.com/divad12">
               David Hu
             </a>,
-            {' '}<a target="_blank" href="http://benalpert.com">
-              Ben Alpert
+            {' '}<a target="_blank" href="https://sophiebits.com">
+              Sophie Alpert
             </a>, and
             {' '}<a target="_blank" href="https://github.com/xymostech">
               Emily Eisenberg
