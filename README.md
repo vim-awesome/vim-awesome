@@ -31,50 +31,50 @@ repos on GitHub, it is still a useful source of relative usage data.
 
 1. Install Sass and Compass, which we use to generate our CSS.
 
-  ```sh
-  $ gem update --system
-  $ gem install bundler
-  $ bundle install
-  ```
+   ```sh
+   $ gem update --system
+   $ gem install bundler
+   $ bundle install
+   ```
 
 1. Install Python dependencies.
 
-  ```sh
-  $ pip install -r requirements.txt
-  ```
+   ```sh
+   $ pip install -r requirements.txt
+   ```
 
 1. Install Node dependencies.
 
-  ```sh
-  $ npm install -g webpack
-  $ npm install
-  ```
+   ```sh
+   $ npm install -g webpack
+   $ npm install
+   ```
 
 1. Start a local server serving port 5001 by invoking, in the project root
    directory,
 
-  ```sh
-  $ make
-  ```
+   ```sh
+   $ make
+   ```
 
 1. Initialize the database, tables, and indices:
 
-  ```sh
-  $ make init_db
-  ```
+   ```sh
+   $ make init_db
+   ```
 
 1. Seed the database with some test data. Download [this database dump](https://github.com/vim-awesome/vim-awesome/releases/download/v1.2/rethinkdb_dump_2016-04-14.tar.gz), and then run
 
 
-  ```sh
-  $ rethinkdb restore -i vim_awesome /path/to/vim_awesome_rethinkdb_dump.tar.gz
-  ```
+   ```sh
+   $ rethinkdb restore -i vim_awesome /path/to/vim_awesome_rethinkdb_dump.tar.gz
+   ```
 
 1. Open the website in your browser!
 
-  ```sh
-  $ open http://localhost:5001
-  ```
+   ```sh
+   $ open http://localhost:5001
+   ```
 
 ## Contributing
 
