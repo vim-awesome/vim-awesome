@@ -25,8 +25,11 @@ $box-padding: 18px;
 $box-margin: 20px;
 $box-bg-color: $bg-light-2;
 
+// `large` refers to width
 $large-screen: "(min-width: 1200px)";
 $not-large-screen: "(max-width: 1199px)";  // "not" does not seem to work well
+// `tall` refers to height
+$not-tall-screen: "(max-height: 600px)";
 
 .tac {
   text-align: center;
@@ -109,6 +112,10 @@ code {
   position: fixed;
   height: 100%;
   top: 0;
+
+  @media #{$large-screen} {
+    overflow-y: scroll;
+  }
 
   @media #{$not-large-screen} {
     position: static;
@@ -295,8 +302,16 @@ code {
     margin-top: 80px;
 
     @media #{$large-screen} {
-      position: absolute;
       bottom: 0;
+      position: absolute;
+    }
+
+    @media #{$not-tall-screen},
+           #{$not-large-screen},
+           #{$large-screen} and #{$not-tall-screen} {
+
+      margin: 0;
+      position: relative;
     }
 
     @include transition(all 0.1s ease-out);
