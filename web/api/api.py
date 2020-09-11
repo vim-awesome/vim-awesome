@@ -1,4 +1,5 @@
 import itertools
+import datetime
 import json
 import re
 
@@ -6,6 +7,11 @@ import flask
 from flask import request
 from web.cache import cache
 import rethinkdb as r
+from werkzeug.security import check_password_hash
+from tools.scrape import vimorg, github
+from flask_jwt_extended import (
+     jwt_required, create_access_token, get_jwt_claims
+)
 
 import web.api.api_util as api_util
 import db
@@ -213,6 +219,123 @@ def submit_plugin():
     util.log_to_gitter("Someone just submitted a plugin!\n%s" % plugin_markdown)
 
     return flask.redirect('/thanks-for-submitting')
+
+
+@api.route('/login', methods=['POST'])
+def submit_login():
+    username = flask.request.form.get('username')
+    password = flask.request.form.get('password')
+    user = db.users.find(username)
+    if not user or not check_password_hash(user.get('password'), password):
+        return api_util.jsonify(
+            {'msg': 'Username or password is wrong.'}
+        ), 400
+
+    token = create_access_token(
+        identity=username,
+        user_claims={'username': username, 'role': user['role']},
+        expires_delta=datetime.timedelta(days=30)
+    )
+    return api_util.jsonify({
+        'username': username,
+        'role': user['role'],
+        'token': token
+    })
+
+
+@api.route('/session', methods=['GET'])
+@jwt_required
+def session():
+    return api_util.jsonify(get_jwt_claims())
+
+
+@api.route('/submitted-plugins', methods=['GET'])
+@jwt_required
+def get_submitted_plugins():
+    RESULTS_PER_PAGE = 50
+    page = int(request.args.get('page', 1))
+
+    results = db.submitted_plugins.get_list()
+
+    count = len(results)
+    total_pages = (count + RESULTS_PER_PAGE - 1) / RESULTS_PER_PAGE  # ceil
+
+    results = results[((page - 1) * RESULTS_PER_PAGE):
+            (page * RESULTS_PER_PAGE)]
+
+    return api_util.jsonify({
+        'plugins': results,
+        'current_page': page,
+        'total_pages': total_pages,
+        'total_results': count,
+        'results_per_page': RESULTS_PER_PAGE,
+    })
+
+
+@api.route('/submitted-plugins/<id>', methods=['GET'])
+@jwt_required
+def get_submitted_plugin_by_id(id):
+    plugin = db.submitted_plugins.get_by_id(id)
+    return api_util.jsonify({
+        'plugin': plugin
+    })
+
+
+@api.route('/submitted-plugins/<id>', methods=['DELETE'])
+@jwt_required
+def reject_submitted_plugin_by_id(id):
+    db.submitted_plugins.reject(id)
+    return api_util.jsonify({
+        'msg': 'Rejected.'
+    })
+
+
+@api.route('/submitted-plugins/<id>/approve', methods=['POST'])
+@jwt_required
+def approve_submitted_plugin_by_id(id):
+    plugin = db.submitted_plugins.get_by_id(id)
+    if not plugin.get('github-link') and not plugin.get('vimorg-link'):
+        return api_util.jsonify({
+            'msg': 'No valid github or vimorg link'
+        }), 400
+
+    result = {}
+    repo_data = {}
+
+    if plugin.get('github-link'):
+        github_data, repo = github.get_all_info_from_url(plugin['github-link'])
+        repo_data = repo
+        if github_data:
+            result = dict(result, **github_data)
+
+    if plugin.get('vimorg-link'):
+        vimorg_data = vimorg.get_all_info_from_url_and_name(
+            plugin['vimorg-link'],
+            plugin['name']
+        )
+        if vimorg_data:
+            result = dict(result, **vimorg_data)
+
+    if not result:
+        return api_util.jsonify({
+            'msg': 'Unable to find any valid information from github or vimorg'
+        }), 400
+
+    jwt_claims = get_jwt_claims()
+    result['approved_by'] = jwt_claims['username']
+
+    db.plugins.add_scraped_data(result, repo_data, {
+        'category': plugin['category'],
+        'tags': plugin['tags']
+    })
+    db.submitted_plugins.approve_and_enable_scraping(id, result)
+    # Clear cache so newly added package appears in search
+    cache.clear()
+
+    return api_util.jsonify({
+        'msg': 'Approved.',
+        'name': plugin['name']
+    })
 
 
 @cache.cached(timeout=60 * 60 * 26, key_prefix='search_index')
