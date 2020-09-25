@@ -20,7 +20,9 @@ import db.util
 import util
 
 r_conn = db.util.r_conn
-_GITHUB_PARSE_INFO_RGX = re.compile('^https://github.com/([^/]+)/([^/]+)')
+_GITHUB_PARSE_INFO_RGX = re.compile(
+    '^(?:https://)?(?:www.)?github.com/([^/]+)/([^/]+)'
+)
 
 try:
     import secrets
@@ -59,6 +61,7 @@ def get_all_info_from_url(github_url):
     if not info:
         return {}
     [(owner, repo)] = info
+    repo = re.sub('.git$', '', repo)
     res, repo_data = get_api_page('repos/%s/%s' % (owner, repo))
     if res.status_code != 404:
         return get_plugin_data(owner, repo, repo_data), repo_data
